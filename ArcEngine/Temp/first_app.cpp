@@ -75,13 +75,13 @@ namespace arc
 
 		arc_game_objects.push_back(std::move(gameObj));
 
-		std::shared_ptr<arcModel> arc_model1 = arcModel::createGLTFModelFromFile(arc_device, "models\\imple.gltf");
+		//std::shared_ptr<arcModel> arc_model1 = arcModel::createGLTFModelFromFile(arc_device, "models\\imple.gltf");
 
-		auto gameObj1 = arcGameObject::createGameObject();
-		gameObj1.model = arc_model1;
-		gameObj1.transform.translation = { 2.0f, 0.0f, 2.5f };
-		gameObj1.transform.scale = glm::vec3{ 2.0f, 3.0f, 2.0f };
+		//auto gameObj1 = arcGameObject::createGameObject();
+		//gameObj1.model = arc_model1;
+		//gameObj1.transform.translation = { 2.0f, 0.0f, 2.5f };
+		//gameObj1.transform.scale = glm::vec3{ 2.0f, 3.0f, 2.0f };
 
-		arc_game_objects.push_back(std::move(gameObj1));
+		//arc_game_objects.push_back(std::move(gameObj1));
 	}
 }
