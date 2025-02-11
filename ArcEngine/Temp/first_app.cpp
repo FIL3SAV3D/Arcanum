@@ -66,7 +66,7 @@ namespace arc
 
 	void cFirstApp::loadGameObjects()
 	{
-		std::shared_ptr<arcModel> arc_model = arcModel::createOBJModelFromFile(arc_device, "models/flat_vase.obj");
+		std::shared_ptr<arcModel> arc_model = arcModel::createOBJModelFromFile(arc_device, "ArcEngine/Models/flat_vase.obj");
 
 		auto gameObj = arcGameObject::createGameObject();
 		gameObj.model = arc_model;
