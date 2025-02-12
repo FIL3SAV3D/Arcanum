@@ -1,6 +1,7 @@
 # Visual Studio files
 .vs/
 *.vcxproj
+*.vcxproj.filters
 *.sln
 x64/
 
