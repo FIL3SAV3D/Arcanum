@@ -3,12 +3,17 @@
 #include "simple_render_system.h"
 #include "camera.h"
 #include "keyboard_movement_controller.h"
+#include "Rendering/buffer.h"
+
+#include "Util/texture.h"
 
 // libs
 #define GLM_FORCE_RADIANS
 #define FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
+
+#include "filesystem"
 
 // std
 #include <stdexcept>
@@ -17,6 +22,13 @@
 
 namespace arc
 {
+
+	struct GlobalUBO
+	{
+		glm::mat4 projectionView{ 1.0f };
+		glm::vec3 lightDirection = glm::normalize(glm::vec3(1.0f, -3.0f, -1.0f));
+	};
+
 	cFirstApp::cFirstApp()
 	{
 		loadGameObjects();
@@ -28,6 +40,20 @@ namespace arc
 
 	void arc::cFirstApp::run()
 	{
+		std::vector<std::unique_ptr<cBuffer>> uboBuffers(arcSwapChain::MAX_FRAMES_IN_FLIGHT);
+		for (int i = 0; i < uboBuffers.size(); i++)
+		{
+			uboBuffers[i] = std::make_unique<cBuffer>(
+				arc_device,
+				sizeof(GlobalUBO),
+				1,
+				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+			);
+			uboBuffers[i]->map();
+		}
+
+
 		simpleRenderSystem simple_render_system{ arc_device, arc_renderer.getSwapChainRenderPass() };
 		arcCamera camera{};
 
@@ -54,8 +80,19 @@ namespace arc
 
 			if (auto command_buffer = arc_renderer.beginFrame())
 			{
+				int frame_index = arc_renderer.getFrameIndex();
+
+				frameInfo frame_info{ frame_index, frame_time, command_buffer, camera };
+
+				// Update
+				GlobalUBO ubo{};
+				ubo.projectionView = camera.getProjectionMatrix() * camera.getViewMatrix();
+				uboBuffers[frame_index]->writeToBuffer(&ubo);
+				uboBuffers[frame_index]->flush();
+
+				// Render
 				arc_renderer.beginSwapChainRenderPass(command_buffer);
-				simple_render_system.renderGameObjects(command_buffer, arc_game_objects, camera);
+				simple_render_system.renderGameObjects(frame_info, arc_game_objects);
 				arc_renderer.endSwapChainRenderPass(command_buffer);
 				arc_renderer.endFrame();
 			}
@@ -66,7 +103,7 @@ namespace arc
 
 	void cFirstApp::loadGameObjects()
 	{
-		std::shared_ptr<arcModel> arc_model = arcModel::createOBJModelFromFile(arc_device, "ArcEngine/Models/flat_vase.obj");
+		std::shared_ptr<arcModel> arc_model = arcModel::createOBJModelFromFile(arc_device, "ArcEngine/Models/smooth_vase.obj");
 
 		auto gameObj = arcGameObject::createGameObject();
 		gameObj.model = arc_model;
@@ -75,13 +112,18 @@ namespace arc
 
 		arc_game_objects.push_back(std::move(gameObj));
 
-		//std::shared_ptr<arcModel> arc_model1 = arcModel::createGLTFModelFromFile(arc_device, "models\\imple.gltf");
+		std::shared_ptr<arcModel> arc_model1 = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\Rat.glb");
 
-		//auto gameObj1 = arcGameObject::createGameObject();
-		//gameObj1.model = arc_model1;
-		//gameObj1.transform.translation = { 2.0f, 0.0f, 2.5f };
-		//gameObj1.transform.scale = glm::vec3{ 2.0f, 3.0f, 2.0f };
+		/*auto test2 = std::filesystem::current_path().string();
+		auto path2 = test2 + "\\" + "ArcEngine\\Models\\T_Rat_BC.png";*/
 
-		//arc_game_objects.push_back(std::move(gameObj1));
+		auto gameObj1 = arcGameObject::createGameObject();
+		gameObj1.model = arc_model1;
+		gameObj1.transform.translation = { 2.0f, 0.0f, 2.5f };
+		gameObj1.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
+		//gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
+
+		arc_game_objects.push_back(std::move(gameObj1));
+		
 	}
 }

@@ -5,6 +5,8 @@
 #include "game_object.h"
 #include "camera.h"
 
+#include "frame_info.h"
+
 // std
 #include <memory>
 #include <vector>
@@ -20,7 +22,7 @@ namespace arc
 		simpleRenderSystem(const simpleRenderSystem&) = delete;
 		simpleRenderSystem& operator=(const simpleRenderSystem&) = delete;
 
-		void renderGameObjects(VkCommandBuffer _command_buffer, std::vector<arcGameObject>& _game_objects, const arcCamera& _camera);
+		void renderGameObjects(frameInfo& _info, std::vector<arcGameObject>& _game_objects);
 
 
 	private:

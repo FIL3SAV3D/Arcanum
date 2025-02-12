@@ -60,15 +60,18 @@ namespace arc
 
 		pipeline_config.render_pass = _render_pass;
 		pipeline_config.pipeline_layout = pipeline_layout;
-		arc_pipeline = std::make_unique<arcPipeline>(arc_device, pipeline_config, "shaders/simple_shader.vert.spv", "shaders/simple_shader.frag.spv");
+		arc_pipeline = std::make_unique<arcPipeline>(arc_device, pipeline_config, "ArcEngine/shaders/simple_shader.vert.spv", "ArcEngine/shaders/simple_shader.frag.spv");
 	}
 
 
-	void simpleRenderSystem::renderGameObjects(VkCommandBuffer _command_buffer, std::vector<arcGameObject>& _game_objects, const arcCamera& _camera)
+	void simpleRenderSystem::renderGameObjects(frameInfo& _info, std::vector<arcGameObject>& _game_objects)
 	{
-		arc_pipeline->bind(_command_buffer);
+		arcCamera& camera = _info.camera;
+		VkCommandBuffer command_buffer = _info.command_buffer;
 
-		auto projection_view = _camera.getProjectionMatrix() * _camera.getViewMatrix();
+		arc_pipeline->bind(command_buffer);
+
+		auto projection_view = camera.getProjectionMatrix() * camera.getViewMatrix();
 
 		for (auto& obj : _game_objects)
 		{
@@ -78,15 +81,15 @@ namespace arc
 			push.normalMatrix = obj.transform.normalMatrix();
 
 			vkCmdPushConstants(
-				_command_buffer,
+				command_buffer,
 				pipeline_layout,
 				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 				0,
 				sizeof(sSimplePushConstantData),
 				&push);
 
-			obj.model->bind(_command_buffer);
-			obj.model->draw(_command_buffer);
+			obj.model->bind(command_buffer);
+			obj.model->draw(command_buffer);
 		}
 	}
 }

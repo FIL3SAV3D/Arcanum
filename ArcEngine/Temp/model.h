@@ -58,7 +58,6 @@ namespace arc
 		void createIndexBuffers(const std::vector<uint32_t>& _indices);
 
 		cDevice& device;
-
 		std::unique_ptr<cBuffer> vertex_buffer = nullptr;
 		uint32_t vertex_count;
 

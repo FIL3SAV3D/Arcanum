@@ -1,3 +1,4 @@
+os.execute[[shader_compile.bat]]
 
 cppdialect "c++17"
 
