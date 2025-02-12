@@ -6,6 +6,9 @@
 #include "Rendering/renderer.h"
 #include "game_object.h"
 
+#include "descriptors.h"
+#include "Util/texture.h"
+
 // std
 #include <memory>
 #include <vector>
@@ -32,6 +35,10 @@ namespace arc
 		arcWindow arc_window{WIDTH, HEIGHT, "ARCANUM"};
 		cDevice arc_device{ arc_window };
 		arcRenderer arc_renderer{ arc_window, arc_device };
-		std::vector<arcGameObject> arc_game_objects;
+
+		std::unique_ptr<cDescriptorPool> global_pool{};
+		arcGameObject::Map game_objects;
+		cTexture* tex;
+		cTexture* tex_normal;
 	};
 }

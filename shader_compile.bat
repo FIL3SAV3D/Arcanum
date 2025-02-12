@@ -1,2 +1,2 @@
-E:\vulkan\Bin\glslc.exe ArcEngine\shaders\simple_shader.vert -o ArcEngine\shaders\simple_shader.vert.spv
-E:\vulkan\Bin\glslc.exe ArcEngine\shaders\simple_shader.frag -o ArcEngine\shaders\simple_shader.frag.spv
+F:\VulkanAPI\Bin\glslc.exe ArcEngine\Shaders\simple_shader.vert -o ArcEngine\Shaders\simple_shader.vert.spv
+F:\VulkanAPI\Bin\glslc.exe  ArcEngine\Shaders\simple_shader.frag -o ArcEngine\Shaders\simple_shader.frag.spv

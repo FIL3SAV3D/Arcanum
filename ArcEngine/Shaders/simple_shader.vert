@@ -6,28 +6,33 @@ layout (location = 2) in vec3 normal;
 layout (location = 3) in vec2 uv;
 
 layout (location = 0) out vec3 fragColor;
+layout (location = 1) out vec3 fragPosWorld;
+layout (location = 2) out vec3 fragNormalWorld;
+layout (location = 3) out vec2 fragUV;
 
+
+layout (set = 0, binding = 0) uniform GlobalUbo
+{
+	mat4 projection_view_matrix;
+	vec4 ambientLightColor;
+	vec3 lightPosition;
+	vec4 lightColor;
+} ubo;
 
 
 layout (push_constant) uniform Push
 {
-mat4 transform;
+mat4 modelMatrix;
 mat4 normalMatrix;
 } push;
 
-const vec3 DIRECTION_TO_LIGHT = normalize(vec3(1.0, -3.0, -1.0));
-const float AMBIENT = 0.02;
-
 void main()
 { 
+	vec4 positionWorld = push.modelMatrix * vec4(position, 1.0);
+	gl_Position = ubo.projection_view_matrix * positionWorld;
 	
-
-	gl_Position = push.transform * vec4(position, 1.0);
-	
-	vec3 normalWorldSpace = normalize(mat3(push.normalMatrix) * normal);
-
-	float lightIntensity = max(dot(normalWorldSpace, DIRECTION_TO_LIGHT), 0) + AMBIENT;
-
-	fragColor = lightIntensity * color;
-	fragColor = normal;
+	fragNormalWorld = normalize(mat3(push.normalMatrix) * normal);
+	fragPosWorld = positionWorld.xyz;
+	fragColor = color;
+	fragUV = uv;
 }

@@ -4,6 +4,7 @@
 
 // std
 #include <memory>
+#include <unordered_map>
 
 // libs
 #include "glm/gtc/matrix_transform.hpp"
@@ -27,6 +28,7 @@ namespace arc
 	{
 	public:
 		using id_t = unsigned int;
+		using Map = std::unordered_map<id_t, arcGameObject>;
 
 		static arcGameObject createGameObject()
 		{

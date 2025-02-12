@@ -105,7 +105,7 @@ namespace arc
 	void cTexture::transitionImageLayout(VkImageLayout _old_layout, VkImageLayout _new_layout)
 	{
 		VkCommandBuffer command_buffer = device.beginSingleTimeCommands();
-
+		
 		VkImageMemoryBarrier barrier{};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 		barrier.oldLayout = _old_layout;

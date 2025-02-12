@@ -16,17 +16,17 @@ namespace arc
 	class simpleRenderSystem
 	{
 	public:
-		 simpleRenderSystem(cDevice& _device, VkRenderPass _render_pass);
+		 simpleRenderSystem(cDevice& _device, VkRenderPass _render_pass, VkDescriptorSetLayout _global_descriptor_set_layout);
 		~simpleRenderSystem();
 
 		simpleRenderSystem(const simpleRenderSystem&) = delete;
 		simpleRenderSystem& operator=(const simpleRenderSystem&) = delete;
 
-		void renderGameObjects(frameInfo& _info, std::vector<arcGameObject>& _game_objects);
+		void renderGameObjects(frameInfo& _info);
 
 
 	private:
-		void createPipelineLayout();
+		void createPipelineLayout(VkDescriptorSetLayout _global_descriptor_set_layout);
 		void createPipeline(VkRenderPass _render_pass);
 
 		cDevice& arc_device;
