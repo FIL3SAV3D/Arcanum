@@ -1,9 +1,11 @@
 #include "first_app.h"
 
-#include "simple_render_system.h"
 #include "camera.h"
 #include "keyboard_movement_controller.h"
 #include "Rendering/buffer.h"
+
+#include "systems/simple_render_system.h"
+#include "systems/point_light_system.h"
 
 
 // libs
@@ -24,10 +26,11 @@ namespace arc
 
 	struct GlobalUBO
 	{
-		glm::mat4 projectionView{ 1.0f };
+		glm::mat4 projection{ 1.0f };
+		glm::mat4 view{ 1.0f };
 		glm::vec4 ambientLightColor{ 1.0f, 1.0f, 1.0f, 0.02f }; // w is light intensity
 		glm::vec3 lightPosition{ -1.0f };
-		alignas(16) glm::vec4 lightColor{ 1.0f }; // w is light intensity
+		alignas(16) glm::vec4 lightColor{ 1.0f, 1.0f, 1.0f, 1.0f }; // w is light intensity
 	};
 
 	struct Texture
@@ -105,13 +108,15 @@ namespace arc
 		}
 
 
-		simpleRenderSystem simple_render_system{ arc_device, arc_renderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout()};
+		simpleRenderSystem simple_render_system{ arc_device, arc_renderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout() };
+		cPointLightSystem point_light_system   { arc_device, arc_renderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout()};
 		arcCamera camera{};
 
 		auto viewObject = arcGameObject::createGameObject();
 		KeyboardMovementController cameraController{};
 
 		auto current_time = std::chrono::high_resolution_clock::now();
+
 
 		while (!arc_window.shouldClose())
 		{
@@ -126,27 +131,27 @@ namespace arc
 			camera.setViewYXZ(viewObject.transform.translation, viewObject.transform.rotation);
 
 			float aspect = arc_renderer.getAspectRatio();
-			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
-			camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
+			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -10, 1000.0f);
+			camera.setPerspectiveProjection(glm::radians(120.0f), aspect, 0.1f, 1000.0f);
 			game_objects.at(0).transform.rotation.y += 1.0f * frame_time;
-
 
 			if (auto command_buffer = arc_renderer.beginFrame())
 			{
 				int frame_index = arc_renderer.getFrameIndex();
 
-				frameInfo frame_info{ 
-					frame_index, 
-					frame_time, 
-					command_buffer, 
-					camera, 
+				frameInfo frame_info{
+					frame_index,
+					frame_time,
+					command_buffer,
+					camera,
 					globalDescriptorSets[frame_index],
 					game_objects
 				};
 
 				// Update
 				GlobalUBO ubo{};
-				ubo.projectionView = camera.getProjectionMatrix() * camera.getViewMatrix();
+				ubo.projection = camera.getProjectionMatrix();
+				ubo.view = camera.getViewMatrix();
 				uboBuffers[frame_index]->writeToBuffer(&ubo);
 				uboBuffers[frame_index]->flush();
 
@@ -157,6 +162,7 @@ namespace arc
 				// Render
 				arc_renderer.beginSwapChainRenderPass(command_buffer);
 				simple_render_system.renderGameObjects(frame_info);
+				point_light_system.render(frame_info);
 				arc_renderer.endSwapChainRenderPass(command_buffer);
 				arc_renderer.endFrame();
 			}
@@ -175,13 +181,24 @@ namespace arc
 		//gameObj.transform.scale = glm::vec3{ 2.0f, 3.0f, 2.0f };
 
 		//arc_game_objects.push_back(std::move(gameObj));
-
+		//"E:\Arcanum\ArcEngine\Models\Source images\T_MIMIC_BC.png"
 		auto test2 = std::filesystem::current_path().string();
 		auto path2 = test2 + "\\" + "ArcEngine\\Models\\T_Rat_BC.png";
 		auto path_normal = test2 + "\\" + "ArcEngine\\Models\\T_Rat_N.png";
 
 		tex = new cTexture{ arc_device, path2 };
 		tex_normal = new cTexture{ arc_device, path_normal };
+
+		//std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\MIMICAAAAH.glb");
+
+		//auto rat01 = arcGameObject::createGameObject();
+		//rat01.model = rat_model;
+		//rat01.transform.translation = { 0.0f, 0.0f, 0.0f };
+		//rat01.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
+		//rat01.transform.rotation = { 180.0f * (3.14/180), 0.0f, 0.0f};
+		////gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
+
+		//game_objects.emplace(rat01.getId(), std::move(rat01));
 
 		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\Rat.glb");
 
@@ -203,6 +220,20 @@ namespace arc
 		//gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
 
 		game_objects.emplace(rat02.getId(), std::move(rat02));
+
+
+		//std::shared_ptr<arcModel> rat_racer = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\RatRacer.glb");
+
+		//auto ratr = arcGameObject::createGameObject();
+		//ratr.model = rat_racer;
+		//ratr.transform.translation = { -1.0f, 0.0f, 0.0f };
+		//ratr.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
+		//ratr.transform.rotation = { 0.0f, 0.0f, 0.0f };
+
+		////gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
+
+		//game_objects.emplace(ratr.getId(), std::move(ratr));
+
 
 		std::shared_ptr<arcModel> quad_model = arcModel::createOBJModelFromFile(arc_device, "ArcEngine/Models/quad.obj");
 

@@ -101,6 +101,9 @@ namespace arc
 		_config_info.dynamic_state_info.pDynamicStates = _config_info.dynamic_state_enables.data();
 		_config_info.dynamic_state_info.dynamicStateCount = static_cast<uint32_t>(_config_info.dynamic_state_enables.size());
 		_config_info.dynamic_state_info.flags = 0;
+
+		_config_info.bindingDescriptions   = arcModel::sVertex::getBindingDescriptions();
+		_config_info.attributeDescriptions = arcModel::sVertex::getAttributeDescriptions();
 	}
 
 	std::vector<char> arcPipeline::readFile(const std::string& _file_path)
@@ -152,8 +155,8 @@ namespace arc
 		shader_stages[1].pNext               = nullptr;
 		shader_stages[1].pSpecializationInfo = nullptr;
 
-		auto binding_descriptions = arcModel::sVertex::getBindingDescriptions();
-		auto attribute_descriptions = arcModel::sVertex::getAttributeDescriptions();
+		auto& binding_descriptions = _config.bindingDescriptions;
+		auto& attribute_descriptions = _config.attributeDescriptions;
 		VkPipelineVertexInputStateCreateInfo vertex_input_info{};
 		vertex_input_info.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_descriptions.size());

@@ -13,6 +13,8 @@ namespace arc
 		pipelineConfigInfo(const pipelineConfigInfo&) = delete;
 		pipelineConfigInfo& operator=(const pipelineConfigInfo&) = delete;
 
+		std::vector<VkVertexInputBindingDescription> bindingDescriptions{};
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
 		VkPipelineViewportStateCreateInfo      viewport_info;
 		VkPipelineInputAssemblyStateCreateInfo input_assembly_info;
 		VkPipelineRasterizationStateCreateInfo rasterization_info;
