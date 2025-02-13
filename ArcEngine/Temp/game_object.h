@@ -24,6 +24,11 @@ namespace arc
 		glm::mat3 normalMatrix();
 	};
 
+	struct PointLightComponent
+	{
+		float light_intensity = 1.0f;
+	};
+
 	class arcGameObject
 	{
 	public:
@@ -36,6 +41,12 @@ namespace arc
 			return arcGameObject{ current_id++ };
 		}
 
+		static arcGameObject makePointLight(
+			float _intensity = 1.0f, 
+			float _radius = 1.0f, 
+			glm::vec3 _color = glm::vec3{ 1.0f }
+		);
+
 		arcGameObject(const arcGameObject&) = delete;
 		arcGameObject& operator=(const arcGameObject&) = delete;
 
@@ -44,9 +55,12 @@ namespace arc
 
 		const id_t getId() { return id; }
 
-		std::shared_ptr < arcModel > model{};
 		glm::vec3 color;
 		TransformComponent transform{};
+
+		// Optional pointer components
+		std::shared_ptr < arcModel > model               = nullptr;
+		std::unique_ptr<PointLightComponent> point_light = nullptr;
 
 	private:
 		arcGameObject(id_t _object_id) : id{ _object_id } {}

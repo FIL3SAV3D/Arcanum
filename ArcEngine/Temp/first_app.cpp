@@ -24,14 +24,7 @@
 namespace arc
 {
 
-	struct GlobalUBO
-	{
-		glm::mat4 projection{ 1.0f };
-		glm::mat4 view{ 1.0f };
-		glm::vec4 ambientLightColor{ 1.0f, 1.0f, 1.0f, 0.02f }; // w is light intensity
-		glm::vec3 lightPosition{ -1.0f };
-		alignas(16) glm::vec4 lightColor{ 1.0f, 1.0f, 1.0f, 1.0f }; // w is light intensity
-	};
+
 
 	struct Texture
 	{
@@ -132,7 +125,7 @@ namespace arc
 
 			float aspect = arc_renderer.getAspectRatio();
 			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -10, 1000.0f);
-			camera.setPerspectiveProjection(glm::radians(120.0f), aspect, 0.1f, 1000.0f);
+			camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
 			game_objects.at(0).transform.rotation.y += 1.0f * frame_time;
 
 			if (auto command_buffer = arc_renderer.beginFrame())
@@ -152,6 +145,7 @@ namespace arc
 				GlobalUBO ubo{};
 				ubo.projection = camera.getProjectionMatrix();
 				ubo.view = camera.getViewMatrix();
+				point_light_system.update(frame_info, ubo);
 				uboBuffers[frame_index]->writeToBuffer(&ubo);
 				uboBuffers[frame_index]->flush();
 
@@ -183,8 +177,8 @@ namespace arc
 		//arc_game_objects.push_back(std::move(gameObj));
 		//"E:\Arcanum\ArcEngine\Models\Source images\T_MIMIC_BC.png"
 		auto test2 = std::filesystem::current_path().string();
-		auto path2 = test2 + "\\" + "ArcEngine\\Models\\T_Rat_BC.png";
-		auto path_normal = test2 + "\\" + "ArcEngine\\Models\\T_Rat_N.png";
+		auto path2 = test2 + "\\" + "ArcEngine\\Models\\src_images\\T_Rat_BC.png";
+		auto path_normal = test2 + "\\" + "ArcEngine\\Models\\src_images\\T_Rat_N.png";
 
 		tex = new cTexture{ arc_device, path2 };
 		tex_normal = new cTexture{ arc_device, path_normal };
@@ -200,7 +194,7 @@ namespace arc
 
 		//game_objects.emplace(rat01.getId(), std::move(rat01));
 
-		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\Rat.glb");
+		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\glb_models\\Rat.glb");
 
 		auto rat01 = arcGameObject::createGameObject();
 		rat01.model = rat_model;
@@ -235,7 +229,7 @@ namespace arc
 		//game_objects.emplace(ratr.getId(), std::move(ratr));
 
 
-		std::shared_ptr<arcModel> quad_model = arcModel::createOBJModelFromFile(arc_device, "ArcEngine/Models/quad.obj");
+		std::shared_ptr<arcModel> quad_model = arcModel::createOBJModelFromFile(arc_device, "ArcEngine/Models/obj_models/quad.obj");
 
 		auto quad = arcGameObject::createGameObject();
 		quad.model = quad_model;
@@ -245,5 +239,22 @@ namespace arc
 
 		game_objects.emplace(quad.getId(), std::move(quad));
 		
+		auto pointlight = arcGameObject::makePointLight();
+		pointlight.transform.scale.x = 0.1f;
+		pointlight.transform.translation = { 0.0f, -1.0f, 0.0f };
+		pointlight.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		game_objects.emplace(pointlight.getId(), std::move(pointlight));
+
+		auto pointlight1 = arcGameObject::makePointLight();
+		pointlight1.transform.scale.x = 0.1f;
+		pointlight1.transform.translation = { 1.0f, -1.0f, 0.0f };
+		pointlight1.color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+		game_objects.emplace(pointlight1.getId(), std::move(pointlight1));
+
+		auto pointlight2 = arcGameObject::makePointLight();
+		pointlight2.transform.scale.x = 0.1f;
+		pointlight2.transform.translation = { 0.5f, -1.0f, 0.5f };
+		pointlight2.color = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+		game_objects.emplace(pointlight2.getId(), std::move(pointlight2));
 	}
 }

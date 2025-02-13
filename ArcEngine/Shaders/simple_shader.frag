@@ -8,13 +8,19 @@ layout (location = 3) in vec2 fragUV;
 
 layout (location = 0) out vec4 outColor;
 
+struct pointLight
+{
+	vec4 position; // ignore w
+	vec4 color; // w is intensity
+};
+
 layout (set = 0, binding = 0) uniform GlobalUbo
 {
 	mat4 projection_matrix;
 	mat4 view_matrix;
 	vec4 ambientLightColor;
-	vec3 lightPosition;
-	vec4 lightColor;
+	pointLight pointLights[10];
+	int numLights;
 } ubo;
 
 layout( binding = 1) uniform sampler2D texSampler;
@@ -28,16 +34,21 @@ mat4 normalMatrix;
 
 void main()
 {
-	vec3 directionToLight = ubo.lightPosition - fragPosWorld;
-	float attenuation = 1.0 / dot(directionToLight, directionToLight); // distance squared
-
-	vec3 lightColor = ubo.lightColor.xyz * ubo.lightColor.w * attenuation;
-	vec3 ambientLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
-
 	vec3 sampledNormals = texture(NormalTexSampler, fragUV).rgb * fragNormalWorld;
 
-	vec3 diffuseLight = lightColor * max(dot(normalize(sampledNormals) * 3.0, normalize(directionToLight)), 0);
+	vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
+	//vec3 surfaceNormal = normalize(fragNormalWorld); Use this when no textures instead of sampledNormals
 
-    outColor = vec4((diffuseLight + ambientLight) * texture(texSampler, fragUV).rgb , 1.0);
-//	outColor = vec4(sampledNormals, 1.0);
+	for(int i = 0; i < ubo.numLights; i++)
+	{
+		pointLight light = ubo.pointLights[i];
+		vec3 directionToLight = light.position.xyz - fragPosWorld;
+		float attenuation = 1.0 / dot(directionToLight, directionToLight); // distance squared
+		float cosAngIncidence = max(dot(normalize(sampledNormals) * 3.0, normalize(directionToLight)), 0);
+		vec3 intensity = light.color.xyz * light.color.w * attenuation;
+
+		diffuseLight += intensity * cosAngIncidence;
+
+		outColor = vec4(diffuseLight * texture(texSampler, fragUV).rgb , 1.0);
+	}
 }

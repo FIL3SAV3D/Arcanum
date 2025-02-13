@@ -11,13 +11,19 @@ layout (location = 2) out vec3 fragNormalWorld;
 layout (location = 3) out vec2 fragUV;
 
 
+struct pointLight
+{
+	vec4 position; // ignore w
+	vec4 color; // w is intensity
+};
+
 layout (set = 0, binding = 0) uniform GlobalUbo
 {
 	mat4 projection_matrix;
 	mat4 view_matrix;
 	vec4 ambientLightColor;
-	vec3 lightPosition;
-	vec4 lightColor;
+	pointLight pointLights[10];
+	int numLights;
 } ubo;
 
 

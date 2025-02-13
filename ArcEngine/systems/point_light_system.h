@@ -22,6 +22,7 @@ namespace arc
 		cPointLightSystem(const cPointLightSystem&) = delete;
 		cPointLightSystem& operator=(const cPointLightSystem&) = delete;
 
+		void update(frameInfo& _info, GlobalUBO& ubo);
 		void render(frameInfo& _info);
 
 

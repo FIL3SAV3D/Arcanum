@@ -87,6 +87,10 @@ namespace arc
 		for (auto& kv : _info.game_objects)
 		{
 			auto& obj = kv.second;
+
+			if (obj.point_light != nullptr)
+				continue;
+
 			sSimplePushConstantData push{};
 			push.mdoelMatrix   = obj.transform.mat4();
 			push.normalMatrix = obj.transform.normalMatrix();

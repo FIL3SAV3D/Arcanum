@@ -59,4 +59,14 @@ namespace arc
 			}
 		};
 	}
+
+	arcGameObject arc::arcGameObject::makePointLight(float _intensity, float _radius, glm::vec3 _color)
+	{
+		arcGameObject gameObj = arcGameObject::createGameObject();
+		gameObj.color = _color;
+		gameObj.transform.scale.x = _radius;
+		gameObj.point_light = std::make_unique<PointLightComponent>();
+		gameObj.point_light->light_intensity = _intensity;
+		return gameObj;
+	}
 }
