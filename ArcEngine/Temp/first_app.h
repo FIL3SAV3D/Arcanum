@@ -40,5 +40,6 @@ namespace arc
 		arcGameObject::Map game_objects;
 		cTexture* tex;
 		cTexture* tex_normal;
+		cTexture* tex_ORM;
 	};
 }

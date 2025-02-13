@@ -22,11 +22,13 @@ namespace arc
 		void setViewYXZ      (glm::vec3 position, glm::vec3 rotation);
 
 		const glm::mat4& getProjectionMatrix() const { return projection_matrix; }
-		const glm::mat4& getViewMatrix()       const { return view_matrix;       }
+		const glm::mat4& getViewMatrix()       const { return view_matrix; }
+		const glm::mat4& getInverseViewMatrix() const { return inverse_view_matrix;       }
 
 	private:
 		glm::mat4 projection_matrix{ 1.0f };
-		glm::mat4 view_matrix      { 1.0f };
+		glm::mat4 view_matrix{ 1.0f };
+		glm::mat4 inverse_view_matrix{ 1.0f };
 
 	};
 }

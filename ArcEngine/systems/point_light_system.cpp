@@ -73,6 +73,7 @@ namespace arc
 
 	void cPointLightSystem::update(frameInfo& _info, GlobalUBO& ubo)
 	{
+		auto rotateLight = glm::rotate(glm::mat4(1.0f), _info.frame_time, { 0.0f, -1.0f, 0.0f });
 		int lightIndex = 0;
 		for (auto& kv : _info.game_objects)
 		{
@@ -80,6 +81,11 @@ namespace arc
 
 			if (obj.point_light == nullptr)
 				continue;
+
+			assert(lightIndex < MAX_LIGHTS && "Exceeded max lights limit");
+
+			// update light position
+			obj.transform.translation = glm::vec3(rotateLight * glm::vec4(obj.transform.translation, 1.0f));
 
 			// Copy Light to ubo
 			ubo.pointLights[lightIndex].position = glm::vec4(obj.transform.translation, 1.0f);
