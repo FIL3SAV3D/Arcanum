@@ -59,10 +59,11 @@ namespace arc
 
 		pipelineConfigInfo pipeline_config{};
 		arcPipeline::defaultPipelineConfigInfo(pipeline_config);
+		arcPipeline::enableAlphaBlending(pipeline_config);
 
 		pipeline_config.render_pass = _render_pass;
 		pipeline_config.pipeline_layout = pipeline_layout;
-		arc_pipeline = std::make_unique<arcPipeline>(arc_device, pipeline_config, "ArcEngine/shaders/simple_shader.vert.spv", "ArcEngine/shaders/simple_shader.frag.spv");
+		arc_pipeline = std::make_unique<arcPipeline>(arc_device, pipeline_config, "ArcEngine/shaders/compiled_shaders/simple_shader.vert.spv", "ArcEngine/shaders/compiled_shaders/simple_shader.frag.spv");
 	}
 
 

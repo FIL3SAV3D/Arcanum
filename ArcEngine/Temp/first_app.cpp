@@ -5,6 +5,7 @@
 #include "Rendering/buffer.h"
 
 #include "systems/simple_render_system.h"
+#include "systems/infinite_grid_render_system.h"
 #include "systems/point_light_system.h"
 
 
@@ -108,6 +109,7 @@ namespace arc
 
 
 		simpleRenderSystem simple_render_system{ arc_device, arc_renderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout() };
+		cInfiniteGridRenderSystem inf_grid_system{ arc_device, arc_renderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout() };
 		cPointLightSystem point_light_system   { arc_device, arc_renderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout()};
 		arcCamera camera{};
 
@@ -162,8 +164,12 @@ namespace arc
 
 				// Render
 				arc_renderer.beginSwapChainRenderPass(command_buffer);
+
+				// order matters
+				inf_grid_system.renderGrid(frame_info);
 				simple_render_system.renderGameObjects(frame_info);
 				point_light_system.render(frame_info);
+
 				arc_renderer.endSwapChainRenderPass(command_buffer);
 				arc_renderer.endFrame();
 			}
@@ -191,20 +197,20 @@ namespace arc
 		//auto path_orm = test2 + "\\" + "ArcEngine\\Models\\src_images\\T_Rat_ORM.png";
 
 		auto test2 = std::filesystem::current_path().string();
-		auto path2 = test2 + "\\" + "ArcEngine\\Models\\src_images\\T_MIMIC_BC.png";
-		auto path_normal = test2 + "\\" + "ArcEngine\\Models\\src_images\\T_MIMIC_N.png";
-		auto path_orm = test2 + "\\" + "ArcEngine\\Models\\src_images\\T_MIMIC_M.png";
+		auto path2 = test2 + "\\" + "ArcEngine\\Models\\src_images\\mimic_textures\\T_Mimic_BC.png";
+		auto path_normal = test2 + "\\" + "ArcEngine\\Models\\src_images\\mimic_textures\\T_Mimic_N.png";
+		auto path_orm = test2 + "\\" + "ArcEngine\\Models\\src_images\\mimic_textures\\T_Mimic_ORM.png";
 
 		tex = new cTexture{ arc_device, path2 };
 		tex_normal = new cTexture{ arc_device, path_normal };
 		tex_ORM = new cTexture{ arc_device, path_orm };
 
-		std::shared_ptr<arcModel> chest_model = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\glb_models\\MIMICAAAAH.glb");
+		std::shared_ptr<arcModel> chest_model = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\glb_models\\SM_MimicChest.glb");
 
 		auto chest = arcGameObject::createGameObject();
 		chest.model = chest_model;
 		chest.transform.translation = { 0.0f, 0.0f, 0.0f };
-		chest.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
+		chest.transform.scale = glm::vec3{ 1.00f,  1.00f,  1.00f };
 		chest.transform.rotation = { 180.0f * (3.14/180), 0.0f, 0.0f};
 		//gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
 
@@ -214,7 +220,7 @@ namespace arc
 
 		//auto rat01 = arcGameObject::createGameObject();
 		//rat01.model = rat_model;
-		//rat01.transform.translation = { 0.0f, 0.0f, 0.0f };
+		//rat01.transform.translation = { 0.0f, -0.4f, 0.0f };
 		//rat01.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
 		//rat01.transform.rotation = { -90.0f, 0.0f, 0.0f};
 		////gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
@@ -223,7 +229,7 @@ namespace arc
 
 		//auto rat02 = arcGameObject::createGameObject();
 		//rat02.model = rat_model;
-		//rat02.transform.translation = { 1.0f, 0.0f, 0.0f };
+		//rat02.transform.translation = { 1.0f, -0.4f, 0.0f };
 		//rat02.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
 		//rat02.transform.rotation = { -90.0f, 0.0f, 0.0f };
 
@@ -245,15 +251,15 @@ namespace arc
 		//game_objects.emplace(ratr.getId(), std::move(ratr));
 
 
-		std::shared_ptr<arcModel> quad_model = arcModel::createOBJModelFromFile(arc_device, "ArcEngine/Models/obj_models/quad.obj");
+		//std::shared_ptr<arcModel> quad_model = arcModel::createOBJModelFromFile(arc_device, "ArcEngine/Models/obj_models/quad.obj");
 
-		auto quad = arcGameObject::createGameObject();
-		quad.model = quad_model;
-		quad.transform.translation = { 0.0f, 0.2f, 0.0f };
-		quad.transform.scale = glm::vec3{ 3.0f,  1.0f,  3.0f };
-		//gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
+		//auto quad = arcGameObject::createGameObject();
+		//quad.model = quad_model;
+		//quad.transform.translation = { 0.0f, 0.2f, 0.0f };
+		//quad.transform.scale = glm::vec3{ 3.0f,  1.0f,  3.0f };
+		////gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
 
-		game_objects.emplace(quad.getId(), std::move(quad));
+		//game_objects.emplace(quad.getId(), std::move(quad));
 			
 		std::vector<glm::vec3> lightColors{
 			{1.f, .1f, .1f},

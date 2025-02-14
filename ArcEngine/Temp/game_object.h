@@ -43,7 +43,7 @@ namespace arc
 
 		static arcGameObject makePointLight(
 			float _intensity = 1.0f, 
-			float _radius = 1.0f, 
+			float _radius = 0.5f, 
 			glm::vec3 _color = glm::vec3{ 1.0f }
 		);
 

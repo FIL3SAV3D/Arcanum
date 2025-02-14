@@ -24,6 +24,7 @@ namespace arc
 		const glm::mat4& getProjectionMatrix() const { return projection_matrix; }
 		const glm::mat4& getViewMatrix()       const { return view_matrix; }
 		const glm::mat4& getInverseViewMatrix() const { return inverse_view_matrix;       }
+		const glm::vec3& getCameraPos() const { return glm::vec3(inverse_view_matrix[3]); }
 
 	private:
 		glm::mat4 projection_matrix{ 1.0f };

@@ -106,6 +106,21 @@ namespace arc
 		_config_info.attributeDescriptions = arcModel::sVertex::getAttributeDescriptions();
 	}
 
+	void arcPipeline::enableAlphaBlending(pipelineConfigInfo& _config_info)
+	{
+		_config_info.color_blend_attachment.blendEnable = VK_TRUE;
+
+		_config_info.color_blend_attachment.colorWriteMask =
+			VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
+			VK_COLOR_COMPONENT_A_BIT;
+		_config_info.color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+		_config_info.color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		_config_info.color_blend_attachment.colorBlendOp = VK_BLEND_OP_ADD;
+		_config_info.color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+		_config_info.color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+		_config_info.color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;
+	}
+
 	std::vector<char> arcPipeline::readFile(const std::string& _file_path)
 	{
 		std::ifstream file{ _file_path, std::ios::ate | std::ios::binary };

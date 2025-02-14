@@ -9,6 +9,7 @@
 // std
 #include <stdexcept>
 #include <array>
+#include <map>
 
 namespace arc
 {
@@ -59,6 +60,7 @@ namespace arc
 
 		pipelineConfigInfo pipeline_config{};
 		arcPipeline::defaultPipelineConfigInfo(pipeline_config);
+		arcPipeline::enableAlphaBlending(pipeline_config);
 		pipeline_config.bindingDescriptions.clear();
 		pipeline_config.attributeDescriptions.clear();
 		pipeline_config.render_pass = _render_pass;
@@ -66,8 +68,8 @@ namespace arc
 		arc_pipeline = std::make_unique<arcPipeline>(
 			arc_device, 
 			pipeline_config, 
-			"ArcEngine/shaders/point_light_shader.vert.spv", 
-			"ArcEngine/shaders/point_light_shader.frag.spv");
+			"ArcEngine/shaders/compiled_shaders/point_light_shader.vert.spv", 
+			"ArcEngine/shaders/compiled_shaders/point_light_shader.frag.spv");
 	}
 
 
@@ -97,6 +99,19 @@ namespace arc
 
 	void cPointLightSystem::render(frameInfo& _info)
 	{
+		// Sort Lights
+		std::map<float, arcGameObject::id_t> sorted;
+		for (auto& kv : _info.game_objects)
+		{
+			auto& obj = kv.second;
+			if (obj.point_light == nullptr)
+				continue;
+
+			auto offset = _info.camera.getCameraPos() - obj.transform.translation;
+			float distSquared = glm::dot(offset, offset);
+			sorted[distSquared] = obj.getId();
+		}
+
 		arcCamera& camera = _info.camera;
 		VkCommandBuffer command_buffer = _info.command_buffer;
 
@@ -113,12 +128,9 @@ namespace arc
 			nullptr
 		);
 
-		for (auto& kv : _info.game_objects)
+		for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
 		{
-			auto& obj = kv.second;
-
-			if (obj.point_light == nullptr)
-				continue;
+			auto& obj = _info.game_objects.at(it->second);
 
 			PointLightPushConstants push{};
 			push.position = glm::vec4(obj.transform.translation, 1.0f);

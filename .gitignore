@@ -6,6 +6,7 @@
 *.sln
 x64/
 bin/
+obj/
 
 # Prerequisites
 *.d

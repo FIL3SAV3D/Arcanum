@@ -10,6 +10,7 @@ namespace arc
 {
 	struct pipelineConfigInfo
 	{
+		pipelineConfigInfo() = default;
 		pipelineConfigInfo(const pipelineConfigInfo&) = delete;
 		pipelineConfigInfo& operator=(const pipelineConfigInfo&) = delete;
 
@@ -45,6 +46,7 @@ namespace arc
 		void bind(VkCommandBuffer command_buffer);
 
 		static void defaultPipelineConfigInfo(pipelineConfigInfo& _config_info);
+		static void enableAlphaBlending(pipelineConfigInfo& _config_info);
 
 	private:
 		static std::vector<char> readFile(const std::string& _file_path);
