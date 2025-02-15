@@ -1,7 +1,7 @@
 #include "first_app.h"
 
-#include "camera.h"
-#include "keyboard_movement_controller.h"
+#include "Temp/camera.h"
+#include "Temp/keyboard_movement_controller.h"
 #include "Rendering/buffer.h"
 
 #include "systems/simple_render_system.h"
@@ -180,11 +180,11 @@ namespace arc
 				if (camera.getCameraPos().y > 0.0)
 				{
 					point_light_system.render(frame_info);
-					inf_grid_system.renderGrid(frame_info);
+					//inf_grid_system.renderGrid(frame_info);
 				}
 				else
 				{
-					inf_grid_system.renderGrid(frame_info);
+					//inf_grid_system.renderGrid(frame_info);
 					point_light_system.render(frame_info);
 				}
 

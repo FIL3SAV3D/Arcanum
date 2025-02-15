@@ -4,9 +4,9 @@
 #include "Window/window.h"
 
 #include "Rendering/renderer.h"
-#include "game_object.h"
+#include "temp/game_object.h"
 
-#include "descriptors.h"
+#include "temp/descriptors.h"
 #include "Util/texture.h"
 
 // std
