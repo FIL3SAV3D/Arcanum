@@ -23,6 +23,7 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 	mat4 projection_matrix;
 	mat4 view_matrix;
 	mat4 inverse_view_matrix;
+	vec4 camPos;
 	vec4 ambientLightColor;
 	pointLight pointLights[10];
 	int numLights;
@@ -31,10 +32,10 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 void main()
 {
 	int Index = Indicies[gl_VertexIndex];
-	vec3 vPos3 = Pos[Index];
+	vec3 vPos3 = Pos[Index] * 100.0;
 
-	vPos3.x += ubo.inverse_view_matrix[3][0];
-	vPos3.z += ubo.inverse_view_matrix[3][2];
+	vPos3.x += ubo.camPos.x;
+	vPos3.z += ubo.camPos.z;
 
 	vec4 vPos4 = vec4(vPos3, 1.0);
 

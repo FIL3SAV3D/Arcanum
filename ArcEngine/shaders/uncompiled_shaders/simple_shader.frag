@@ -18,6 +18,7 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 	mat4 projection_matrix;
 	mat4 view_matrix;
 	mat4 inverse_view_matrix;
+	vec4 camPos;
 	vec4 ambientLightColor;
 	pointLight pointLights[10];
 	int numLights;

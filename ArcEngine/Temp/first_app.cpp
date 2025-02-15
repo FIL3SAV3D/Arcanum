@@ -154,6 +154,7 @@ namespace arc
 				ubo.projection = camera.getProjectionMatrix();
 				ubo.view = camera.getViewMatrix();
 				ubo.inverseView = camera.getInverseViewMatrix();
+				ubo.camPos = glm::vec4(camera.getCameraPos(), 1.0f);
 				point_light_system.update(frame_info, ubo);
 				uboBuffers[frame_index]->writeToBuffer(&ubo);
 				uboBuffers[frame_index]->flush();
@@ -166,9 +167,9 @@ namespace arc
 				arc_renderer.beginSwapChainRenderPass(command_buffer);
 
 				// order matters
-				inf_grid_system.renderGrid(frame_info);
 				simple_render_system.renderGameObjects(frame_info);
 				point_light_system.render(frame_info);
+				inf_grid_system.renderGrid(frame_info);
 
 				arc_renderer.endSwapChainRenderPass(command_buffer);
 				arc_renderer.endFrame();
@@ -191,51 +192,51 @@ namespace arc
 
 		/*arc_game_objects.push_back(std::move(gameObj));*/
 		/*"E:\Arcanum\ArcEngine\Models\Source images\T_MIMIC_BC.png"*/
-		//auto test2 = std::filesystem::current_path().string();
-		//auto path2 = test2 + "\\" + "ArcEngine\\Models\\src_images\\T_Rat_BC.png";
-		//auto path_normal = test2 + "\\" + "ArcEngine\\Models\\src_images\\T_Rat_N.png";
-		//auto path_orm = test2 + "\\" + "ArcEngine\\Models\\src_images\\T_Rat_ORM.png";
-
 		auto test2 = std::filesystem::current_path().string();
-		auto path2 = test2 + "\\" + "ArcEngine\\Models\\src_images\\mimic_textures\\T_Mimic_BC.png";
-		auto path_normal = test2 + "\\" + "ArcEngine\\Models\\src_images\\mimic_textures\\T_Mimic_N.png";
-		auto path_orm = test2 + "\\" + "ArcEngine\\Models\\src_images\\mimic_textures\\T_Mimic_ORM.png";
+		auto path2 = test2 + "\\" + "ArcEngine\\Models\\src_images\\T_Rat_BC.png";
+		auto path_normal = test2 + "\\" + "ArcEngine\\Models\\src_images\\T_Rat_N.png";
+		auto path_orm = test2 + "\\" + "ArcEngine\\Models\\src_images\\T_Rat_ORM.png";
+
+		//auto test2 = std::filesystem::current_path().string();
+		//auto path2 = test2 + "\\" + "ArcEngine\\Models\\src_images\\mimic_textures\\T_Mimic_BC.png";
+		//auto path_normal = test2 + "\\" + "ArcEngine\\Models\\src_images\\mimic_textures\\T_Mimic_N.png";
+		//auto path_orm = test2 + "\\" + "ArcEngine\\Models\\src_images\\mimic_textures\\T_Mimic_ORM.png";
 
 		tex = new cTexture{ arc_device, path2 };
 		tex_normal = new cTexture{ arc_device, path_normal };
 		tex_ORM = new cTexture{ arc_device, path_orm };
 
-		std::shared_ptr<arcModel> chest_model = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\glb_models\\SM_MimicChest.glb");
+		//std::shared_ptr<arcModel> chest_model = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\glb_models\\SM_MimicChest.glb");
 
-		auto chest = arcGameObject::createGameObject();
-		chest.model = chest_model;
-		chest.transform.translation = { 0.0f, 0.0f, 0.0f };
-		chest.transform.scale = glm::vec3{ 1.00f,  1.00f,  1.00f };
-		chest.transform.rotation = { 180.0f * (3.14/180), 0.0f, 0.0f};
+		//auto chest = arcGameObject::createGameObject();
+		//chest.model = chest_model;
+		//chest.transform.translation = { 0.0f, 0.0f, 0.0f };
+		//chest.transform.scale = glm::vec3{ 1.00f,  1.00f,  1.00f };
+		//chest.transform.rotation = { 180.0f * (3.14/180), 0.0f, 0.0f};
+		////gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
+
+		//game_objects.emplace(chest.getId(), std::move(chest));
+
+		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\glb_models\\Rat.glb");
+
+		auto rat01 = arcGameObject::createGameObject();
+		rat01.model = rat_model;
+		rat01.transform.translation = { 0.0f, -0.4f, 0.0f };
+		rat01.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
+		rat01.transform.rotation = { -90.0f, 0.0f, 0.0f};
 		//gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
 
-		game_objects.emplace(chest.getId(), std::move(chest));
+		game_objects.emplace(rat01.getId(), std::move(rat01));
 
-		//std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\glb_models\\Rat.glb");
+		auto rat02 = arcGameObject::createGameObject();
+		rat02.model = rat_model;
+		rat02.transform.translation = { 1.0f, -0.4f, 0.0f };
+		rat02.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
+		rat02.transform.rotation = { -90.0f, 0.0f, 0.0f };
 
-		//auto rat01 = arcGameObject::createGameObject();
-		//rat01.model = rat_model;
-		//rat01.transform.translation = { 0.0f, -0.4f, 0.0f };
-		//rat01.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
-		//rat01.transform.rotation = { -90.0f, 0.0f, 0.0f};
-		////gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
+		//gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
 
-		//game_objects.emplace(rat01.getId(), std::move(rat01));
-
-		//auto rat02 = arcGameObject::createGameObject();
-		//rat02.model = rat_model;
-		//rat02.transform.translation = { 1.0f, -0.4f, 0.0f };
-		//rat02.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
-		//rat02.transform.rotation = { -90.0f, 0.0f, 0.0f };
-
-		////gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
-
-		//game_objects.emplace(rat02.getId(), std::move(rat02));
+		game_objects.emplace(rat02.getId(), std::move(rat02));
 
 
 		//std::shared_ptr<arcModel> rat_racer = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\RatRacer.glb");
