@@ -24,14 +24,20 @@ workspace "Arcanum"
 		kind "ConsoleApp"
 		targetdir "bin/%{cfg.buildcfg}"
 
+		files {
+            "src/Framework/**.h",
+            "src/Framework/**.cpp",
+            "src/Framework/**.hpp",
+        }
+
 	project "ArcEngine"
 		kind "ConsoleApp"
 		targetdir "bin/%{cfg.buildcfg}"
 		
 		files {
-            "ArcEngine/**.h",
-            "ArcEngine/**.cpp",
-            "ArcEngine/**.hpp",
+            "src/ArcEngine/**.h",
+            "src/ArcEngine/**.cpp",
+            "src/ArcEngine/**.hpp",
         }
 		
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
@@ -43,7 +49,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/Library/GLM" }
 		includedirs { "../Arcanum/Library/TinyGLTF" }
 		includedirs { "../Arcanum/Library/TinyObj" }
-		includedirs { "../Arcanum/ArcEngine" }
+		includedirs { "../Arcanum/src/ArcEngine" }
 		
 		filter "configurations:Debug"
 		defines { "DEBUG" }
@@ -58,8 +64,8 @@ workspace "Arcanum"
 		targetdir "bin/%{cfg.buildcfg}"
 	
 		files{
-			    "**.frag",
-			    "**.vert"
+			    "src/Shaders/**.frag",
+			    "src/Shaders/**.vert"
 		}
 
 		filter 'files:**.frag'
