@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Window/device.h"
-#include "Window/window.h"
+#include "Window/Window.h"
 
-#include "swap_chain.h"
+#include "SwapChain.h"
 
 // std
 #include <cassert>

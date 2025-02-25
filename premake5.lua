@@ -5,9 +5,9 @@ language "C++"
 staticruntime "off"
 
 filter "configurations:Debug"
-	    runtime "Debug"
-	    symbols "on"
-	    defines { "ARC_DEBUG" }
+    runtime "Debug"
+    symbols "on"
+    defines { "ARC_DEBUG" }
 
 filter "configurations:Release"
 	runtime "Release"
@@ -36,10 +36,12 @@ workspace "Arcanum"
 		links { "../Arcanum/Library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "ArcEngine" }
 
+
 		includedirs { "$(VULKAN_SDK)/include" }
 		includedirs { "../Arcanum/Library/GLFW/include" }
 		includedirs { "../Arcanum/Library/GLM" }
 		includedirs { "../Arcanum/src/ArcEngine" }
+
 
 	project "ArcEngine"
 		kind "StaticLib"
@@ -54,6 +56,7 @@ workspace "Arcanum"
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
 		
 		links { "../Arcanum/Library/GLFW/lib-vc2022/glfw3.lib"}
+
 		
 		includedirs { "$(VULKAN_SDK)/include" }
 		includedirs { "../Arcanum/Library/GLFW/include" }
@@ -61,6 +64,9 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/Library/TinyGLTF" }
 		includedirs { "../Arcanum/Library/TinyObj" }
 		includedirs { "../Arcanum/src/ArcEngine" }
+		includedirs { "../Arcanum/Library/Jolt" }
+
+
 
 	project "Shaders"
 		kind "Utility"
@@ -76,11 +82,11 @@ workspace "Arcanum"
 
             buildcommands{ "%{vulkan_sdk}/Bin/glslc.exe %{file.abspath} -o %{wks.location}src/shaders/compiled_shaders/%{file.basename}.frag.spv" }
 
-            buildoutputs { "ArcEngine/shaders/compiled_shaders/%{file.basename}.frag.spv" }
+            buildoutputs { "src/shaders/compiled_shaders/%{file.basename}.frag.spv" }
 
 		filter 'files:**.vert'
             buildmessage 'Compiling %{file.relpath}'
 
             buildcommands{ "%{vulkan_sdk}/Bin/glslc.exe %{file.abspath} -o %{wks.location}src/shaders/compiled_shaders/%{file.basename}.vert.spv" }
 
-            buildoutputs { "ArcEngine/shaders/compiled_shaders/%{file.basename}.vert.spv" }
+            buildoutputs { "src/shaders/compiled_shaders/%{file.basename}.vert.spv" }

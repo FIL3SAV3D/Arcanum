@@ -1,8 +1,8 @@
-E:\vulkan\Bin\glslc.exe  ArcEngine\Shaders\uncompiled_shaders\simple_shader.vert -o ArcEngine\Shaders\compiled_shaders\simple_shader.vert.spv
-E:\vulkan\Bin\glslc.exe  ArcEngine\Shaders\uncompiled_shaders\simple_shader.frag -o ArcEngine\Shaders\compiled_shaders\simple_shader.frag.spv
+E:\vulkan\Bin\glslc.exe  src\Shaders\uncompiled_shaders\SimpleShader.vert -o src\Shaders\compiled_shaders\SimpleShader.vert.spv
+E:\vulkan\Bin\glslc.exe  src\Shaders\uncompiled_shaders\SimpleShader.frag -o src\Shaders\compiled_shaders\SimpleShader.frag.spv
 
-E:\vulkan\Bin\glslc.exe  ArcEngine\Shaders\uncompiled_shaders\point_light_shader.vert -o ArcEngine\Shaders\compiled_shaders\point_light_shader.vert.spv
-E:\vulkan\Bin\glslc.exe  ArcEngine\Shaders\uncompiled_shaders\point_light_shader.frag -o ArcEngine\Shaders\compiled_shaders\point_light_shader.frag.spv
+E:\vulkan\Bin\glslc.exe  src\Shaders\uncompiled_shaders\PointLightShader.vert -o src\Shaders\compiled_shaders\PointLightShader.vert.spv
+E:\vulkan\Bin\glslc.exe  src\Shaders\uncompiled_shaders\PointLightShader.frag -o src\Shaders\compiled_shaders\PointLightShader.frag.spv
 
-E:\vulkan\Bin\glslc.exe  ArcEngine\Shaders\uncompiled_shaders\infinite_grid_shader.vert -o ArcEngine\Shaders\compiled_shaders\infinite_grid_shader.vert.spv
-E:\vulkan\Bin\glslc.exe  ArcEngine\Shaders\uncompiled_shaders\infinite_grid_shader.frag -o ArcEngine\Shaders\compiled_shaders\infinite_grid_shader.frag.spv
+E:\vulkan\Bin\glslc.exe  src\Shaders\uncompiled_shaders\InfGridShader.vert -o src\Shaders\compiled_shaders\InfGridShader.vert.spv
+E:\vulkan\Bin\glslc.exe  src\Shaders\uncompiled_shaders\InfGridShader.frag -o src\Shaders\compiled_shaders\InfGridShader.frag.spv
