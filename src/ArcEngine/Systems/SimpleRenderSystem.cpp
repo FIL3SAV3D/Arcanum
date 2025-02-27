@@ -14,7 +14,7 @@ namespace arc
 {
 	struct sSimplePushConstantData
 	{
-		glm::mat4 mdoelMatrix  { 1.0f };
+		glm::mat4 modelMatrix { 1.0f };
 		glm::mat4 normalMatrix{ 1.0f };
 		
 	};
@@ -87,16 +87,18 @@ namespace arc
 			nullptr
 		);
 
-		for (auto& kv : _info.game_objects)
+		for (auto& entity : _info.entities)
 		{
-			auto& obj = kv.second;
-
-			if (obj.point_light != nullptr)
+			if (_info.coordinator.HasComponent<PointLightComponent>(entity))
 				continue;
 
+			auto& transformComponent = _info.coordinator.GetComponent<TransformComponent>(entity);
+
+			auto& modelComponent     = _info.coordinator.GetComponent<ModelComponent>(entity);
+
 			sSimplePushConstantData push{};
-			push.mdoelMatrix   = obj.transform.mat4();
-			push.normalMatrix = obj.transform.normalMatrix();
+			push.modelMatrix  = transformComponent.GetMat4x4();
+			push.normalMatrix = transformComponent.GetNormalMat4x4();
 
 			vkCmdPushConstants(
 				command_buffer,
@@ -106,8 +108,8 @@ namespace arc
 				sizeof(sSimplePushConstantData),
 				&push);
 
-			obj.model->bind(command_buffer);
-			obj.model->draw(command_buffer);
+			modelComponent.model->bind(command_buffer);
+			modelComponent.model->draw(command_buffer);
 		}
 	}
 }

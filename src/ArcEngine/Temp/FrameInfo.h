@@ -2,6 +2,7 @@
 
 #include "camera.h"
 #include "GameObject.h"
+#include "EntityComponentSystem/Coordinator.h"
 
 // lib
 #include "vulkan/vulkan.h"
@@ -22,7 +23,7 @@ namespace arc
 		glm::mat4 view{ 1.0f };
 		glm::mat4 inverseView{ 1.0f };
 		glm::vec4 camPos{ 1.0 };
-		glm::vec4 ambientLightColor{ 1.0f, 1.0f, 1.0f, 0.02f }; // w is light intensity
+		glm::vec4 ambientLightColor{ 1.0f, 1.0f, 1.0f, 0.12f }; // w is light intensity
 		PointLight pointLights[MAX_LIGHTS];
 		int numLights;
 	};
@@ -34,6 +35,7 @@ namespace arc
 		VkCommandBuffer command_buffer;
 		arcCamera& camera;
 		VkDescriptorSet global_descriptor_set;
-		arcGameObject::Map& game_objects;
+		std::vector<Entity> entities{};
+		Coordinator& coordinator;
 	};
 }

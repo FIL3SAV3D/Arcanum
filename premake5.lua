@@ -46,6 +46,7 @@ workspace "Arcanum"
 	project "ArcEngine"
 		kind "StaticLib"
 		targetdir "bin/%{cfg.buildcfg}"
+		dependson { "Jolt", ... }
 		
 		files {
             "src/ArcEngine/**.h",
@@ -56,6 +57,7 @@ workspace "Arcanum"
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
 		
 		links { "../Arcanum/Library/GLFW/lib-vc2022/glfw3.lib"}
+		links { "Jolt" }
 
 		
 		includedirs { "$(VULKAN_SDK)/include" }
@@ -64,9 +66,19 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/Library/TinyGLTF" }
 		includedirs { "../Arcanum/Library/TinyObj" }
 		includedirs { "../Arcanum/src/ArcEngine" }
-		includedirs { "../Arcanum/Library/Jolt" }
+		includedirs { "../Arcanum/src/Jolt" }
 
+	project "Jolt"
+		kind "StaticLib"
+		targetdir "bin/%{cfg.buildcfg}"
 
+		files{
+			"src/Jolt/**.h",
+			"src/Jolt/**.cpp",
+			"src/Jolt/**.hpp"
+		}
+
+		includedirs { "../Arcanum/src/Jolt" }
 
 	project "Shaders"
 		kind "Utility"

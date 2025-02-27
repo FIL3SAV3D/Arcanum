@@ -2,7 +2,7 @@
 
 namespace arc
 {
-	void KeyboardMovementController::moveInPlaneXZ(GLFWwindow* window, float delta, arcGameObject& object)
+	void KeyboardMovementController::moveInPlaneXZ(GLFWwindow* window, float delta, TransformComponent& transform)
 	{
 		glm::vec3 rotate{ 0.0f };
 		if (glfwGetKey(window, Keys.lookRight) == GLFW_PRESS)
@@ -17,12 +17,12 @@ namespace arc
 		delta = glm::min(delta, 1.0f);
 
 		if(glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon())
-			object.transform.rotation += turn_speed * delta * glm::normalize(rotate);
+			transform.rotation += turn_speed * delta * glm::normalize(rotate);
 
-		object.transform.rotation.x = glm::clamp(object.transform.rotation.x, -1.5f, 1.5f);
-		object.transform.rotation.y = glm::mod(object.transform.rotation.y, glm::two_pi<float>());
+		transform.rotation.x = glm::clamp(transform.rotation.x, -1.5f, 1.5f);
+		transform.rotation.y = glm::mod(transform.rotation.y, glm::two_pi<float>());
 
-		float yaw = object.transform.rotation.y;
+		float yaw = transform.rotation.y;
 		const glm::vec3 forward_dir{ glm::sin(yaw), 0.0f, glm::cos(yaw) };
 		const glm::vec3 right_dir{ forward_dir.z, 0.0f, -forward_dir.x };
 		const glm::vec3 up_dir  { 0.0f, -1.0f, 0.0f };
@@ -43,6 +43,6 @@ namespace arc
 			move_dir -= up_dir;
 
 		if (glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon())
-			object.transform.translation += move_speed * delta * glm::normalize(move_dir);
+			transform.position += move_speed * delta * glm::normalize(move_dir);
 	}
 }

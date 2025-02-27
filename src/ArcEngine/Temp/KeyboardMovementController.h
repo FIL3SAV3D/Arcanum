@@ -2,6 +2,7 @@
 
 #include "GameObject.h"
 #include "window/Window.h"
+#include "FrameInfo.h"
 
 namespace arc
 {
@@ -21,7 +22,7 @@ namespace arc
 			int lookDown = GLFW_KEY_DOWN;
 		};
 
-		void moveInPlaneXZ(GLFWwindow* window, float delta, arcGameObject& object);
+		void moveInPlaneXZ(GLFWwindow* window, float delta, TransformComponent& transform);
 
 		KeyMappings Keys{};
 

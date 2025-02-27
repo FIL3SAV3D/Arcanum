@@ -21,154 +21,9 @@
 #include <array>
 #include <chrono>
 
-// Jolt
-#include <Jolt/Jolt.h>
+#include "Temp/JoltHelper.h"
 
-// Jolt includes
-#include <Jolt/RegisterTypes.h>
-#include <Jolt/Core/Factory.h>
-#include <Jolt/Core/TempAllocator.h>
-#include <Jolt/Core/JobSystemThreadPool.h>
-#include <Jolt/Physics/PhysicsSettings.h>
-#include <Jolt/Physics/PhysicsSystem.h>
-#include <Jolt/Physics/Collision/Shape/BoxShape.h>
-#include <Jolt/Physics/Collision/Shape/SphereShape.h>
-#include <Jolt/Physics/Body/BodyCreationSettings.h>
-#include <Jolt/Physics/Body/BodyActivationListener.h>
-#include <iostream>
 
-using namespace JPH;
-
-namespace Layers
-{
-	static constexpr JPH::ObjectLayer NON_MOVING = 0;
-	static constexpr JPH::ObjectLayer MOVING = 1;
-	static constexpr JPH::ObjectLayer NUM_LAYERS = 2;
-};
-
-namespace BroadPhaseLayers
-{
-	static constexpr JPH::BroadPhaseLayer NON_MOVING(0);
-	static constexpr JPH::BroadPhaseLayer MOVING(1);
-	static constexpr JPH::uint NUM_LAYERS(2);
-};
-
-class ObjectLayerPairFilterImpl : public ObjectLayerPairFilter
-{
-public:
-	virtual bool					ShouldCollide(ObjectLayer inObject1, ObjectLayer inObject2) const override
-	{
-		switch (inObject1)
-		{
-		case Layers::NON_MOVING:
-			return inObject2 == Layers::MOVING; // Non moving only collides with moving
-		case Layers::MOVING:
-			return true; // Moving collides with everything
-		default:
-			JPH_ASSERT(false);
-			return false;
-		}
-	}
-};
-
-class BPLayerInterfaceImpl final : public JPH::BroadPhaseLayerInterface
-{
-public:
-	BPLayerInterfaceImpl()
-	{
-		// Create a mapping table from object to broad phase layer
-		mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
-		mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
-	}
-
-	virtual JPH::uint					GetNumBroadPhaseLayers() const override
-	{
-		return BroadPhaseLayers::NUM_LAYERS;
-	}
-
-	virtual JPH::BroadPhaseLayer			GetBroadPhaseLayer(JPH::ObjectLayer inLayer) const override
-	{
-		JPH_ASSERT(inLayer < Layers::NUM_LAYERS);
-		return mObjectToBroadPhase[inLayer];
-	}
-
-#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
-	virtual const char* GetBroadPhaseLayerName(BroadPhaseLayer inLayer) const override
-	{
-		switch ((BroadPhaseLayer::Type)inLayer)
-		{
-		case (BroadPhaseLayer::Type)BroadPhaseLayers::NON_MOVING:	return "NON_MOVING";
-		case (BroadPhaseLayer::Type)BroadPhaseLayers::MOVING:		return "MOVING";
-		default:													JPH_ASSERT(false); return "INVALID";
-		}
-	}
-#endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
-
-private:
-	JPH::BroadPhaseLayer					mObjectToBroadPhase[Layers::NUM_LAYERS];
-};
-
-class ObjectVsBroadPhaseLayerFilterImpl : public JPH::ObjectVsBroadPhaseLayerFilter
-{
-public:
-	virtual bool				ShouldCollide(JPH::ObjectLayer inLayer1, JPH::BroadPhaseLayer inLayer2) const override
-	{
-		switch (inLayer1)
-		{
-		case Layers::NON_MOVING:
-			return inLayer2 == BroadPhaseLayers::MOVING;
-		case Layers::MOVING:
-			return true;
-		default:
-			JPH_ASSERT(false);
-			return false;
-		}
-	}
-};
-
-// An example contact listener
-class MyContactListener : public JPH::ContactListener
-{
-public:
-	// See: ContactListener
-	virtual ValidateResult	OnContactValidate(const Body& inBody1, const Body& inBody2, RVec3Arg inBaseOffset, const CollideShapeResult& inCollisionResult) override
-	{
-		std::cout << "Contact validate callback" << std::endl;
-
-		// Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
-		return ValidateResult::AcceptAllContactsForThisBodyPair;
-	}
-
-	virtual void			OnContactAdded(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings) override
-	{
-		std::cout << "A contact was added" << std::endl;
-	}
-
-	virtual void			OnContactPersisted(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings) override
-	{
-		std::cout << "A contact was persisted" << std::endl;
-	}
-
-	virtual void			OnContactRemoved(const SubShapeIDPair& inSubShapePair) override
-	{
-		std::cout << "A contact was removed" << std::endl;
-	}
-};
-
-// An example activation listener
-class MyBodyActivationListener : public BodyActivationListener
-{
-public:
-	virtual void		OnBodyActivated(const BodyID& inBodyID, uint64 inBodyUserData) override
-	{
-		std::cout << "A body got activated" << std::endl;
-	}
-
-	virtual void		OnBodyDeactivated(const BodyID& inBodyID, uint64 inBodyUserData) override
-	{
-		std::cout << "A body went to sleep" << std::endl;
-	}
-};
 
 namespace arc
 {
@@ -186,6 +41,8 @@ namespace arc
 			.setMaxSets(arcSwapChain::MAX_FRAMES_IN_FLIGHT)
 			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, arcSwapChain::MAX_FRAMES_IN_FLIGHT)
 			.build();
+
+		coordinator.Init();
 
 		loadGameObjects();
 	}
@@ -326,14 +183,15 @@ namespace arc
 			float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
 			current_time = new_time;
 
-			cameraController.moveInPlaneXZ(arc_window.getGLFWWindow(), frame_time, viewObject);
 
-			camera.setViewYXZ(viewObject.transform.translation, viewObject.transform.rotation);
+			cameraController.moveInPlaneXZ(arc_window.getGLFWWindow(), frame_time, coordinator.GetComponent<TransformComponent>(CameraEntity));
+
+			camera.setViewYXZ(coordinator.GetComponent<TransformComponent>(CameraEntity).position, coordinator.GetComponent<TransformComponent>(CameraEntity).rotation);
 
 			float aspect = arc_renderer.getAspectRatio();
 			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -10, 1000.0f);
 			camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
-			game_objects.at(0).transform.rotation.y += 1.0f * frame_time;
+			/*game_objects.at(0).transform.rotation.y += 1.0f * frame_time;*/
 
 			if (auto command_buffer = arc_renderer.beginFrame())
 			{
@@ -345,7 +203,8 @@ namespace arc
 					command_buffer,
 					camera,
 					globalDescriptorSets[frame_index],
-					game_objects
+					entities,
+					coordinator
 				};
 
 				// Update
@@ -393,103 +252,50 @@ namespace arc
 	{
 		printf("FirstApp loadGameObjects\n");
 
-		/*std::shared_ptr<arcModel> vase_model = arcModel::createOBJModelFromFile(arc_device, "src/ArcEngine/Models/obj_models/smooth_vase.obj");
+		entities.insert(entities.begin(), 256, 0);
 
-		auto vase = arcGameObject::createGameObject();
-		vase.model = vase_model;
-		vase.transform.translation = { 0.0f, 0.0f, 2.5f };
-		vase.transform.scale = glm::vec3{ 2.0f, 3.0f, 2.0f };
+		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "E:\\Arcanum\\src\\ArcEngine\\Models\\glb_models\\BeatSphere.glb");
 
-		game_objects.emplace(vase.getId(), std::move(vase));*/
+		std::default_random_engine generator;
+		std::uniform_real_distribution<float> randPosition(-10.0f, 10.0f);
+		std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
+		std::uniform_real_distribution<float> randScale(0.1f, 0.5f);
 
-		/*arc_game_objects.push_back(std::move(gameObj));*/
-		/*"E:\Arcanum\ArcEngine\Models\Source images\T_MIMIC_BC.png"*/
+		//
+		for (auto& entity : entities)
+		{
+			entity = coordinator.CreateEntity();
+
+			coordinator.AddComponent(
+				entity, 
+				TransformComponent{ 
+				{randPosition(generator), randPosition(generator), randPosition(generator)},
+				{randRotation(generator), randRotation(generator), randRotation(generator)}, 
+				{randScale(generator), randScale(generator), randScale(generator)}
+				}
+			);
+
+			coordinator.AddComponent(entity, ModelComponent{ rat_model });
+		}
+
+		CameraEntity = coordinator.CreateEntity();
+		coordinator.AddComponent(
+			CameraEntity,
+			TransformComponent{}
+		);
+
+		coordinator.AddComponent(
+			CameraEntity,
+			CameraComponent{}
+		);
+
 		auto test2 = std::filesystem::current_path().string();
 		auto path2 = "E:\\Arcanum\\src\\ArcEngine\\Models\\src_images\\T_Rat_BC.png";
 		auto path_normal = "E:\\Arcanum\\src/ArcEngine\\Models\\src_images\\T_Rat_N.png";
 		auto path_orm = "E:\\Arcanum\\src/ArcEngine\\Models\\src_images\\T_Rat_ORM.png";
 
-		//auto test2 = std::filesystem::current_path().string();
-		//auto path2 = test2 + "\\" + "ArcEngine\\Models\\src_images\\mimic_textures\\T_Mimic_BC.png";
-		//auto path_normal = test2 + "\\" + "ArcEngine\\Models\\src_images\\mimic_textures\\T_Mimic_N.png";
-		//auto path_orm = test2 + "\\" + "ArcEngine\\Models\\src_images\\mimic_textures\\T_Mimic_ORM.png";
-
 		tex = new cTexture{ arc_device, path2 };
 		tex_normal = new cTexture{ arc_device, path_normal };
 		tex_ORM = new cTexture{ arc_device, path_orm };
-
-		//std::shared_ptr<arcModel> chest_model = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\glb_models\\SM_MimicChest.glb");
-
-		//auto chest = arcGameObject::createGameObject();
-		//chest.model = chest_model;
-		//chest.transform.translation = { 0.0f, 0.0f, 0.0f };
-		//chest.transform.scale = glm::vec3{ 1.00f,  1.00f,  1.00f };
-		//chest.transform.rotation = { 180.0f * (3.14/180), 0.0f, 0.0f};
-		////gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
-
-		//game_objects.emplace(chest.getId(), std::move(chest));
-
-		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "E:\\Arcanum\\src\\ArcEngine\\Models\\glb_models\\Rat.glb");
-
-		auto rat01 = arcGameObject::createGameObject();
-		rat01.model = rat_model;
-		rat01.transform.translation = { 0.0f, -0.4f, 0.0f };
-		rat01.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
-		rat01.transform.rotation = { -90.0f, 0.0f, 0.0f};
-		//gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
-
-		game_objects.emplace(rat01.getId(), std::move(rat01));
-
-		auto rat02 = arcGameObject::createGameObject();
-		rat02.model = rat_model;
-		rat02.transform.translation = { 1.0f, -0.4f, 0.0f };
-		rat02.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
-		rat02.transform.rotation = { -90.0f, 0.0f, 0.0f };
-
-		//gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
-
-		game_objects.emplace(rat02.getId(), std::move(rat02));
-
-
-		//std::shared_ptr<arcModel> rat_racer = arcModel::createGLTFModelFromFile(arc_device, "ArcEngine\\Models\\RatRacer.glb");
-
-		//auto ratr = arcGameObject::createGameObject();
-		//ratr.model = rat_racer;
-		//ratr.transform.translation = { -1.0f, 0.0f, 0.0f };
-		//ratr.transform.scale = glm::vec3{ 0.05f,  0.05f,  0.05f };
-		//ratr.transform.rotation = { 0.0f, 0.0f, 0.0f };
-
-		////gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
-
-		//game_objects.emplace(ratr.getId(), std::move(ratr));
-
-
-		//std::shared_ptr<arcModel> quad_model = arcModel::createOBJModelFromFile(arc_device, "ArcEngine/Models/obj_models/quad.obj");
-
-		//auto quad = arcGameObject::createGameObject();
-		//quad.model = quad_model;
-		//quad.transform.translation = { 0.0f, 0.2f, 0.0f };
-		//quad.transform.scale = glm::vec3{ 3.0f,  1.0f,  3.0f };
-		////gameObj1.texture = std::make_shared<cTexture>(arc_device, path2);
-
-		//game_objects.emplace(quad.getId(), std::move(quad));
-			
-		std::vector<glm::vec3> lightColors{
-			{1.f, .1f, .1f},
-			{.1f, .1f, 1.f},
-			{.1f, 1.f, .1f},
-			//{1.f, 1.f, .1f},
-			//{.1f, 1.f, 1.f},
-			//{1.f, 1.f, 1.f}
-		};
-
-		for (int i = 0; i < lightColors.size(); i++)
-		{
-			auto pointlight = arcGameObject::makePointLight(0.2f, 0.2f);
-			pointlight.color = lightColors[i];
-			auto rotateLight = glm::rotate(glm::mat4(1.0f), (i * glm::two_pi<float>()) / lightColors.size(), {0.0f, -1.0f, 0.0f});
-			pointlight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f));
-			game_objects.emplace(pointlight.getId(), std::move(pointlight));
-		}
 	}
 }

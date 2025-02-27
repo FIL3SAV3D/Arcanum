@@ -1,8 +1,14 @@
-#include "GameObject.h"
+#pragma once
 
-namespace arc
+#include "glm/gtc/matrix_transform.hpp"
+
+struct TransformComponent
 {
-	/*glm::mat4 TransformComponent::mat4() {
+	glm::vec3 position{ 0.0f };
+	glm::vec3 rotation{ 0.0f };
+	glm::vec3 scale   { 1.0f };
+
+	glm::mat4 GetMat4x4() {
 		const float c3 = glm::cos(rotation.z);
 		const float s3 = glm::sin(rotation.z);
 		const float c2 = glm::cos(rotation.x);
@@ -28,9 +34,9 @@ namespace arc
 				scale.z * (c1 * c2),
 				0.0f,
 			},
-			{translation.x, translation.y, translation.z, 1.0f} };
+			{position.x, position.y, position.z, 1.0f} };
 	}
-	glm::mat3 TransformComponent::normalMatrix()
+	glm::mat3 GetNormalMat4x4()
 	{
 		const float c3 = glm::cos(rotation.z);
 		const float s3 = glm::sin(rotation.z);
@@ -58,15 +64,5 @@ namespace arc
 				invScale.z * (c1 * c2),
 			}
 		};
-	}*/
-
-	//arcGameObject arc::arcGameObject::makePointLight(float _intensity, float _radius, glm::vec3 _color)
-	//{
-	//	///*arcGameObject gameObj = arcGameObject::createGameObject();
-	//	//gameObj.color = _color;
-	//	//gameObj.transform.scale.x = _radius;
-	//	//gameObj.point_light = std::make_unique<PointLightComponent>();
-	//	//gameObj.point_light->light_intensity = _intensity;
-	//	//return gameObj;*/
-	//}
-}
+	}
+};

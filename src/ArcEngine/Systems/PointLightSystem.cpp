@@ -77,21 +77,19 @@ namespace arc
 	{
 		auto rotateLight = glm::rotate(glm::mat4(1.0f), _info.frame_time, { 0.0f, -1.0f, 0.0f });
 		int lightIndex = 0;
-		for (auto& kv : _info.game_objects)
+		for (auto& entity : _info.entities)
 		{
-			auto& obj = kv.second;
-
-			if (obj.point_light == nullptr)
+			if (!_info.coordinator.HasComponent<PointLightComponent>(entity))
 				continue;
 
 			assert(lightIndex < MAX_LIGHTS && "Exceeded max lights limit");
 
 			// update light position
-			obj.transform.translation = glm::vec3(rotateLight * glm::vec4(obj.transform.translation, 1.0f));
+			//entity.transform.translation = glm::vec3(rotateLight * glm::vec4(obj.transform.translation, 1.0f));
 
-			// Copy Light to ubo
-			ubo.pointLights[lightIndex].position = glm::vec4(obj.transform.translation, 1.0f);
-			ubo.pointLights[lightIndex].color = glm::vec4(obj.color, obj.point_light->light_intensity);
+			//// Copy Light to ubo
+			//ubo.pointLights[lightIndex].position = glm::vec4(obj.transform.translation, 1.0f);
+			//ubo.pointLights[lightIndex].color = glm::vec4(obj.color, obj.point_light->light_intensity);
 			lightIndex += 1;
 		}
 		ubo.numLights = lightIndex;
@@ -100,47 +98,47 @@ namespace arc
 	void cPointLightSystem::render(frameInfo& _info)
 	{
 		// Sort Lights
-		std::map<float, arcGameObject::id_t> sorted;
-		for (auto& kv : _info.game_objects)
-		{
-			auto& obj = kv.second;
-			if (obj.point_light == nullptr)
-				continue;
+	//	std::map<float, arcGameObject::id_t> sorted;
+	//	for (auto& kv : _info.game_objects)
+	//	{
+	//		auto& obj = kv.second;
+	//		if (obj.point_light == nullptr)
+	//			continue;
 
-			auto offset = _info.camera.getCameraPos() - obj.transform.translation;
-			float distSquared = glm::dot(offset, offset);
-			sorted[distSquared] = obj.getId();
-		}
+	//		auto offset = _info.camera.getCameraPos() - obj.transform.translation;
+	//		float distSquared = glm::dot(offset, offset);
+	//		sorted[distSquared] = obj.getId();
+	//	}
 
-		arcCamera& camera = _info.camera;
-		VkCommandBuffer command_buffer = _info.command_buffer;
+	//	arcCamera& camera = _info.camera;
+	//	VkCommandBuffer command_buffer = _info.command_buffer;
 
-		arc_pipeline->bind(command_buffer);
+	//	arc_pipeline->bind(command_buffer);
 
-		vkCmdBindDescriptorSets(
-			command_buffer,
-			VK_PIPELINE_BIND_POINT_GRAPHICS,
-			pipeline_layout,
-			0, 
-			1,
-			&_info.global_descriptor_set,
-			0, 
-			nullptr
-		);
+	//	vkCmdBindDescriptorSets(
+	//		command_buffer,
+	//		VK_PIPELINE_BIND_POINT_GRAPHICS,
+	//		pipeline_layout,
+	//		0, 
+	//		1,
+	//		&_info.global_descriptor_set,
+	//		0, 
+	//		nullptr
+	//	);
 
-		for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
-		{
-			auto& obj = _info.game_objects.at(it->second);
+	//	for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
+	//	{
+	//		auto& obj = _info.game_objects.at(it->second);
 
-			PointLightPushConstants push{};
-			push.position = glm::vec4(obj.transform.translation, 1.0f);
-			push.color = glm::vec4(obj.color, obj.point_light->light_intensity);
-			push.radius = obj.transform.scale.x;
+	//		PointLightPushConstants push{};
+	//		push.position = glm::vec4(obj.transform.translation, 1.0f);
+	//		push.color = glm::vec4(obj.color, obj.point_light->light_intensity);
+	//		push.radius = obj.transform.scale.x;
 
-			vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PointLightPushConstants), &push);
+	//		vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PointLightPushConstants), &push);
 
-			vkCmdDraw(_info.command_buffer, 6, 1, 0, 0);
-		}
+	//		vkCmdDraw(_info.command_buffer, 6, 1, 0, 0);
+	//	}
 
 	}
 }
