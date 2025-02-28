@@ -8,7 +8,8 @@ const vec3 Pos[4] = vec3[4]
 	vec3(-1.0, 0.0,  1.0)
 );
 
-const int Indicies[6] = int[6](0, 2, 1, 2, 0, 3);
+const int IndiciesFront[6] = int[6](0, 1, 2, 0, 2, 3);
+const int IndiciesBack[6] = int[6](0, 2, 1, 2, 0, 3);
 
 layout(location = 0) out vec3 worldPos;
 
@@ -31,7 +32,18 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 
 void main()
 {
-	int Index = Indicies[gl_VertexIndex];
+
+	int Index;
+
+	if(ubo.camPos.y >= 0.0)
+	{
+		Index = IndiciesBack[gl_VertexIndex];
+	}
+	else
+	{
+		Index = IndiciesFront[gl_VertexIndex];
+	}
+
 	vec3 vPos3 = Pos[Index] * 100.0;
 
 	vPos3.x += ubo.camPos.x;

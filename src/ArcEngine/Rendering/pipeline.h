@@ -48,6 +48,8 @@ namespace arc
 		static void defaultPipelineConfigInfo(pipelineConfigInfo& _config_info);
 		static void enableAlphaBlending(pipelineConfigInfo& _config_info);
 
+		VkSampleCountFlagBits GetMaxUsableSampleCount();
+
 	private:
 		static std::vector<char> readFile(const std::string& _file_path);
 

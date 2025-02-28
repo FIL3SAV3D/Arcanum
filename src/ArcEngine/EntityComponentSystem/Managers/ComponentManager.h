@@ -56,7 +56,7 @@ public:
 	template<typename T>
 	bool HasComponent(Entity entity)
 	{
-		return GetComponentArray<T>() == nullptr;
+		return GetComponentArray<T>()->HasData(entity);
 	}
 
 	void EntityDestroyed(Entity entity)

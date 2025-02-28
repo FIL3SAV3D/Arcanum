@@ -23,7 +23,7 @@
 
 #include "Temp/JoltHelper.h"
 
-
+#define JPH_USE_SSE4_2
 
 namespace arc
 {
@@ -44,6 +44,44 @@ namespace arc
 
 		coordinator.Init();
 
+		/// Jolt Testing Ground
+		JPH::RegisterDefaultAllocator();
+
+		JPH::Factory::sInstance = new JPH::Factory();
+
+		JPH::RegisterTypes();
+
+		
+
+		const JPH::uint cMaxBodies = 8000000;
+
+		const JPH::uint cNumBodyMutexes = 0;
+
+		const JPH::uint cMaxBodyPairs = 4500000;
+
+		const JPH::uint cMaxContactConstraints = 4500000;
+
+		physics_system.Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, broad_phase_layer_interface, object_vs_broadphase_layer_filter, object_vs_object_layer_filter);
+
+		physics_system.SetBodyActivationListener(&body_activation_listener);
+
+		physics_system.SetContactListener(&contact_listener);
+
+		BodyInterface& BodyInterface = physics_system.GetBodyInterface();
+
+		BoxShapeSettings floor_shape_settings(Vec3(100.0f, 1.0f, 100.0f));
+		floor_shape_settings.SetEmbedded();
+
+		ShapeSettings::ShapeResult floor_shape_result = floor_shape_settings.Create();
+		ShapeRefC floor_shape = floor_shape_result.Get();
+
+		BodyCreationSettings floor_settings(floor_shape, RVec3(0.0, 0.0, 0.0), Quat::sIdentity(), EMotionType::Static, Layers::NON_MOVING);
+
+		BodyInterface.CreateAndAddBody(floor_settings, EActivation::DontActivate);
+
+		physics_system.SetGravity({0.0f, 1.0f, 0.0f});
+		/// Jolt Testing Ground
+
 		loadGameObjects();
 	}
 
@@ -56,47 +94,7 @@ namespace arc
 
 	void arc::cFirstApp::run()
 	{
-		/// Jolt Testing Ground
-		JPH::RegisterDefaultAllocator();
-
-		JPH::Factory::sInstance = new JPH::Factory();
-
-		JPH::RegisterTypes();
-
-		JPH::TempAllocatorImpl temp_allocator(10 * 1024 * 1024);
-
-		JPH::JobSystemThreadPool job_system(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, JPH::thread::hardware_concurrency() - 1);
-
-		const JPH::uint cMaxBodies = 1024;
-
-		const JPH::uint cNumBodyMutexes = 0;
-
-		const JPH::uint cMaxBodyPairs = 1024;
-
-		const JPH::uint cMaxContactConstraints = 1024;
-
-		BPLayerInterfaceImpl broad_phase_layer_interface;
-
-		ObjectVsBroadPhaseLayerFilterImpl object_vs_broadphase_layer_filter;
-
-		ObjectLayerPairFilterImpl object_vs_object_layer_filter;
-
-		JPH::PhysicsSystem physics_system;
-		physics_system.Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, broad_phase_layer_interface, object_vs_broadphase_layer_filter, object_vs_object_layer_filter);
-
-		MyBodyActivationListener body_activation_listener;
-		physics_system.SetBodyActivationListener(&body_activation_listener);
-
-		MyContactListener contact_listener;
-		physics_system.SetContactListener(&contact_listener);
-
-		BodyInterface& body_interface = physics_system.GetBodyInterface();
-
-		BoxShapeSettings floor_shape_settings(Vec3(100.0f, 1.0f, 100.0f));
-		floor_shape_settings.SetEmbedded();
-
-
-		/// Jolt Testing Ground
+		
 
 		printf("FirstApp Run\n");
 
@@ -160,7 +158,6 @@ namespace arc
 				.build(globalDescriptorSets[i]);
 		}
 
-
 		simpleRenderSystem simple_render_system{ arc_device, arc_renderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout() };
 		cInfiniteGridRenderSystem inf_grid_system{ arc_device, arc_renderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout() };
 		cPointLightSystem point_light_system   { arc_device, arc_renderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout()};
@@ -171,6 +168,9 @@ namespace arc
 
 		auto current_time = std::chrono::high_resolution_clock::now();
 
+		JPH::TempAllocatorImpl temp_allocator( 4048 * size_t(1024 * 1024));
+		JPH::JobSystemThreadPool job_system(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, JPH::thread::hardware_concurrency() - 1);
+		physics_system.OptimizeBroadPhase();
 
 		while (!arc_window.shouldClose())
 		{
@@ -183,6 +183,7 @@ namespace arc
 			float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
 			current_time = new_time;
 
+			physics_system.Update(frame_time, 1, &temp_allocator, &job_system);
 
 			cameraController.moveInPlaneXZ(arc_window.getGLFWWindow(), frame_time, coordinator.GetComponent<TransformComponent>(CameraEntity));
 
@@ -206,7 +207,24 @@ namespace arc
 					entities,
 					coordinator
 				};
-
+				
+				auto& BInter = physics_system.GetBodyInterface();
+				for (auto& entity : entities)
+				{
+					if (!coordinator.HasComponent<PhysicsComponent>(entity))
+						continue;
+					auto& Pcomp = coordinator.GetComponent<PhysicsComponent>(entity);
+					auto& Tcomp = coordinator.GetComponent<TransformComponent>(entity);
+					JPH::RVec3 pos{};
+					JPH::Quat quat{};
+					JPH::RMat44 Transform = BInter.GetCenterOfMassTransform(Pcomp.CollisionID);
+					JPH::RMat44 rotation = Transform.GetRotation();
+					
+					JPH::RVec3 rot = rotation.GetQuaternion().GetEulerAngles();
+					Tcomp.position = { Transform.GetTranslation().GetX(), Transform.GetTranslation().GetY(), Transform.GetTranslation().GetZ() };
+					Tcomp.rotation = { rot.GetX(), rot.GetY(), rot.GetZ() };
+				}
+				
 				// Update
 				GlobalUBO ubo{};
 				ubo.projection = camera.getProjectionMatrix();
@@ -252,30 +270,46 @@ namespace arc
 	{
 		printf("FirstApp loadGameObjects\n");
 
-		entities.insert(entities.begin(), 256, 0);
+		entities.insert(entities.begin(), MAX_ENTITIES - 1, 0);
 
-		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "E:\\Arcanum\\src\\ArcEngine\\Models\\glb_models\\BeatSphere.glb");
+		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "E:\\Arcanum\\src\\ArcEngine\\Models\\glb_models\\Rat.glb");
 
 		std::default_random_engine generator;
-		std::uniform_real_distribution<float> randPosition(-10.0f, 10.0f);
+		std::uniform_real_distribution<float> randPosition(-50.0f, 50.0f);
+		std::uniform_real_distribution<float> randHeight(5.0f, 20.0f);
 		std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
 		std::uniform_real_distribution<float> randScale(0.1f, 0.5f);
 
-		//
+		//{randScale(generator), randScale(generator), randScale(generator)}
 		for (auto& entity : entities)
 		{
 			entity = coordinator.CreateEntity();
 
+			TransformComponent TComp{
+				{randPosition(generator), -randHeight(generator), randPosition(generator)},
+				{randRotation(generator), randRotation(generator), randRotation(generator)},
+				{0.1f, 0.1f, 0.1f}
+			};
 			coordinator.AddComponent(
 				entity, 
-				TransformComponent{ 
-				{randPosition(generator), randPosition(generator), randPosition(generator)},
-				{randRotation(generator), randRotation(generator), randRotation(generator)}, 
-				{randScale(generator), randScale(generator), randScale(generator)}
-				}
+				TComp
 			);
 
 			coordinator.AddComponent(entity, ModelComponent{ rat_model });
+
+			PhysicsComponent pComp{};
+			pComp.CreateCollision(physics_system, rat_model->JPHVertArray);
+			coordinator.AddComponent(entity, pComp);
+			
+			JPH::Quat quat{};
+			quat = quat.sEulerAngles(RVec3{ TComp.rotation.x, TComp.rotation.y, TComp.rotation.z });
+			quat = quat.Normalized();
+			physics_system.GetBodyInterface().SetPositionAndRotation(
+				pComp.CollisionID, 
+				{ TComp.position.x, TComp.position.y, TComp.position.z }, 
+				quat,
+				EActivation::Activate);
+			//physics_system.GetBodyInterface().SetLinearVelocity(pComp.CollisionID, Vec3(0.0f, 5.0f, 0.0f));
 		}
 
 		CameraEntity = coordinator.CreateEntity();

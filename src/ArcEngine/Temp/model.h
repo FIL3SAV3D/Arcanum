@@ -2,6 +2,9 @@
 #include "Window/device.h"
 #include "Rendering/buffer.h"
 
+#include "Jolt/Jolt.h"
+#include "Jolt/Math/Vec3.h"
+
 // libs
 #define GLM_FORCE_RADIANS
 #define FORCE_DEPTH_ZERO_TO_ONE
@@ -37,6 +40,8 @@ namespace arc
 			std::vector<sVertex> vertices{};
 			std::vector<uint32_t> indices{};
 
+			JPH::Array<JPH::Vec3> JPHVertArray{};
+
 			void loadOBJModel(const std::string& _filepath);
 			void loadGLTFModel(const std::string& _filepath);
 		};
@@ -53,6 +58,7 @@ namespace arc
 		void bind(VkCommandBuffer _command_buffer);
 		void draw(VkCommandBuffer _command_buffer);
 
+		JPH::Array<JPH::Vec3> JPHVertArray{};
 	private:
 		void createVertexBuffers(const std::vector<sVertex>& _vertices);
 		void createIndexBuffers(const std::vector<uint32_t>& _indices);

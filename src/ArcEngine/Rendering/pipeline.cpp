@@ -49,7 +49,7 @@ namespace arc
 		_config_info.rasterization_info.rasterizerDiscardEnable = VK_FALSE;
 		_config_info.rasterization_info.polygonMode = VK_POLYGON_MODE_FILL;
 		_config_info.rasterization_info.lineWidth = 1.0f;
-		_config_info.rasterization_info.cullMode = VK_CULL_MODE_NONE;
+		_config_info.rasterization_info.cullMode = VK_CULL_MODE_FRONT_BIT;
 		_config_info.rasterization_info.frontFace = VK_FRONT_FACE_CLOCKWISE;
 		_config_info.rasterization_info.depthBiasEnable = VK_FALSE;
 		_config_info.rasterization_info.depthBiasConstantFactor = 0.0f;  // Optional
@@ -119,6 +119,20 @@ namespace arc
 		_config_info.color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
 		_config_info.color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
 		_config_info.color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;
+	}
+
+	VkSampleCountFlagBits arcPipeline::GetMaxUsableSampleCount()
+	{
+		VkPhysicalDeviceProperties physicalDeviceProperties = arc_device.properties;
+		VkSampleCountFlags counts = physicalDeviceProperties.limits.framebufferColorSampleCounts & physicalDeviceProperties.limits.framebufferDepthSampleCounts;
+		if (counts & VK_SAMPLE_COUNT_64_BIT) { return VK_SAMPLE_COUNT_64_BIT; }
+		if (counts & VK_SAMPLE_COUNT_32_BIT) { return VK_SAMPLE_COUNT_32_BIT; }
+		if (counts & VK_SAMPLE_COUNT_16_BIT) { return VK_SAMPLE_COUNT_16_BIT; }
+		if (counts & VK_SAMPLE_COUNT_8_BIT) { return VK_SAMPLE_COUNT_8_BIT; }
+		if (counts & VK_SAMPLE_COUNT_4_BIT) { return VK_SAMPLE_COUNT_4_BIT; }
+		if (counts & VK_SAMPLE_COUNT_2_BIT) { return VK_SAMPLE_COUNT_2_BIT; }
+
+		return VK_SAMPLE_COUNT_1_BIT;
 	}
 
 	std::vector<char> arcPipeline::readFile(const std::string& _file_path)

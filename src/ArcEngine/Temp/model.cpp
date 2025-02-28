@@ -45,6 +45,7 @@ namespace arc
 	{
 		createVertexBuffers(_builder.vertices);
 		createIndexBuffers(_builder.indices);
+		JPHVertArray = _builder.JPHVertArray;
 	}
 
 	arcModel::~arcModel()
@@ -89,7 +90,6 @@ namespace arc
 		{
 			vkCmdDraw(_command_buffer, vertex_count, 1, 0, 0);
 		}
-
 	}
 
 	void arcModel::createVertexBuffers(const std::vector<sVertex>& _vertices)
@@ -267,6 +267,7 @@ namespace arc
 
 		vertices.clear();
 		indices.clear();
+		JPHVertArray.clear();
 
 		for (size_t m = 0; m < model.meshes.size(); m++)
 		{
@@ -313,6 +314,7 @@ namespace arc
 						vert.uv = texCoordsBuffer ? glm::vec2(texCoordsBuffer[0 + v * 2], texCoordsBuffer[1 + v * 2]) : glm::vec3(0.0f);
 						vert.color = glm::vec3(1.0f);
 						vertices.push_back(vert);
+						JPHVertArray.push_back({ vert.position.x, vert.position.y, vert.position.z });
 					}
 				}
 				// Indices

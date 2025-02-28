@@ -82,6 +82,7 @@ namespace arc
 			if (!_info.coordinator.HasComponent<PointLightComponent>(entity))
 				continue;
 
+
 			assert(lightIndex < MAX_LIGHTS && "Exceeded max lights limit");
 
 			// update light position

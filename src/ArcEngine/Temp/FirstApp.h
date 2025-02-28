@@ -21,8 +21,8 @@ namespace arc
 	class cFirstApp
 	{
 	public:
-		static constexpr int WIDTH  = 800;
-		static constexpr int HEIGHT = 600;
+		static constexpr int WIDTH  = 1280;
+		static constexpr int HEIGHT = 720;
 
 		 cFirstApp();
 		~cFirstApp();
@@ -46,6 +46,14 @@ namespace arc
 		cTexture* tex_ORM;
 
 		Coordinator coordinator;
+
+		JPH::PhysicsSystem physics_system;
+		BPLayerInterfaceImpl broad_phase_layer_interface;
+		ObjectVsBroadPhaseLayerFilterImpl object_vs_broadphase_layer_filter;
+		ObjectLayerPairFilterImpl object_vs_object_layer_filter;
+		MyContactListener contact_listener;
+		MyBodyActivationListener body_activation_listener;
+		JPH::TempAllocatorImpl* temp_allocator;
 
 		std::vector<Entity> entities{};
 		Entity CameraEntity;

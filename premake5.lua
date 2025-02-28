@@ -41,6 +41,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/Library/GLFW/include" }
 		includedirs { "../Arcanum/Library/GLM" }
 		includedirs { "../Arcanum/src/ArcEngine" }
+		includedirs { "../Arcanum/src/Jolt" }
 
 
 	project "ArcEngine"
