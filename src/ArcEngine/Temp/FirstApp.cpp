@@ -272,7 +272,7 @@ namespace arc
 
 		entities.insert(entities.begin(), MAX_ENTITIES - 1, 0);
 
-		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "E:\\Arcanum\\src\\ArcEngine\\Models\\glb_models\\Rat.glb");
+		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "F:\\Arcanum\\src\\ArcEngine\\Models\\glb_models\\Rat.glb");
 
 		std::default_random_engine generator;
 		std::uniform_real_distribution<float> randPosition(-50.0f, 50.0f);
@@ -324,9 +324,9 @@ namespace arc
 		);
 
 		auto test2 = std::filesystem::current_path().string();
-		auto path2 = "E:\\Arcanum\\src\\ArcEngine\\Models\\src_images\\T_Rat_BC.png";
-		auto path_normal = "E:\\Arcanum\\src/ArcEngine\\Models\\src_images\\T_Rat_N.png";
-		auto path_orm = "E:\\Arcanum\\src/ArcEngine\\Models\\src_images\\T_Rat_ORM.png";
+		auto path2 = test2 + "\\src\\ArcEngine\\Models\\src_images\\T_Rat_BC.png";
+		auto path_normal = test2 + "\\src\\ArcEngine\\Models\\src_images\\T_Rat_N.png";
+		auto path_orm = test2 + "\\src\\ArcEngine\\Models\\src_images\\T_Rat_ORM.png";
 
 		tex = new cTexture{ arc_device, path2 };
 		tex_normal = new cTexture{ arc_device, path_normal };

@@ -9,6 +9,7 @@
 // std
 #include <stdexcept>
 #include <array>
+#include <filesystem>
 
 namespace arc
 {
@@ -57,6 +58,9 @@ namespace arc
 	{
 		assert(pipeline_layout != nullptr && "Cannot create pipeline before pipeline layout");
 
+		auto path = std::filesystem::current_path().string();
+		std::replace(path.begin(), path.end(), '\\', '/');
+
 		pipelineConfigInfo pipeline_config{};
 		arcPipeline::defaultPipelineConfigInfo(pipeline_config);
 		arcPipeline::enableAlphaBlending(pipeline_config);
@@ -64,8 +68,8 @@ namespace arc
 		pipeline_config.render_pass = _render_pass;
 		pipeline_config.pipeline_layout = pipeline_layout;
 		arc_pipeline = std::make_unique<arcPipeline>(arc_device, pipeline_config, 
-			"E:/Arcanum/src/Shaders/compiled_shaders/SimpleShader.vert.spv", 
-			"E:/Arcanum/src/Shaders/compiled_shaders/SimpleShader.frag.spv");
+			path + "/src/Shaders/compiled_shaders/SimpleShader.vert.spv",
+			path + "/src/Shaders/compiled_shaders/SimpleShader.frag.spv");
 	}
 
 
