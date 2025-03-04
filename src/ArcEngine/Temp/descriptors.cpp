@@ -30,7 +30,7 @@ namespace arc {
     // *************** Descriptor Set Layout *********************
 
     cDescriptorSetLayout::cDescriptorSetLayout(
-        cDevice& _device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
+        arcDevice& _device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
         : device{ _device }, bindings{ bindings } {
         std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
         for (auto kv : bindings) {
@@ -80,17 +80,18 @@ namespace arc {
     // *************** Descriptor Pool *********************
 
     cDescriptorPool::cDescriptorPool(
-        arc::cDevice& _device,
+        arc::arcDevice& _device,
         uint32_t maxSets,
         VkDescriptorPoolCreateFlags poolFlags,
         const std::vector<VkDescriptorPoolSize>& poolSizes)
         : device{ _device } {
         VkDescriptorPoolCreateInfo descriptorPoolInfo{};
+
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
         descriptorPoolInfo.pPoolSizes = poolSizes.data();
         descriptorPoolInfo.maxSets = maxSets;
-        descriptorPoolInfo.flags = poolFlags;
+        descriptorPoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 
         if (vkCreateDescriptorPool(device.device(), &descriptorPoolInfo, nullptr, &descriptorPool) !=
             VK_SUCCESS) {

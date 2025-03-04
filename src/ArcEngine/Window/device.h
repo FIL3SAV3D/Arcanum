@@ -22,7 +22,7 @@ struct QueueFamilyIndices {
   bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
 };
 
-class cDevice {
+class arcDevice {
  public:
 #ifdef NDEBUG
   const bool enableValidationLayers = false;
@@ -30,14 +30,14 @@ class cDevice {
   const bool enableValidationLayers = true;
 #endif
 
-  cDevice(arc::arcWindow &window);
-  ~cDevice();
+  arcDevice(arc::arcWindow &window);
+  ~arcDevice();
 
   // Not copyable or movable
-  cDevice(const cDevice &) = delete;
-  cDevice& operator=(const cDevice &) = delete;
-  cDevice(cDevice &&) = delete;
-  cDevice &operator=(cDevice &&) = delete;
+  arcDevice(const arcDevice &) = delete;
+  arcDevice& operator=(const arcDevice &) = delete;
+  arcDevice(arcDevice &&) = delete;
+  arcDevice &operator=(arcDevice &&) = delete;
 
   VkCommandPool getCommandPool() { return commandPool; }
   VkDevice device() { return device_; }
@@ -71,6 +71,9 @@ class cDevice {
       VkDeviceMemory &imageMemory);
 
   VkPhysicalDeviceProperties properties;
+
+  VkInstance& GetInstance() { return instance; }
+  VkPhysicalDevice& GetPhysicalDevice() { return physicalDevice; }
 
  private:
   void createInstance();

@@ -28,13 +28,14 @@ workspace "Arcanum"
 		files {
             "src/Framework/**.h",
             "src/Framework/**.cpp",
-            "src/Framework/**.hpp",
+            "src/Framework/**.hpp"
         }
 
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
 		
 		links { "../Arcanum/Library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "ArcEngine" }
+		links { "Ws2_32.lib" }
 
 
 		includedirs { "$(VULKAN_SDK)/include" }
@@ -42,6 +43,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/Library/GLM" }
 		includedirs { "../Arcanum/src/ArcEngine" }
 		includedirs { "../Arcanum/src/Jolt" }
+
 
 
 	project "ArcEngine"
@@ -53,10 +55,22 @@ workspace "Arcanum"
             "src/ArcEngine/**.h",
             "src/ArcEngine/**.cpp",
             "src/ArcEngine/**.hpp",
+
+			"src/ImGui/*.h",
+			"src/ImGui/*.cpp",
+			"src/ImGui/*.hpp",
+
+			"src/ImGui/backends/imgui_impl_vulkan.cpp",
+			"src/ImGui/backends/imgui_impl_vulkan.h",
+			"src/ImGui/backends/imgui_impl_glfw.cpp",
+			"src/ImGui/backends/imgui_impl_glfw.h",
+
+			"misc/debuggers/imgui.natvis",
+			"misc/debuggers/imgui.natstepfilter",
+			"misc/cpp/imgui_stdlib.*"
         }
 		
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
-		
 		links { "../Arcanum/Library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "Jolt" }
 
@@ -68,6 +82,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/Library/TinyObj" }
 		includedirs { "../Arcanum/src/ArcEngine" }
 		includedirs { "../Arcanum/src/Jolt" }
+		includedirs { "../Arcanum/src/ImGui" }
 
 	project "Jolt"
 		kind "StaticLib"
@@ -81,6 +96,18 @@ workspace "Arcanum"
 
 		includedirs { "../Arcanum/src/Jolt" }
 
+	project "ServerTest"
+		kind "ConsoleApp"
+		targetdir "bin/%{cfg.buildcfg}"
+
+		files{
+			"src/ServerTest/**.h",
+			"src/ServerTest/**.cpp",
+			"src/ServerTest/**.hpp"
+		}
+		links { "Ws2_32.lib" }
+		
+		includedirs { "../Arcanum/src/ServerTest" }
 	project "Shaders"
 		kind "Utility"
 		targetdir "bin/%{cfg.buildcfg}"

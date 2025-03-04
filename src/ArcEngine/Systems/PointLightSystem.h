@@ -16,7 +16,7 @@ namespace arc
 	class cPointLightSystem
 	{
 	public:
-		 cPointLightSystem(cDevice& _device, VkRenderPass _render_pass, VkDescriptorSetLayout _global_descriptor_set_layout);
+		 cPointLightSystem(arcDevice& _device, VkRenderPass _render_pass, VkDescriptorSetLayout _global_descriptor_set_layout);
 		~cPointLightSystem();
 
 		cPointLightSystem(const cPointLightSystem&) = delete;
@@ -30,7 +30,7 @@ namespace arc
 		void createPipelineLayout(VkDescriptorSetLayout _global_descriptor_set_layout);
 		void createPipeline(VkRenderPass _render_pass);
 
-		cDevice& arc_device;
+		arcDevice& arc_device;
 
 		std::unique_ptr<arcPipeline> arc_pipeline;
 		VkPipelineLayout pipeline_layout;

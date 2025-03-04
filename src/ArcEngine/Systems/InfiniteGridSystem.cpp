@@ -20,7 +20,7 @@ namespace arc
 	//	
 	//};
 
-	cInfiniteGridRenderSystem::cInfiniteGridRenderSystem(cDevice& _device, VkRenderPass _render_pass, VkDescriptorSetLayout _global_descriptor_set_layout):
+	cInfiniteGridRenderSystem::cInfiniteGridRenderSystem(arcDevice& _device, VkRenderPass _render_pass, VkDescriptorSetLayout _global_descriptor_set_layout):
 		arc_device{_device}
 	{
 		createPipelineLayout(_global_descriptor_set_layout);

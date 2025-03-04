@@ -10,7 +10,7 @@ namespace arc
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Section
 
-	cTexture::cTexture(cDevice& _device, const std::string _file_path):
+	cTexture::cTexture(arcDevice& _device, const std::string _file_path):
 		device{ _device }
 	{
 		printf("Trying to load texture %s\n", _file_path.c_str());

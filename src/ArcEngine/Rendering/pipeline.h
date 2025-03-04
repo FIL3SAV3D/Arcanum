@@ -34,7 +34,7 @@ namespace arc
 	{
 	public:
 		arcPipeline(
-			cDevice&          _device,
+			arcDevice&          _device,
 			const pipelineConfigInfo& _config,
 			const std::string&        _vert_file_path,
 			const std::string&        _frag_file_path);
@@ -60,7 +60,7 @@ namespace arc
 
 		void createShaderModule( const std::vector<char>& _code, VkShaderModule* _shader_module );
 
-		cDevice& arc_device;
+		arcDevice& arc_device;
 
 		VkPipeline graphics_pipeline;
 

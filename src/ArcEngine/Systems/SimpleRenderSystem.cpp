@@ -20,7 +20,7 @@ namespace arc
 		
 	};
 
-	simpleRenderSystem::simpleRenderSystem(cDevice& _device, VkRenderPass _render_pass, VkDescriptorSetLayout _global_descriptor_set_layout):
+	simpleRenderSystem::simpleRenderSystem(arcDevice& _device, VkRenderPass _render_pass, VkDescriptorSetLayout _global_descriptor_set_layout):
 		arc_device{_device}
 	{
 		createPipelineLayout(_global_descriptor_set_layout);

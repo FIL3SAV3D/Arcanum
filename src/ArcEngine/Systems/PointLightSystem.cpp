@@ -21,7 +21,7 @@ namespace arc
 		float radius = 1.0f;
 	};
 
-	cPointLightSystem::cPointLightSystem(cDevice& _device, VkRenderPass _render_pass, VkDescriptorSetLayout _global_descriptor_set_layout):
+	cPointLightSystem::cPointLightSystem(arcDevice& _device, VkRenderPass _render_pass, VkDescriptorSetLayout _global_descriptor_set_layout):
 		arc_device{_device}
 	{
 		createPipelineLayout(_global_descriptor_set_layout);

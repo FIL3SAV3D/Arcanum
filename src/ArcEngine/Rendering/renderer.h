@@ -16,7 +16,7 @@ namespace arc
 	{
 	public:
 
-		arcRenderer(arcWindow& _arc_window, cDevice& _arc_device);
+		arcRenderer(arcWindow& _arc_window, arcDevice& _arc_device);
 		~arcRenderer();
 
 		arcRenderer(const arcRenderer&) = delete;
@@ -52,7 +52,7 @@ namespace arc
 		void recreateSwapChain();
 
 		arcWindow& arc_window;
-		cDevice& arc_device;
+		arcDevice& arc_device;
 		std::unique_ptr<arcSwapChain> arc_swap_chain;
 		std::vector<VkCommandBuffer> command_buffers;
 

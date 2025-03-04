@@ -11,7 +11,7 @@ namespace arc
 	class cTexture
 	{
 	public:
-		cTexture( cDevice& _device,  const std::string _file_path);
+		cTexture( arcDevice& _device,  const std::string _file_path);
 		~cTexture();
 
 		cTexture(const cTexture&) = delete;
@@ -25,7 +25,7 @@ namespace arc
 	private:
 		void transitionImageLayout(VkImageLayout _old_layout, VkImageLayout _new_layout);
 
-		cDevice& device;
+		arcDevice& device;
 		VkImage image;
 		VkDeviceMemory image_memory;
 		VkImageView image_view;

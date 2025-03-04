@@ -7,7 +7,7 @@ namespace arc {
 	class cBuffer {
 	public:
 		cBuffer(
-			cDevice& device,
+			arcDevice& device,
 			VkDeviceSize instanceSize,
 			uint32_t instanceCount,
 			VkBufferUsageFlags usageFlags,
@@ -43,7 +43,7 @@ namespace arc {
 	private:
 		static VkDeviceSize getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment);
 
-		cDevice& Device;
+		arcDevice& Device;
 		void* mapped = nullptr;
 		VkBuffer buffer = VK_NULL_HANDLE;
 		VkDeviceMemory memory = VK_NULL_HANDLE;

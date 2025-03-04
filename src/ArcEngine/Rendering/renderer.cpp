@@ -6,7 +6,7 @@
 
 namespace arc
 {
-	arcRenderer::arcRenderer(arcWindow& _arc_window, cDevice& _arc_device):
+	arcRenderer::arcRenderer(arcWindow& _arc_window, arcDevice& _arc_device):
 		arc_window{_arc_window},
 		arc_device{_arc_device}
 	{

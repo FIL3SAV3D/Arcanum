@@ -13,7 +13,7 @@ namespace arc {
     public:
         class Builder {
         public:
-            Builder(cDevice& _device) : device{ _device } {}
+            Builder(arcDevice& _device) : device{ _device } {}
 
             Builder& addBinding(
                 uint32_t binding,
@@ -23,12 +23,12 @@ namespace arc {
             std::unique_ptr<cDescriptorSetLayout> build() const;
 
         private:
-            cDevice& device;
+            arcDevice& device;
             std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings{};
         };
 
         cDescriptorSetLayout(
-            cDevice& cDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
+            arcDevice& arcDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
         ~cDescriptorSetLayout();
         cDescriptorSetLayout(const cDescriptorSetLayout&) = delete;
         cDescriptorSetLayout& operator=(const cDescriptorSetLayout&) = delete;
@@ -36,7 +36,7 @@ namespace arc {
         VkDescriptorSetLayout getDescriptorSetLayout() const { return descriptorSetLayout; }
 
     private:
-        cDevice& device;
+        arcDevice& device;
         VkDescriptorSetLayout descriptorSetLayout;
         std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings;
 
@@ -47,7 +47,7 @@ namespace arc {
     public:
         class Builder {
         public:
-            Builder(cDevice& _device) : device{ _device } {}
+            Builder(arcDevice& _device) : device{ _device } {}
 
             Builder& addPoolSize(VkDescriptorType descriptorType, uint32_t count);
             Builder& setPoolFlags(VkDescriptorPoolCreateFlags flags);
@@ -55,14 +55,14 @@ namespace arc {
             std::unique_ptr<cDescriptorPool> build() const;
 
         private:
-            cDevice& device;
+            arcDevice& device;
             std::vector<VkDescriptorPoolSize> poolSizes{};
             uint32_t maxSets = 1000;
             VkDescriptorPoolCreateFlags poolFlags = 0;
         };
 
         cDescriptorPool(
-            cDevice& cDevice,
+            arcDevice& arcDevice,
             uint32_t maxSets,
             VkDescriptorPoolCreateFlags poolFlags,
             const std::vector<VkDescriptorPoolSize>& poolSizes);
@@ -77,8 +77,9 @@ namespace arc {
 
         void resetPool();
 
+		auto& GetDescriptorPool() { return descriptorPool; }
     private:
-        cDevice& device;
+        arcDevice& device;
         VkDescriptorPool descriptorPool;
 
         friend class cDescriptorWriter;

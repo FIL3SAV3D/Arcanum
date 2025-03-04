@@ -30,7 +30,7 @@ namespace arc {
 	}
 
 	cBuffer::cBuffer(
-		cDevice& device,
+		arcDevice& device,
 		VkDeviceSize instanceSize,
 		uint32_t instanceCount,
 		VkBufferUsageFlags usageFlags,

@@ -107,5 +107,5 @@ void main()
 
 	Color.a *= opacity_falloff;
 
-	outColor = Color;
+	outColor =  vec4(pow(Color.r, 1.0/2.2), pow(Color.g, 1.0/2.2), pow(Color.b, 1.0/2.2), Color.a);
 }

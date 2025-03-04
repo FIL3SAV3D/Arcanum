@@ -27,6 +27,8 @@ namespace arc
 		 cFirstApp();
 		~cFirstApp();
 
+		void InitImGui();
+
 		cFirstApp(const cFirstApp&) = delete;
 		cFirstApp& operator=(const cFirstApp&) = delete;
 
@@ -36,8 +38,8 @@ namespace arc
 		void loadGameObjects();
 
 		arcWindow arc_window{WIDTH, HEIGHT, "ARCANUM"};
-		cDevice arc_device{ arc_window };
-		arcRenderer arc_renderer{ arc_window, arc_device };
+		arcDevice arc_device{ arc_window };
+		arcRenderer ArcRenderer{ arc_window, arc_device };
 
 		std::unique_ptr<cDescriptorPool> global_pool{};
 		//arcGameObject::Map game_objects;

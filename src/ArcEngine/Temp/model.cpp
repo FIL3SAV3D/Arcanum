@@ -41,7 +41,7 @@ namespace std
 
 namespace arc
 {
-	arcModel::arcModel(cDevice& _device, const arcModel::sBuilder& _builder) : device{ _device }
+	arcModel::arcModel(arcDevice& _device, const arcModel::sBuilder& _builder) : device{ _device }
 	{
 		createVertexBuffers(_builder.vertices);
 		createIndexBuffers(_builder.indices);
@@ -52,7 +52,7 @@ namespace arc
 	{
 	}
 
-	std::unique_ptr<arcModel> arcModel::createOBJModelFromFile(cDevice& device, const std::string& _filepath)
+	std::unique_ptr<arcModel> arcModel::createOBJModelFromFile(arcDevice& device, const std::string& _filepath)
 	{
 		sBuilder builder{};
 		builder.loadOBJModel(_filepath);
@@ -60,7 +60,7 @@ namespace arc
 		return std::make_unique<arcModel>(device, builder);
 	}
 
-	std::unique_ptr<arcModel> arcModel::createGLTFModelFromFile(cDevice& device, const std::string& _filepath)
+	std::unique_ptr<arcModel> arcModel::createGLTFModelFromFile(arcDevice& device, const std::string& _filepath)
 	{
 		sBuilder builder{};
 		builder.loadGLTFModel(_filepath);

@@ -68,5 +68,6 @@ void main()
 		specularLight += intensity * blinnTerm;
 	}
 	outColor = vec4(diffuseLight * sampledColor.rgb + specularLight * sampledORM.b, sampledColor.a);
+	outColor =  vec4(pow(outColor.r, 1.0/2.2), pow(outColor.g, 1.0/2.2), pow(outColor.b, 1.0/2.2), outColor.a);
 	//outColor = vec4(texture(NormalTexSampler, fragUV).rgb, sampledColor.a);
 }

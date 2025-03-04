@@ -40,5 +40,5 @@ void main()
 
 	float cosDist = cos(dist * M_PI) + 1.0;
 
-	outColor = vec4(push.color.xyz + cosDist * 0.1, cosDist);
+	outColor = vec4( vec3(pow(push.color.r, 1.0/2.2), pow(push.color.g, 1.0/2.2), pow(push.color.b, 1.0/2.2)) + cosDist * 0.1, cosDist);
 }

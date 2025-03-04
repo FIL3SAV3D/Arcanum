@@ -47,7 +47,7 @@ void DestroyDebugUtilsMessengerEXT(
 }
 
 // class member functions
-cDevice::cDevice(arc::arcWindow &window) : window{window} {
+arcDevice::arcDevice(arc::arcWindow &window) : window{window} {
   createInstance();
   setupDebugMessenger();
   createSurface();
@@ -56,7 +56,7 @@ cDevice::cDevice(arc::arcWindow &window) : window{window} {
   createCommandPool();
 }
 
-cDevice::~cDevice() {
+arcDevice::~arcDevice() {
   vkDestroyCommandPool(device_, commandPool, nullptr);
   vkDestroyDevice(device_, nullptr);
 
@@ -68,7 +68,7 @@ cDevice::~cDevice() {
   vkDestroyInstance(instance, nullptr);
 }
 
-void cDevice::createInstance() {
+void arcDevice::createInstance() {
   if (enableValidationLayers && !checkValidationLayerSupport()) {
     throw std::runtime_error("validation layers requested, but not available!");
   }
@@ -108,7 +108,7 @@ void cDevice::createInstance() {
   hasGflwRequiredInstanceExtensions();
 }
 
-void cDevice::pickPhysicalDevice() {
+void arcDevice::pickPhysicalDevice() {
   uint32_t deviceCount = 0;
   vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
   if (deviceCount == 0) {
@@ -133,7 +133,7 @@ void cDevice::pickPhysicalDevice() {
   std::cout << "physical device: " << properties.deviceName << std::endl;
 }
 
-void cDevice::createLogicalDevice() {
+void arcDevice::createLogicalDevice() {
   QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
   std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -179,7 +179,7 @@ void cDevice::createLogicalDevice() {
   vkGetDeviceQueue(device_, indices.presentFamily, 0, &presentQueue_);
 }
 
-void cDevice::createCommandPool() {
+void arcDevice::createCommandPool() {
   QueueFamilyIndices queueFamilyIndices = findPhysicalQueueFamilies();
 
   VkCommandPoolCreateInfo poolInfo = {};
@@ -193,9 +193,9 @@ void cDevice::createCommandPool() {
   }
 }
 
-void cDevice::createSurface() { window.createWindowSurface(instance, &surface_); }
+void arcDevice::createSurface() { window.createWindowSurface(instance, &surface_); }
 
-bool cDevice::isDeviceSuitable(VkPhysicalDevice device) {
+bool arcDevice::isDeviceSuitable(VkPhysicalDevice device) {
   QueueFamilyIndices indices = findQueueFamilies(device);
 
   bool extensionsSupported = checkDeviceExtensionSupport(device);
@@ -213,7 +213,7 @@ bool cDevice::isDeviceSuitable(VkPhysicalDevice device) {
          supportedFeatures.samplerAnisotropy;
 }
 
-void cDevice::populateDebugMessengerCreateInfo(
+void arcDevice::populateDebugMessengerCreateInfo(
     VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
   createInfo = {};
   createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -226,7 +226,7 @@ void cDevice::populateDebugMessengerCreateInfo(
   createInfo.pUserData = nullptr;  // Optional
 }
 
-void cDevice::setupDebugMessenger() {
+void arcDevice::setupDebugMessenger() {
   if (!enableValidationLayers) return;
   VkDebugUtilsMessengerCreateInfoEXT createInfo;
   populateDebugMessengerCreateInfo(createInfo);
@@ -235,7 +235,7 @@ void cDevice::setupDebugMessenger() {
   }
 }
 
-bool cDevice::checkValidationLayerSupport() {
+bool arcDevice::checkValidationLayerSupport() {
   uint32_t layerCount;
   vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
@@ -260,7 +260,7 @@ bool cDevice::checkValidationLayerSupport() {
   return true;
 }
 
-std::vector<const char *> cDevice::getRequiredExtensions() {
+std::vector<const char *> arcDevice::getRequiredExtensions() {
   uint32_t glfwExtensionCount = 0;
   const char **glfwExtensions;
   glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -274,7 +274,7 @@ std::vector<const char *> cDevice::getRequiredExtensions() {
   return extensions;
 }
 
-void cDevice::hasGflwRequiredInstanceExtensions() {
+void arcDevice::hasGflwRequiredInstanceExtensions() {
   uint32_t extensionCount = 0;
   vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
   std::vector<VkExtensionProperties> extensions(extensionCount);
@@ -297,7 +297,7 @@ void cDevice::hasGflwRequiredInstanceExtensions() {
   }
 }
 
-bool cDevice::checkDeviceExtensionSupport(VkPhysicalDevice device) {
+bool arcDevice::checkDeviceExtensionSupport(VkPhysicalDevice device) {
   uint32_t extensionCount;
   vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
 
@@ -317,7 +317,7 @@ bool cDevice::checkDeviceExtensionSupport(VkPhysicalDevice device) {
   return requiredExtensions.empty();
 }
 
-QueueFamilyIndices cDevice::findQueueFamilies(VkPhysicalDevice device) {
+QueueFamilyIndices arcDevice::findQueueFamilies(VkPhysicalDevice device) {
   QueueFamilyIndices indices;
 
   uint32_t queueFamilyCount = 0;
@@ -348,7 +348,7 @@ QueueFamilyIndices cDevice::findQueueFamilies(VkPhysicalDevice device) {
   return indices;
 }
 
-SwapChainSupportDetails cDevice::querySwapChainSupport(VkPhysicalDevice device) {
+SwapChainSupportDetails arcDevice::querySwapChainSupport(VkPhysicalDevice device) {
   SwapChainSupportDetails details;
   vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface_, &details.capabilities);
 
@@ -374,7 +374,7 @@ SwapChainSupportDetails cDevice::querySwapChainSupport(VkPhysicalDevice device) 
   return details;
 }
 
-VkFormat cDevice::findSupportedFormat(
+VkFormat arcDevice::findSupportedFormat(
     const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
   for (VkFormat format : candidates) {
     VkFormatProperties props;
@@ -390,7 +390,7 @@ VkFormat cDevice::findSupportedFormat(
   throw std::runtime_error("failed to find supported format!");
 }
 
-uint32_t cDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+uint32_t arcDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
   VkPhysicalDeviceMemoryProperties memProperties;
   vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
   for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
@@ -403,7 +403,7 @@ uint32_t cDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags prop
   throw std::runtime_error("failed to find suitable memory type!");
 }
 
-void cDevice::createBuffer(
+void arcDevice::createBuffer(
     VkDeviceSize size,
     VkBufferUsageFlags usage,
     VkMemoryPropertyFlags properties,
@@ -434,7 +434,7 @@ void cDevice::createBuffer(
   vkBindBufferMemory(device_, buffer, bufferMemory, 0);
 }
 
-VkCommandBuffer cDevice::beginSingleTimeCommands() {
+VkCommandBuffer arcDevice::beginSingleTimeCommands() {
   VkCommandBufferAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
   allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -452,7 +452,7 @@ VkCommandBuffer cDevice::beginSingleTimeCommands() {
   return commandBuffer;
 }
 
-void cDevice::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+void arcDevice::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
   vkEndCommandBuffer(commandBuffer);
 
   VkSubmitInfo submitInfo{};
@@ -466,7 +466,7 @@ void cDevice::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
   vkFreeCommandBuffers(device_, commandPool, 1, &commandBuffer);
 }
 
-void cDevice::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+void arcDevice::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
   VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
   VkBufferCopy copyRegion{};
@@ -478,7 +478,7 @@ void cDevice::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize si
   endSingleTimeCommands(commandBuffer);
 }
 
-void cDevice::copyBufferToImage(
+void arcDevice::copyBufferToImage(
     VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount) {
   VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
@@ -505,7 +505,7 @@ void cDevice::copyBufferToImage(
   endSingleTimeCommands(commandBuffer);
 }
 
-void cDevice::createImageWithInfo(
+void arcDevice::createImageWithInfo(
     const VkImageCreateInfo &imageInfo,
     VkMemoryPropertyFlags properties,
     VkImage &image,

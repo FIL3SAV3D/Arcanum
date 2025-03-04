@@ -46,14 +46,14 @@ namespace arc
 			void loadGLTFModel(const std::string& _filepath);
 		};
 
-		arcModel(cDevice& _device, const arcModel::sBuilder& _builder);
+		arcModel(arcDevice& _device, const arcModel::sBuilder& _builder);
 		~arcModel();
 
 		arcModel(const arcModel&) = delete;
 		arcModel& operator=(const arcModel&) = delete;
 
-		static std::unique_ptr<arcModel> createOBJModelFromFile(cDevice& device, const std::string& _filepath);
-		static std::unique_ptr<arcModel> createGLTFModelFromFile(cDevice& device, const std::string& _filepath);
+		static std::unique_ptr<arcModel> createOBJModelFromFile(arcDevice& device, const std::string& _filepath);
+		static std::unique_ptr<arcModel> createGLTFModelFromFile(arcDevice& device, const std::string& _filepath);
 
 		void bind(VkCommandBuffer _command_buffer);
 		void draw(VkCommandBuffer _command_buffer);
@@ -63,7 +63,7 @@ namespace arc
 		void createVertexBuffers(const std::vector<sVertex>& _vertices);
 		void createIndexBuffers(const std::vector<uint32_t>& _indices);
 
-		cDevice& device;
+		arcDevice& device;
 		std::unique_ptr<cBuffer> vertex_buffer = nullptr;
 		uint32_t vertex_count;
 

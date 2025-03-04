@@ -11,7 +11,7 @@
 namespace arc
 {
 	arcPipeline::arcPipeline(
-		cDevice& _device,
+		arcDevice& _device,
 		const pipelineConfigInfo& _config,
 		const std::string& _vert_file_path,
 		const std::string& _frag_file_path) : arc_device{ _device }

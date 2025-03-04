@@ -25,6 +25,10 @@
 
 #define JPH_USE_SSE4_2
 
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_vulkan.h"
+
 namespace arc
 {
 	struct Texture
@@ -38,8 +42,10 @@ namespace arc
 
 
 		global_pool = cDescriptorPool::Builder(arc_device)
-			.setMaxSets(arcSwapChain::MAX_FRAMES_IN_FLIGHT)
-			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, arcSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.setMaxSets(arcSwapChain::MAX_FRAMES_IN_FLIGHT * 2)
+			.setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, arcSwapChain::MAX_FRAMES_IN_FLIGHT * 2)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, arcSwapChain::MAX_FRAMES_IN_FLIGHT * 2)
 			.build();
 
 		coordinator.Init();
@@ -90,6 +96,131 @@ namespace arc
 		delete tex;
 		delete tex_normal;
 		delete tex_ORM;
+
+		ImGui_ImplVulkan_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+	}
+	void setupImGuiStyle()
+	{
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		style.Alpha = 1.0f;
+		style.DisabledAlpha = 0.6000000238418579f;
+		style.WindowPadding = ImVec2(8.0f, 8.0f);
+		style.WindowRounding = 0.0f;
+		style.WindowBorderSize = 1.0f;
+		style.WindowMinSize = ImVec2(32.0f, 32.0f);
+		style.WindowTitleAlign = ImVec2(0.0f, 0.5f);
+		style.WindowMenuButtonPosition = ImGuiDir_Left;
+		style.ChildRounding = 0.0f;
+		style.ChildBorderSize = 1.0f;
+		style.PopupRounding = 0.0f;
+		style.PopupBorderSize = 1.0f;
+		style.FramePadding = ImVec2(4.0f, 3.0f);
+		style.FrameRounding = 0.0f;
+		style.FrameBorderSize = 1.0f;
+		style.ItemSpacing = ImVec2(8.0f, 4.0f);
+		style.ItemInnerSpacing = ImVec2(4.0f, 4.0f);
+		style.CellPadding = ImVec2(4.0f, 2.0f);
+		style.IndentSpacing = 21.0f;
+		style.ColumnsMinSpacing = 6.0f;
+		style.ScrollbarSize = 14.0f;
+		style.ScrollbarRounding = 0.0f;
+		style.GrabMinSize = 10.0f;
+		style.GrabRounding = 0.0f;
+		style.TabRounding = 0.0f;
+		style.TabBorderSize = 1.0f;
+		style.TabCloseButtonMinWidthSelected = 0.0f;
+		style.TabCloseButtonMinWidthUnselected = 0.0f;
+		style.ColorButtonPosition = ImGuiDir_Right;
+		style.ButtonTextAlign = ImVec2(0.5f, 0.5f);
+		style.SelectableTextAlign = ImVec2(0.0f, 0.699999988079071f);
+
+		style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 0.9999899864196777f, 0.9999899864196777f, 1.0f);
+		style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.6000000238418579f, 0.6000000238418579f, 0.6000000238418579f, 1.0f);
+		style.Colors[ImGuiCol_WindowBg] = ImVec4(0.2980392277240753f, 0.3450980484485626f, 0.2666666805744171f, 1.0f);
+		style.Colors[ImGuiCol_ChildBg] = ImVec4(0.2431372553110123f, 0.2745098173618317f, 0.2156862765550613f, 1.0f);
+		style.Colors[ImGuiCol_PopupBg] = ImVec4(0.2980392277240753f, 0.3450980484485626f, 0.2666666805744171f, 1.0f);
+		style.Colors[ImGuiCol_Border] = ImVec4(0.501960813999176f, 0.501960813999176f, 0.501960813999176f, 1.0f);
+		style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.1568627506494522f, 0.1803921610116959f, 0.1333333402872086f, 1.0f);
+
+		style.Colors[ImGuiCol_DockingPreview] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);
+		style.Colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);
+
+		style.Colors[ImGuiCol_FrameBg] = ImVec4(0.2431372553110123f, 0.2745098173618317f, 0.2156862765550613f, 1.0f);
+		style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);
+		style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.2470588237047195f, 0.2745098173618317f, 0.2196078449487686f, 1.0f);
+		style.Colors[ImGuiCol_TitleBg] = ImVec4(0.2980392277240753f, 0.3450980484485626f, 0.2666666805744171f, 1.0f);
+		style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.2980392277240753f, 0.3450980484485626f, 0.2666666805744171f, 1.0f);
+		style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.0f, 1.0f, 1.0f, 0.5099999904632568f);
+		style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.2980392277240753f, 0.3450980484485626f, 0.2666666805744171f, 1.0f);
+		style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.2980392277240753f, 0.3450980484485626f, 0.2666666805744171f, 1.0f);
+		style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.686274528503418f, 0.686274528503418f, 0.686274528503418f, 0.800000011920929f);
+		style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.4862745106220245f, 0.4862745106220245f, 0.4862745106220245f, 0.800000011920929f);
+		style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.4862745106220245f, 0.4862745106220245f, 0.4862745106220245f, 1.0f);
+		style.Colors[ImGuiCol_CheckMark] = ImVec4(0.9999899864196777f, 0.9999945759773254f, 1.0f, 1.0f);
+		style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.772549033164978f, 0.7137255072593689f, 0.3137255012989044f, 1.0f);
+		style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.772549033164978f, 0.7137255072593689f, 0.3137255012989044f, 1.0f);
+		style.Colors[ImGuiCol_Button] = ImVec4(0.2980392277240753f, 0.3450980484485626f, 0.2666666805744171f, 1.0f);
+		style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);
+		style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.2431372553110123f, 0.2745098173618317f, 0.2156862765550613f, 1.0f);
+		style.Colors[ImGuiCol_Header] = ImVec4(0.2980392277240753f, 0.3450980484485626f, 0.2666666805744171f, 1.0f);
+		style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);
+		style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.2431372553110123f, 0.2745098173618317f, 0.2156862765550613f, 1.0f);
+		style.Colors[ImGuiCol_Separator] = ImVec4(1.0f, 0.0f, 0.0f, 0.6200000047683716f);
+		style.Colors[ImGuiCol_SeparatorHovered] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);
+		style.Colors[ImGuiCol_SeparatorActive] = ImVec4(0.2431372553110123f, 0.2745098173618317f, 0.2156862765550613f, 1.0f);
+		style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0.529411792755127f, 0.5647059082984924f, 0.4980392158031464f, 1.0f);
+		style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);
+		style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.2431372553110123f, 0.2745098173618317f, 0.2156862765550613f, 1.0f);
+		style.Colors[ImGuiCol_Tab] = ImVec4(0.2980392277240753f, 0.3450980484485626f, 0.2666666805744171f, 1.0f);
+		style.Colors[ImGuiCol_TabHovered] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);
+		style.Colors[ImGuiCol_TabActive] = ImVec4(0.2431372553110123f, 0.2745098173618317f, 0.2156862765550613f, 1.0f);
+		style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.2980392277240753f, 0.3450980484485626f, 0.2666666805744171f, 1.0f);
+		style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.2431372553110123f, 0.2745098173618317f, 0.2156862765550613f, 1.0f);
+		style.Colors[ImGuiCol_PlotLines] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+		style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.5803921818733215f, 0.5372549295425415f, 0.196078434586525f, 1.0f);
+		style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.7686274647712708f, 0.7098039388656616f, 0.3137255012989044f, 1.0f);
+		style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.5803921818733215f, 0.5372549295425415f, 0.196078434586525f, 1.0f);
+		style.Colors[ImGuiCol_TableHeaderBg] = ImVec4(0.2431372553110123f, 0.2745098173618317f, 0.2156862765550613f, 1.0f);
+		style.Colors[ImGuiCol_TableBorderStrong] = ImVec4(0.1568627506494522f, 0.1803921610116959f, 0.1333333402872086f, 1.0f);
+		style.Colors[ImGuiCol_TableBorderLight] = ImVec4(0.1568627506494522f, 0.1803921610116959f, 0.1333333402872086f, 1.0f);
+		style.Colors[ImGuiCol_TableRowBg] = ImVec4(0.2431372553110123f, 0.2745098173618317f, 0.2156862765550613f, 0.3476395010948181f);
+		style.Colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.0f, 0.9999899864196777f, 0.9999899864196777f, 0.07725322246551514f);
+		style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.7686274647712708f, 0.7098039388656616f, 0.3137255012989044f, 1.0f);
+		style.Colors[ImGuiCol_DragDropTarget] = ImVec4(0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 0.949999988079071f);
+		style.Colors[ImGuiCol_NavHighlight] = ImVec4(0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 0.800000011920929f);
+		style.Colors[ImGuiCol_NavWindowingHighlight] = ImVec4(0.6980392336845398f, 0.6980392336845398f, 0.6980392336845398f, 0.699999988079071f);
+		style.Colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.2000000029802322f, 0.2000000029802322f, 0.2000000029802322f, 0.2000000029802322f);
+		style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.2000000029802322f, 0.2000000029802322f, 0.2000000029802322f, 0.3499999940395355f);
+	}
+	void cFirstApp::InitImGui()
+	{
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
+
+		setupImGuiStyle();
+
+		ImGui_ImplGlfw_InitForVulkan(arc_window.getGLFWWindow(), true);
+		ImGui_ImplVulkan_InitInfo ImGuiInfo{};
+		ImGuiInfo.DescriptorPool = global_pool->GetDescriptorPool();
+		ImGuiInfo.RenderPass = ArcRenderer.getSwapChainRenderPass();
+		ImGuiInfo.Device = arc_device.device();
+		ImGuiInfo.PhysicalDevice = arc_device.GetPhysicalDevice();
+		ImGuiInfo.Instance = arc_device.GetInstance();
+		ImGuiInfo.Queue = arc_device.graphicsQueue();
+		ImGuiInfo.QueueFamily = arc_device.findPhysicalQueueFamilies().graphicsFamily;
+		ImGuiInfo.ImageCount = arcSwapChain::MAX_FRAMES_IN_FLIGHT;
+		ImGuiInfo.MinImageCount = 2;
+		ImGuiInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
+		ImGui_ImplVulkan_Init(&ImGuiInfo);
+		ImGui_ImplVulkan_CreateFontsTexture();
+		ImGui_ImplVulkan_DestroyFontsTexture();
 	}
 
 	void arc::cFirstApp::run()
@@ -158,9 +289,9 @@ namespace arc
 				.build(globalDescriptorSets[i]);
 		}
 
-		simpleRenderSystem simple_render_system{ arc_device, arc_renderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout() };
-		cInfiniteGridRenderSystem inf_grid_system{ arc_device, arc_renderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout() };
-		cPointLightSystem point_light_system   { arc_device, arc_renderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout()};
+		simpleRenderSystem simple_render_system{ arc_device, ArcRenderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout() };
+		cInfiniteGridRenderSystem inf_grid_system{ arc_device, ArcRenderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout() };
+		cPointLightSystem point_light_system   { arc_device, ArcRenderer.getSwapChainRenderPass(), global_set_layout->getDescriptorSetLayout()};
 		arcCamera camera{};
 
 		auto viewObject = arcGameObject::createGameObject();
@@ -171,6 +302,8 @@ namespace arc
 		JPH::TempAllocatorImpl temp_allocator( 4048 * size_t(1024 * 1024));
 		JPH::JobSystemThreadPool job_system(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, JPH::thread::hardware_concurrency() - 1);
 		physics_system.OptimizeBroadPhase();
+		
+		InitImGui();
 
 		while (!arc_window.shouldClose())
 		{
@@ -189,14 +322,14 @@ namespace arc
 
 			camera.setViewYXZ(coordinator.GetComponent<TransformComponent>(CameraEntity).position, coordinator.GetComponent<TransformComponent>(CameraEntity).rotation);
 
-			float aspect = arc_renderer.getAspectRatio();
+			float aspect = ArcRenderer.getAspectRatio();
 			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -10, 1000.0f);
 			camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
 			/*game_objects.at(0).transform.rotation.y += 1.0f * frame_time;*/
 
-			if (auto command_buffer = arc_renderer.beginFrame())
+			if (auto command_buffer = ArcRenderer.beginFrame())
 			{
-				int frame_index = arc_renderer.getFrameIndex();
+				int frame_index = ArcRenderer.getFrameIndex();
 
 				frameInfo frame_info{
 					frame_index,
@@ -240,7 +373,7 @@ namespace arc
 				uboImageBuffers[frame_index]->flush();
 
 				// Render
-				arc_renderer.beginSwapChainRenderPass(command_buffer);
+				ArcRenderer.beginSwapChainRenderPass(command_buffer);
 
 				// order matters
 				simple_render_system.renderGameObjects(frame_info);
@@ -258,8 +391,17 @@ namespace arc
 					point_light_system.render(frame_info);
 				}
 
-				arc_renderer.endSwapChainRenderPass(command_buffer);
-				arc_renderer.endFrame();
+				ImGui_ImplVulkan_NewFrame();
+				ImGui_ImplGlfw_NewFrame();
+				ImGui::NewFrame();
+
+				ImGui::ShowDemoWindow();
+
+				ImGui::Render();
+				ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);
+
+				ArcRenderer.endSwapChainRenderPass(command_buffer);
+				ArcRenderer.endFrame();
 			}
 		}
 
@@ -272,7 +414,10 @@ namespace arc
 
 		entities.insert(entities.begin(), MAX_ENTITIES - 1, 0);
 
-		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, "F:\\Arcanum\\src\\ArcEngine\\Models\\glb_models\\Rat.glb");
+		auto path = std::filesystem::current_path().string();
+		//std::replace(path.begin(), path.end(), '\\', '/');
+
+		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, path + "\\src\\ArcEngine\\Models\\glb_models\\Rat.glb");
 
 		std::default_random_engine generator;
 		std::uniform_real_distribution<float> randPosition(-50.0f, 50.0f);
