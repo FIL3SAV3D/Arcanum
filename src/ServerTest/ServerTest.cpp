@@ -1,35 +1,75 @@
-#include <WinSock2.h>
 #include <iostream>
 
+#include <Net/NetCommon.h>
+
+std::vector<char> vBuffer(20 * 1024);
+
+void GrabSomeData(asio::ip::tcp::socket& socket)
+{
+	socket.async_read_some(asio::buffer(vBuffer.data(), vBuffer.size()), 
+		[&](std::error_code ErrorCode, std::size_t length)
+		{
+			if (!ErrorCode)
+			{
+				std::cout << "\n\nRead" << length << " bytes\n\n";
+
+				for (int i = 0; i < length; i++)
+				{
+					std::cout << vBuffer[i];
+
+					GrabSomeData(socket);
+				}
+			}
+		});
+}
 
 int main()
 {
-	SOCKET clientSocket{};
+	/*SOCKET clientSocket{};*/
 	try
 	{
-		SOCKET serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-		sockaddr_in serverAdress;
-		serverAdress.sin_family = AF_INET;
-		serverAdress.sin_port = htons(8080);
-		serverAdress.sin_addr.S_un.S_addr = INADDR_ANY;
+		asio::error_code ErrorCode;
 
-		bind(serverSocket, (struct sockaddr*)&serverAdress, sizeof(serverAdress));
-		listen(serverSocket, 5);
+		asio::io_context Context;
 
-		SOCKET clientSocket = accept(serverSocket, nullptr, nullptr);
+		asio::io_context::work idleWork(Context);
 
-		int index = 0;
-		while (index < 1000)
+		std::thread ThreadContext = std::thread([&]() { Context.run(); });
+
+		asio::ip::tcp::endpoint Endpoint(asio::ip::make_address("51.38.81.49", ErrorCode), 80);
+
+		asio::ip::tcp::socket Socket(Context);
+
+		Socket.connect(Endpoint, ErrorCode);
+
+		if (!ErrorCode)
 		{
-			char buffer[1024] = { 0 };
-			auto test = recv(clientSocket, buffer, sizeof(buffer), 0);
-			std::cout << "Message from client: " << buffer << std::endl;
-			Sleep(500);
-			++index;
+			std::cout << "Connected!" << std::endl;
 		}
-		
+		else
+		{
+			std::cout << "Failed to connect to adress:\n" << ErrorCode.message() << std::endl;
+		}
 
-		closesocket(serverSocket);
+		if (Socket.is_open())
+		{
+			GrabSomeData(Socket);
+
+			std::string sRequest =
+				"GET /index.html HTTP/1.1\r\n"
+				"Host: example.com\r\n"
+				"Connection: close\r\n\r\n";
+
+			Socket.write_some(asio::buffer(sRequest.data(), sRequest.size()), ErrorCode);
+
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(20000ms);
+
+			Context.stop();
+			if (ThreadContext.joinable())
+				ThreadContext.join();
+		}
+
 	}
 	catch (const std::exception& e)
 	{

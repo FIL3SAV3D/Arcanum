@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "ServerClientTesting",
+    "Projects": [
+      {
+        "Path": "ClientTest.vcxproj",
+        "Action": "Start",
+        "DebugTarget": "Local Windows Debugger"
+      },
+      {
+        "Path": "ServerTest.vcxproj",
+        "Action": "Start",
+        "DebugTarget": "Local Windows Debugger"
+      }
+    ]
+  }
+]

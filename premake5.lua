@@ -23,7 +23,7 @@ workspace "Arcanum"
 	project "Framework"
 		kind "ConsoleApp"
 		targetdir "bin/%{cfg.buildcfg}"
-		dependson { "ArcEngine", "Shaders", ... }
+		dependson { "ArcEngine", "Shaders", "ArcNetCommon", ... }
 
 		files {
             "src/Framework/**.h",
@@ -35,7 +35,7 @@ workspace "Arcanum"
 		
 		links { "../Arcanum/Library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "ArcEngine" }
-		links { "Ws2_32.lib" }
+		links { "ArcNetCommon" }
 
 
 		includedirs { "$(VULKAN_SDK)/include" }
@@ -43,7 +43,8 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/Library/GLM" }
 		includedirs { "../Arcanum/src/ArcEngine" }
 		includedirs { "../Arcanum/src/Jolt" }
-
+		includedirs { "../Arcanum/src/ArcNetCommon" }
+		includedirs { "C:/SDKs/asio-1.30.2/ASIO/include" }
 
 
 	project "ArcEngine"
@@ -99,15 +100,50 @@ workspace "Arcanum"
 	project "ServerTest"
 		kind "ConsoleApp"
 		targetdir "bin/%{cfg.buildcfg}"
+		dependson { "ArcNetCommon", ... }
 
 		files{
 			"src/ServerTest/**.h",
 			"src/ServerTest/**.cpp",
 			"src/ServerTest/**.hpp"
 		}
-		links { "Ws2_32.lib" }
+
+		links { "ArcNetCommon" }
 		
 		includedirs { "../Arcanum/src/ServerTest" }
+		includedirs { "../Arcanum/src/ArcNetCommon" }
+		includedirs { "C:/SDKs/asio-1.30.2/ASIO/include" }
+
+	project "ClientTest"
+		kind "ConsoleApp"
+		targetdir "bin/%{cfg.buildcfg}"
+		dependson { "ArcNetCommon", ... }
+
+		files{
+			"src/ClientTest/**.h",
+			"src/ClientTest/**.cpp",
+			"src/ClientTest/**.hpp"
+		}
+
+		links { "ArcNetCommon" }
+		
+		includedirs { "../Arcanum/src/ClientTest" }
+		includedirs { "../Arcanum/src/ArcNetCommon" }
+		includedirs { "C:/SDKs/asio-1.30.2/ASIO/include" }
+
+	project "ArcNetCommon"
+		kind "StaticLib"
+		targetdir "bin/%{cfg.buildcfg}"
+
+		files{
+			"src/ArcNetCommon/**.h",
+			"src/ArcNetCommon/**.cpp",
+			"src/ArcNetCommon/**.hpp"
+		}
+		
+		includedirs { "../Arcanum/src/ArcNetCommon" }
+		includedirs { "C:/SDKs/asio-1.30.2/ASIO/include" }
+		
 	project "Shaders"
 		kind "Utility"
 		targetdir "bin/%{cfg.buildcfg}"
