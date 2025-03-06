@@ -1,86 +1,87 @@
 #include <iostream>
 
-#include <Net/NetCommon.h>
+#include <ArcNet.h>
 
-std::vector<char> vBuffer(20 * 1024);
-
-void GrabSomeData(asio::ip::tcp::socket& socket)
+enum class CustomMsgTypes : uint32_t
 {
-	socket.async_read_some(asio::buffer(vBuffer.data(), vBuffer.size()), 
-		[&](std::error_code ErrorCode, std::size_t length)
+	ServerAccept,
+	ServerDeny,
+	ServerPing,
+	MessageAll,
+	ServerMessage,
+};
+
+class CustomServer : public arc::net::ServerInterface<CustomMsgTypes>
+{
+public:
+	CustomServer(uint16_t port) : arc::net::ServerInterface<CustomMsgTypes>(port)
+	{
+
+	}
+
+protected:
+	virtual bool OnClientConnect(std::shared_ptr<arc::net::connection<CustomMsgTypes>> client)
+	{
+		arc::net::Message<CustomMsgTypes> msg;
+		msg.header.id = CustomMsgTypes::ServerAccept;
+		client->Send(msg);
+
+		return true;
+	}
+
+	virtual void OnClientDisconnect(std::shared_ptr<arc::net::connection<CustomMsgTypes>> client)
+	{
+		std::cout << "Removing client [" << client->GetID() << "]\n";
+	}
+
+	virtual void OnMessage(std::shared_ptr<arc::net::connection<CustomMsgTypes>> client, arc::net::Message<CustomMsgTypes>& msg)
+	{
+		switch (msg.header.id)
 		{
-			if (!ErrorCode)
-			{
-				std::cout << "\n\nRead" << length << " bytes\n\n";
+		case CustomMsgTypes::ServerAccept:
+		{
+			break;
+		}
+		case CustomMsgTypes::ServerDeny:
+			break;
+		case CustomMsgTypes::ServerPing:
+		{
+			std::cout << "[" << client->GetID() << "]: Server Ping\n";
+			client->Send(msg);
+		}
+			break;
+		case CustomMsgTypes::MessageAll:
+		{
+			std::cout << "[" << client->GetID() << "]: Message All\n";
 
-				for (int i = 0; i < length; i++)
-				{
-					std::cout << vBuffer[i];
+			// Construct a new message and send it to all clients
+			arc::net::Message<CustomMsgTypes> msg;
+			msg.header.id = CustomMsgTypes::MessageAll;
+			msg << client->GetID();
 
-					GrabSomeData(socket);
-				}
-			}
-		});
-}
+			MessageAllClients(msg, client);
+		}
+			break;
+		case CustomMsgTypes::ServerMessage:
+		{
+			break;
+		}
+		default:
+			break;
+		}
+	}
+};
 
 int main()
 {
-	/*SOCKET clientSocket{};*/
-	try
+	CustomServer server(60000);
+	server.Start();
+
+	while (1)
 	{
-		asio::error_code ErrorCode;
-
-		asio::io_context Context;
-
-		asio::io_context::work idleWork(Context);
-
-		std::thread ThreadContext = std::thread([&]() { Context.run(); });
-
-		asio::ip::tcp::endpoint Endpoint(asio::ip::make_address("51.38.81.49", ErrorCode), 80);
-
-		asio::ip::tcp::socket Socket(Context);
-
-		Socket.connect(Endpoint, ErrorCode);
-
-		if (!ErrorCode)
-		{
-			std::cout << "Connected!" << std::endl;
-		}
-		else
-		{
-			std::cout << "Failed to connect to adress:\n" << ErrorCode.message() << std::endl;
-		}
-
-		if (Socket.is_open())
-		{
-			GrabSomeData(Socket);
-
-			std::string sRequest =
-				"GET /index.html HTTP/1.1\r\n"
-				"Host: example.com\r\n"
-				"Connection: close\r\n\r\n";
-
-			Socket.write_some(asio::buffer(sRequest.data(), sRequest.size()), ErrorCode);
-
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(20000ms);
-
-			Context.stop();
-			if (ThreadContext.joinable())
-				ThreadContext.join();
-		}
-
-	}
-	catch (const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-		system("pause");
-
-		return EXIT_FAILURE;
+		server.Update(-1);
 	}
 
-	system("pause");
-
-	return EXIT_SUCCESS;
+	return 0;
 	
 }

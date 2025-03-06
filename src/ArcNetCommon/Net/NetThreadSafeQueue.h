@@ -27,13 +27,13 @@ namespace arc
 				return deqQueue.back();
 			}
 
-			const T& pushback(const T& item)
+			const void pushback(const T& item)
 			{
 				std::scoped_lock lock(muxQueue);
 				deqQueue.emplace_back(std::move(item));
 			}
 
-			const T& pushfront(const T& item)
+			const void pushfront(const T& item)
 			{
 				std::scoped_lock lock(muxQueue);
 				deqQueue.emplace_front(std::move(item));
