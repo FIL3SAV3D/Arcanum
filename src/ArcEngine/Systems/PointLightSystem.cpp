@@ -72,8 +72,8 @@ namespace arc
 		arc_pipeline = std::make_unique<arcPipeline>(
 			arc_device, 
 			pipeline_config, 
-			path + "/src/Shaders/compiled_shaders/PointLightShader.vert.spv",
-			path + "/src/Shaders/compiled_shaders/PointLightShader.frag.spv");
+			path + "/Data/compiled_shaders/PointLightShader.vert.spv",
+			path + "/Data/compiled_shaders/PointLightShader.frag.spv");
 	}
 
 

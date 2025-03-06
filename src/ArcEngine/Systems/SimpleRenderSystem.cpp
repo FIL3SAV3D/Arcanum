@@ -68,8 +68,8 @@ namespace arc
 		pipeline_config.render_pass = _render_pass;
 		pipeline_config.pipeline_layout = pipeline_layout;
 		arc_pipeline = std::make_unique<arcPipeline>(arc_device, pipeline_config, 
-			path + "/src/Shaders/compiled_shaders/SimpleShader.vert.spv",
-			path + "/src/Shaders/compiled_shaders/SimpleShader.frag.spv");
+			path + "/Data/compiled_shaders/SimpleShader.vert.spv",
+			path + "/Data/compiled_shaders/SimpleShader.frag.spv");
 	}
 
 

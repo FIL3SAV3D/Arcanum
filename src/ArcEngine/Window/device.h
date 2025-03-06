@@ -24,7 +24,7 @@ struct QueueFamilyIndices {
 
 class arcDevice {
  public:
-#ifdef NDEBUG
+#ifdef ARC_RELEASE
   const bool enableValidationLayers = false;
 #else
   const bool enableValidationLayers = true;

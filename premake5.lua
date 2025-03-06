@@ -74,7 +74,8 @@ workspace "Arcanum"
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
 		links { "../Arcanum/Library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "Jolt" }
-
+		links { "ArcNetCommon" }
+		
 		
 		includedirs { "$(VULKAN_SDK)/include" }
 		includedirs { "../Arcanum/Library/GLFW/include" }
@@ -84,7 +85,9 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/src/ArcEngine" }
 		includedirs { "../Arcanum/src/Jolt" }
 		includedirs { "../Arcanum/src/ImGui" }
-
+		includedirs { "../Arcanum/src/ArcNetCommon" }
+		includedirs { "C:/SDKs/asio-1.30.2/ASIO/include" }
+		
 	project "Jolt"
 		kind "StaticLib"
 		targetdir "bin/%{cfg.buildcfg}"

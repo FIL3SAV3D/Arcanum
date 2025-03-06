@@ -29,6 +29,32 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_vulkan.h"
 
+#include "ArcNet.h"
+
+
+enum class CommonMsgs : uint32_t
+{
+	ServerAccept,
+	ServerDeny,
+	ServerPing,
+	MessageAll,
+	ServerMessage,
+
+	SpawnEntity,
+	NewUser,
+	UserSync,
+	ServerSync
+};
+
+class CustomClient : public arc::net::ClientInterface<CommonMsgs>
+{
+public:
+	void SpawnEntity()
+	{
+
+	}
+};
+
 namespace arc
 {
 	struct Texture
@@ -39,7 +65,6 @@ namespace arc
 	cFirstApp::cFirstApp()
 	{
 		printf("FirstApp Construct\n");
-
 
 		global_pool = cDescriptorPool::Builder(arc_device)
 			.setMaxSets(arcSwapChain::MAX_FRAMES_IN_FLIGHT * 2)
@@ -56,8 +81,6 @@ namespace arc
 		JPH::Factory::sInstance = new JPH::Factory();
 
 		JPH::RegisterTypes();
-
-		
 
 		const JPH::uint cMaxBodies = 8000000;
 
@@ -96,6 +119,12 @@ namespace arc
 		delete tex;
 		delete tex_normal;
 		delete tex_ORM;
+
+		for (auto& user : users)
+		{
+			delete user.second;
+			user.second = nullptr;
+		}
 
 		ImGui_ImplVulkan_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
@@ -202,7 +231,6 @@ namespace arc
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
-
 		setupImGuiStyle();
 
 		ImGui_ImplGlfw_InitForVulkan(arc_window.getGLFWWindow(), true);
@@ -225,7 +253,8 @@ namespace arc
 
 	void arc::cFirstApp::run()
 	{
-		
+		CustomClient NetClient;
+		NetClient.Connect("172.16.201.82", 60000);
 
 		printf("FirstApp Run\n");
 
@@ -305,12 +334,171 @@ namespace arc
 		
 		InitImGui();
 
+		User* user = new User(coordinator, rat_model);
+		users[0] = user;
+		entities.push_back(user->EntityID);
+
+		arc::net::Message<CommonMsgs> SyncMsg;
+		auto pos = coordinator.GetComponent<TransformComponent>(user->EntityID);
+		SyncMsg.header.id = CommonMsgs::NewUser;
+		SyncMsg << pos.position.x << pos.position.y << pos.position.z;
+		NetClient.Send(SyncMsg);
+
 		while (!arc_window.shouldClose())
 		{
+			if (NetClient.IsConnected())
+			{
+
+
+				if (!NetClient.Incoming().empty())
+				{
+					auto msg = NetClient.Incoming().popfront().msg;
+
+					switch (msg.header.id)
+					{
+					case CommonMsgs::ServerAccept:
+					{
+						std::cout << "Server Accepted Connection\n";
+						break;
+					}
+					case CommonMsgs::ServerDeny:
+						break;
+					case CommonMsgs::ServerPing:
+					{
+						std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+						std::chrono::system_clock::time_point timeThen;
+						msg >> timeThen;
+						std::cout << "Server pkg Size: " << msg.size() << "\n";
+						std::cout << "Ping " << std::chrono::duration<double>(timeNow - timeThen).count() << "\n";
+						break;
+					}
+					case CommonMsgs::MessageAll:
+					{
+						uint32_t clientID;
+						msg >> clientID;
+						std::cout << "Hello from [" << clientID << "]\n";
+						break;
+					}
+					case CommonMsgs::ServerMessage:
+						break;
+					case CommonMsgs::NewUser:
+					{
+						User* newUser = new User{ coordinator, rat_model };
+						auto& comp = coordinator.GetComponent<TransformComponent>(newUser->EntityID);
+						msg >> newUser->UserID;
+						msg >> comp.position.z >> comp.position.y >> comp.position.x;
+						users[newUser->UserID] = newUser;
+						entities.push_back(newUser->EntityID);
+					}
+					break;
+
+					case CommonMsgs::UserSync:
+					{
+						uint32_t userid;
+						msg >> userid;
+						auto& comp = coordinator.GetComponent<TransformComponent>(users[userid]->EntityID);
+						msg >> comp.position.z >> comp.position.y >> comp.position.x;
+					}
+					break;
+
+					case CommonMsgs::ServerSync:
+					{
+						arc::net::Message<CommonMsgs> ServerSyncMsg;
+						auto pos = coordinator.GetComponent<TransformComponent>(user->EntityID);
+						SyncMsg.header.id = CommonMsgs::UserSync;
+						SyncMsg << pos.position.x << pos.position.y << pos.position.z;
+						NetClient.Send(SyncMsg);
+					}
+					break;
+
+					case CommonMsgs::SpawnEntity:
+					{
+						glm::vec3 pos;
+						msg >> pos.z >> pos.y >> pos.x;
+
+						auto entity = coordinator.CreateEntity();
+						entities.push_back(entity);
+
+						TransformComponent TComp{
+							{pos.x, pos.y, pos.z},
+							{0.0f, 0.0f, 0.0f},
+							{0.1f, 0.1f, 0.1f}
+						};
+						coordinator.AddComponent(
+							entity,
+							TComp
+						);
+
+						coordinator.AddComponent(entity, ModelComponent{ rat_model });
+
+						PhysicsComponent pComp{};
+						pComp.CreateCollision(physics_system, rat_model->JPHVertArray);
+						coordinator.AddComponent(entity, pComp);
+
+						JPH::Quat quat{};
+						quat = quat.sEulerAngles(RVec3{ TComp.rotation.x, TComp.rotation.y, TComp.rotation.z });
+						quat = quat.Normalized();
+						physics_system.GetBodyInterface().SetPositionAndRotation(
+							pComp.CollisionID,
+							{ TComp.position.x, TComp.position.y, TComp.position.z },
+							quat,
+							EActivation::Activate);
+						break;
+					}
+					break;
+
+
+					default:
+						break;
+					}
+				}
+			}
+
 			glfwPollEvents();
 
 			if (glfwGetKey(arc_window.getGLFWWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
 				break;
+
+			if (glfwGetKey(arc_window.getGLFWWindow(), GLFW_KEY_0) == GLFW_PRESS)
+			{
+				auto pos = coordinator.GetComponent<TransformComponent>(CameraEntity).position;
+				auto rot = coordinator.GetComponent<TransformComponent>(CameraEntity).rotation;
+
+				auto entity = coordinator.CreateEntity();
+				entities.push_back(entity);
+
+				TransformComponent TComp{
+					{pos.x, pos.y, pos.z},
+					{rot.x, rot.y, rot.z},
+					{0.1f, 0.1f, 0.1f}
+				};
+				coordinator.AddComponent(
+					entity,
+					TComp
+				);
+
+				coordinator.AddComponent(entity, ModelComponent{ rat_model });
+
+				PhysicsComponent pComp{};
+				pComp.CreateCollision(physics_system, rat_model->JPHVertArray);
+				coordinator.AddComponent(entity, pComp);
+
+				JPH::Quat quat{};
+				quat = quat.sEulerAngles(RVec3{ TComp.rotation.x, TComp.rotation.y, TComp.rotation.z });
+				quat = quat.Normalized();
+				physics_system.GetBodyInterface().SetPositionAndRotation(
+					pComp.CollisionID,
+					{ TComp.position.x, TComp.position.y, TComp.position.z },
+					quat,
+					EActivation::Activate);
+
+				arc::net::Message<CommonMsgs> msg;
+				msg.header.id = CommonMsgs::SpawnEntity;
+
+				msg << pos.x << pos.y << pos.z;
+
+				NetClient.Send(msg);
+			}
 
 			auto new_time = std::chrono::high_resolution_clock::now();
 			float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
@@ -327,6 +515,8 @@ namespace arc
 			camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
 			/*game_objects.at(0).transform.rotation.y += 1.0f * frame_time;*/
 
+			user->Update(frame_time, coordinator, arc_window.getGLFWWindow());
+
 			if (auto command_buffer = ArcRenderer.beginFrame())
 			{
 				int frame_index = ArcRenderer.getFrameIndex();
@@ -341,11 +531,13 @@ namespace arc
 					coordinator
 				};
 				
+
 				auto& BInter = physics_system.GetBodyInterface();
 				for (auto& entity : entities)
 				{
 					if (!coordinator.HasComponent<PhysicsComponent>(entity))
 						continue;
+
 					auto& Pcomp = coordinator.GetComponent<PhysicsComponent>(entity);
 					auto& Tcomp = coordinator.GetComponent<TransformComponent>(entity);
 					JPH::RVec3 pos{};
@@ -402,6 +594,8 @@ namespace arc
 
 				ArcRenderer.endSwapChainRenderPass(command_buffer);
 				ArcRenderer.endFrame();
+
+
 			}
 		}
 
@@ -412,15 +606,15 @@ namespace arc
 	{
 		printf("FirstApp loadGameObjects\n");
 
-		entities.insert(entities.begin(), MAX_ENTITIES - 1, 0);
+		entities.insert(entities.begin(), 100, 0);
 
 		auto path = std::filesystem::current_path().string();
 		//std::replace(path.begin(), path.end(), '\\', '/');
 
-		std::shared_ptr<arcModel> rat_model = arcModel::createGLTFModelFromFile(arc_device, path + "\\src\\ArcEngine\\Models\\glb_models\\Rat.glb");
+		rat_model = arcModel::createGLTFModelFromFile(arc_device, path + "\\Data\\Models\\glb_models\\Rat.glb");
 
 		std::default_random_engine generator;
-		std::uniform_real_distribution<float> randPosition(-50.0f, 50.0f);
+		std::uniform_real_distribution<float> randPosition(-10.0f, 10.0f);
 		std::uniform_real_distribution<float> randHeight(5.0f, 20.0f);
 		std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
 		std::uniform_real_distribution<float> randScale(0.1f, 0.5f);
@@ -469,9 +663,9 @@ namespace arc
 		);
 
 		auto test2 = std::filesystem::current_path().string();
-		auto path2 = test2 + "\\src\\ArcEngine\\Models\\src_images\\T_Rat_BC.png";
-		auto path_normal = test2 + "\\src\\ArcEngine\\Models\\src_images\\T_Rat_N.png";
-		auto path_orm = test2 + "\\src\\ArcEngine\\Models\\src_images\\T_Rat_ORM.png";
+		auto path2 = test2 + "\\Data\\Models\\src_images\\T_Rat_BC.png";
+		auto path_normal = test2 + "\\Data\\Models\\src_images\\T_Rat_N.png";
+		auto path_orm = test2 + "\\Data\\Models\\src_images\\T_Rat_ORM.png";
 
 		tex = new cTexture{ arc_device, path2 };
 		tex_normal = new cTexture{ arc_device, path_normal };

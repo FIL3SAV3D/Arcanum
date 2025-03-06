@@ -71,8 +71,8 @@ namespace arc
 		arc_pipeline = std::make_unique<arcPipeline>(
 			arc_device,
 			pipeline_config,
-			path + "/src/Shaders/compiled_shaders/InfGridShader.vert.spv",
-			path + "/src/Shaders/compiled_shaders/InfGridShader.frag.spv"
+			path + "/Data/compiled_shaders/InfGridShader.vert.spv",
+			path + "/Data/compiled_shaders/InfGridShader.frag.spv"
 		);
 	}
 

@@ -2,22 +2,24 @@
 
 #include <ArcNet.h>
 
-enum class CustomMsgTypes : uint32_t
+enum class CommonMsgs : uint32_t
 {
 	ServerAccept,
 	ServerDeny,
 	ServerPing,
 	MessageAll,
 	ServerMessage,
+
+	SpawnEntity,
 };
 
-class CustomClient : public arc::net::ClientInterface<CustomMsgTypes>
+class CustomClient : public arc::net::ClientInterface<CommonMsgs>
 {
 public:
 	void PingServer()
 	{
-		arc::net::Message<CustomMsgTypes> msg; 
-		msg.header.id = CustomMsgTypes::ServerPing;
+		arc::net::Message<CommonMsgs> msg;
+		msg.header.id = CommonMsgs::ServerPing;
 
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
@@ -40,8 +42,8 @@ public:
 
 	void MessageAll()
 	{
-		arc::net::Message<CustomMsgTypes> msg;
-		msg.header.id = CustomMsgTypes::MessageAll;
+		arc::net::Message<CommonMsgs> msg;
+		msg.header.id = CommonMsgs::MessageAll;
 		Send(msg);
 	}
 };
@@ -77,14 +79,14 @@ int main()
 
 				switch (msg.header.id)
 				{
-				case CustomMsgTypes::ServerAccept:
+				case CommonMsgs::ServerAccept:
 				{
 					std::cout << "Server Accepted Connection\n";
 					break;
 				}
-				case CustomMsgTypes::ServerDeny:
+				case CommonMsgs::ServerDeny:
 					break;
-				case CustomMsgTypes::ServerPing:
+				case CommonMsgs::ServerPing:
 				{
 					std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 					std::chrono::system_clock::time_point timeThen;
@@ -93,14 +95,14 @@ int main()
 					std::cout << "Ping " << std::chrono::duration<double>(timeNow - timeThen).count() << "\n";
 					break;
 				}
-				case CustomMsgTypes::MessageAll:
+				case CommonMsgs::MessageAll:
 				{
 					uint32_t clientID;
 					msg >> clientID;
 					std::cout << "Hello from [" << clientID << "]\n";
 					break;
 				}
-				case CustomMsgTypes::ServerMessage:
+				case CommonMsgs::ServerMessage:
 					
 					break;
 				default:

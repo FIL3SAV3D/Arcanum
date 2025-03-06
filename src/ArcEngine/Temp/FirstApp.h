@@ -15,6 +15,9 @@
 #include <memory>
 #include <vector>
 
+#include "LiveCollabTemp/User.h"
+#include <map>
+
 
 namespace arc
 {
@@ -58,6 +61,9 @@ namespace arc
 		JPH::TempAllocatorImpl* temp_allocator;
 
 		std::vector<Entity> entities{};
+		std::map<uint32_t, User*> users{};
 		Entity CameraEntity;
+
+		std::shared_ptr<arcModel> rat_model = nullptr;
 	};
 }
