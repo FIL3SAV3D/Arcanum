@@ -30,28 +30,42 @@
 #include "backends/imgui_impl_vulkan.h"
 
 #include "ArcNet.h"
+#include "ServerClient/SharedInfo.h"
 
-
-enum class CommonMsgs : uint32_t
-{
-	ServerAccept,
-	ServerDeny,
-	ServerPing,
-	MessageAll,
-	ServerMessage,
-
-	SpawnEntity,
-	NewUser,
-	UserSync,
-	ServerSync
-};
-
-class CustomClient : public arc::net::ClientInterface<CommonMsgs>
+class CustomClient : public arc::net::ClientInterface<ServerClientMsg>
 {
 public:
+	~CustomClient()
+	{
+		
+	}
+
 	void SpawnEntity()
 	{
 
+	}
+	void PingServer()
+	{
+		arc::net::Message<ServerClientMsg> msg;
+		msg.header.id = ServerClientMsg::ServerPing;
+
+		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+
+		std::cout << "Sending Ping\n";
+
+		msg << timeNow;
+
+		std::cout << "Size: " << msg.size() << "\n";
+
+		std::chrono::system_clock::time_point test;
+
+		auto msgtest = msg;
+
+		msgtest >> test;
+
+		std::cout << static_cast<int>(msgtest.header.id) << "\n" << test << "\n";
+
+		Send(msg);
 	}
 };
 
@@ -253,8 +267,14 @@ namespace arc
 
 	void arc::cFirstApp::run()
 	{
-		CustomClient NetClient;
-		NetClient.Connect("172.16.201.82", 60000);
+		//if(!NetClient.IsConnected())
+		//{
+		//	NetClient.Disconnect();
+		//	Sleep(1500);
+		//	ServerInst = std::make_shared<ServerInstance>(60000);
+		//	Sleep(1500);
+		//	NetClient.Connect(asio::ip::host_name(), 60000);
+		//}
 
 		printf("FirstApp Run\n");
 
@@ -338,32 +358,38 @@ namespace arc
 		users[0] = user;
 		entities.push_back(user->EntityID);
 
-		arc::net::Message<CommonMsgs> SyncMsg;
-		auto pos = coordinator.GetComponent<TransformComponent>(user->EntityID);
-		SyncMsg.header.id = CommonMsgs::NewUser;
-		SyncMsg << pos.position.x << pos.position.y << pos.position.z;
-		NetClient.Send(SyncMsg);
+		glfwSetInputMode(arc_window.getGLFWWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		if (glfwRawMouseMotionSupported())
+			glfwSetInputMode(arc_window.getGLFWWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
+		CustomClient NetClient;
+		NetClient.Connect("172.16.201.70", 60000);
+
+		//arc::net::Message<ServerClientMsg> SyncMsg;
+		//auto pos = coordinator.GetComponent<TransformComponent>(user->EntityID);
+		//SyncMsg.header.id = ServerClientMsg::NewUser;
+		//SyncMsg << pos.position.x << pos.position.y << pos.position.z;
+		//NetClient.Send(SyncMsg);
 
 		while (!arc_window.shouldClose())
 		{
 			if (NetClient.IsConnected())
 			{
-
-
 				if (!NetClient.Incoming().empty())
 				{
 					auto msg = NetClient.Incoming().popfront().msg;
 
 					switch (msg.header.id)
 					{
-					case CommonMsgs::ServerAccept:
+					case ServerClientMsg::ServerAccept:
 					{
 						std::cout << "Server Accepted Connection\n";
 						break;
 					}
-					case CommonMsgs::ServerDeny:
+					case ServerClientMsg::ServerDeny:
 						break;
-					case CommonMsgs::ServerPing:
+					case ServerClientMsg::ServerPing:
 					{
 						std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 						std::chrono::system_clock::time_point timeThen;
@@ -372,16 +398,16 @@ namespace arc
 						std::cout << "Ping " << std::chrono::duration<double>(timeNow - timeThen).count() << "\n";
 						break;
 					}
-					case CommonMsgs::MessageAll:
+					case ServerClientMsg::MessageAll:
 					{
 						uint32_t clientID;
 						msg >> clientID;
 						std::cout << "Hello from [" << clientID << "]\n";
 						break;
 					}
-					case CommonMsgs::ServerMessage:
+					case ServerClientMsg::ServerMessage:
 						break;
-					case CommonMsgs::NewUser:
+					case ServerClientMsg::NewUser:
 					{
 						User* newUser = new User{ coordinator, rat_model };
 						auto& comp = coordinator.GetComponent<TransformComponent>(newUser->EntityID);
@@ -392,26 +418,53 @@ namespace arc
 					}
 					break;
 
-					case CommonMsgs::UserSync:
+					case ServerClientMsg::UserSync:
 					{
 						uint32_t userid;
 						msg >> userid;
-						auto& comp = coordinator.GetComponent<TransformComponent>(users[userid]->EntityID);
-						msg >> comp.position.z >> comp.position.y >> comp.position.x;
+
+						if (users.find(userid) == users.end())
+						{
+							User* newUser = new User{ coordinator, rat_model };
+							auto& transform = coordinator.GetComponent<TransformComponent>(newUser->EntityID);
+							msg >> transform.rotation.z >> transform.rotation.y >> transform.rotation.x;
+							msg >> transform.position.z >> transform.position.y >> transform.position.x;
+							users[userid] = newUser;
+							entities.push_back(newUser->EntityID);
+						}
+						else
+						{
+							auto& transform = coordinator.GetComponent<TransformComponent>(users[userid]->EntityID);
+							msg >> transform.rotation.z >> transform.rotation.y >> transform.rotation.x;
+							msg >> transform.position.z >> transform.position.y >> transform.position.x;
+						}
 					}
 					break;
 
-					case CommonMsgs::ServerSync:
+					case ServerClientMsg::RelayUserDisconnect:
 					{
-						arc::net::Message<CommonMsgs> ServerSyncMsg;
-						auto pos = coordinator.GetComponent<TransformComponent>(user->EntityID);
-						SyncMsg.header.id = CommonMsgs::UserSync;
-						SyncMsg << pos.position.x << pos.position.y << pos.position.z;
-						NetClient.Send(SyncMsg);
+						uint32_t userid;
+						msg >> userid;
+						std::cout << "Disconnecting: " << userid << "\n";
+						Entity entity = users[userid]->EntityID;
+						coordinator.DestroyEntity(entity);
+						entities.erase(std::remove(entities.begin(), entities.end(), entity));
+						users.erase(entity);
 					}
 					break;
 
-					case CommonMsgs::SpawnEntity:
+					case ServerClientMsg::ServerSync:
+					{
+						arc::net::Message<ServerClientMsg> ServerSyncMsg;
+						auto transform = coordinator.GetComponent<TransformComponent>(user->EntityID);
+						ServerSyncMsg.header.id = ServerClientMsg::UserSync;
+						ServerSyncMsg << transform.position.x << transform.position.y << transform.position.z;
+						ServerSyncMsg << transform.rotation.x << transform.rotation.y << transform.rotation.z;
+						NetClient.Send(ServerSyncMsg);
+					}
+					break;
+
+					case ServerClientMsg::SpawnEntity:
 					{
 						glm::vec3 pos;
 						msg >> pos.z >> pos.y >> pos.x;
@@ -459,6 +512,9 @@ namespace arc
 			if (glfwGetKey(arc_window.getGLFWWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
 				break;
 
+			if (glfwGetKey(arc_window.getGLFWWindow(), GLFW_KEY_1) == GLFW_PRESS)
+				NetClient.PingServer();
+
 			if (glfwGetKey(arc_window.getGLFWWindow(), GLFW_KEY_0) == GLFW_PRESS)
 			{
 				auto pos = coordinator.GetComponent<TransformComponent>(CameraEntity).position;
@@ -492,8 +548,8 @@ namespace arc
 					quat,
 					EActivation::Activate);
 
-				arc::net::Message<CommonMsgs> msg;
-				msg.header.id = CommonMsgs::SpawnEntity;
+				arc::net::Message<ServerClientMsg> msg;
+				msg.header.id = ServerClientMsg::SpawnEntity;
 
 				msg << pos.x << pos.y << pos.z;
 
@@ -506,9 +562,9 @@ namespace arc
 
 			physics_system.Update(frame_time, 1, &temp_allocator, &job_system);
 
-			cameraController.moveInPlaneXZ(arc_window.getGLFWWindow(), frame_time, coordinator.GetComponent<TransformComponent>(CameraEntity));
+			//cameraController.moveInPlaneXZ(arc_window.getGLFWWindow(), frame_time, coordinator.GetComponent<TransformComponent>(CameraEntity));
 
-			camera.setViewYXZ(coordinator.GetComponent<TransformComponent>(CameraEntity).position, coordinator.GetComponent<TransformComponent>(CameraEntity).rotation);
+			camera.setViewYXZ(coordinator.GetComponent<TransformComponent>(user->EntityID).position, coordinator.GetComponent<TransformComponent>(user->EntityID).rotation);
 
 			float aspect = ArcRenderer.getAspectRatio();
 			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -10, 1000.0f);
@@ -598,6 +654,10 @@ namespace arc
 
 			}
 		}
+
+		arc::net::Message<ServerClientMsg> disc;
+		disc.header.id = ServerClientMsg::UserDisconnect;
+		NetClient.Send(disc);
 
 		vkDeviceWaitIdle(arc_device.device());
 	}

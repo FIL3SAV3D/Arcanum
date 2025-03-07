@@ -7,6 +7,7 @@ namespace arc
 	{
 		coordinator.AddComponent(EntityID, TransformComponent());
 		coordinator.AddComponent(EntityID, ModelComponent(defaultModel));
+
 	}
 
 	User::~User()
@@ -17,20 +18,52 @@ namespace arc
 	{
 		TransformComponent& transform = coordinator.GetComponent<TransformComponent>(EntityID);
 
-		glm::vec3 rotate{ 0.0f };
-		if (glfwGetKey(window, Keys.lookRight) == GLFW_PRESS)
-			rotate.y += 1.0f;
-		if (glfwGetKey(window, Keys.lookLeft) == GLFW_PRESS)
-			rotate.y -= 1.0f;
-		if (glfwGetKey(window, Keys.lookUp) == GLFW_PRESS)
-			rotate.x += 1.0f;
-		if (glfwGetKey(window, Keys.lookDown) == GLFW_PRESS)
-			rotate.x -= 1.0f;
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
 
-		float delta = glm::min(deltaTime, 1.0f);
+		if (firstmouse)
+		{
+			lPosX = xpos;
+			lPosY = ypos;
+			firstmouse = false;
+		}
 
-		if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon())
-			transform.rotation += turn_speed * delta * glm::normalize(rotate);
+		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		{
+			move_speed = sprint;
+		}
+		else
+		{
+			move_speed = 3.0f;
+		}
+
+		float xoffset = xpos - lPosX;
+		float yoffset = lPosY - ypos;
+		lPosX = xpos;
+		lPosY = ypos;
+
+		float sensitivity = 1.0f;
+		xoffset *= sensitivity;
+		yoffset *= sensitivity;
+
+		float Delta = glm::min(deltaTime, 1.0f);
+
+		yaw += xoffset * Delta;
+		pitch += yoffset * Delta;
+
+		if (pitch > 89.0f)
+			pitch = 88.5f;
+		if (pitch < -89.0f)
+			pitch = -88.5f;
+
+		transform.rotation.x = pitch;
+		transform.rotation.y = yaw;
+
+		glm::vec3 front;
+		front.x = cos(glm::radians(transform.rotation.y)) * cos(glm::radians(transform.rotation.x));
+		front.y = sin(glm::radians(transform.rotation.x));
+		front.z = sin(glm::radians(transform.rotation.y)) * cos(glm::radians(transform.rotation.x));
+		glm::normalize(front);
 
 		transform.rotation.x = glm::clamp(transform.rotation.x, -1.5f, 1.5f);
 		transform.rotation.y = glm::mod(transform.rotation.y, glm::two_pi<float>());
@@ -56,6 +89,6 @@ namespace arc
 			move_dir -= up_dir;
 
 		if (glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon())
-			transform.position += move_speed * delta * glm::normalize(move_dir);
+			transform.position += move_speed * Delta * glm::normalize(move_dir);
 	}
 }

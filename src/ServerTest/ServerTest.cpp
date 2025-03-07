@@ -1,94 +1,94 @@
 #include <iostream>
 
 #include <ArcNet.h>
+#include <ServerClient/SharedInfo.h>
 
-enum class CommonMsgs : uint32_t
-{
-	ServerAccept,
-	ServerDeny,
-	ServerPing,
-	MessageAll,
-	ServerMessage,
-
-	SpawnEntity,
-	NewUser,
-	UserSync,
-	ServerSync,
-};
-
-class CustomServer : public arc::net::ServerInterface<CommonMsgs>
+class CustomServer : public arc::net::ServerInterface<ServerClientMsg>
 {
 public:
-	CustomServer(uint16_t port) : arc::net::ServerInterface<CommonMsgs>(port)
+	CustomServer(uint16_t port) : arc::net::ServerInterface<ServerClientMsg>(port)
 	{
 
 	}
 
 protected:
-	virtual bool OnClientConnect(std::shared_ptr<arc::net::connection<CommonMsgs>> client)
+	virtual bool OnClientConnect(std::shared_ptr<arc::net::connection<ServerClientMsg>> client)
 	{
-		arc::net::Message<CommonMsgs> msg;
-		msg.header.id = CommonMsgs::ServerAccept;
+		arc::net::Message<ServerClientMsg> msg;
+		msg.header.id = ServerClientMsg::ServerAccept;
 		client->Send(msg);
 
 		return true;
 	}
 
-	virtual void OnClientDisconnect(std::shared_ptr<arc::net::connection<CommonMsgs>> client)
+	virtual void OnClientDisconnect(std::shared_ptr<arc::net::connection<ServerClientMsg>> client)
 	{
 		std::cout << "Removing client [" << client->GetID() << "]\n";
 	}
 
-	virtual void OnMessage(std::shared_ptr<arc::net::connection<CommonMsgs>> client, arc::net::Message<CommonMsgs>& msg)
+	virtual void OnMessage(std::shared_ptr<arc::net::connection<ServerClientMsg>> client, arc::net::Message<ServerClientMsg>& msg)
 	{
 		switch (msg.header.id)
 		{
-		case CommonMsgs::ServerAccept:
+		case ServerClientMsg::ServerAccept:
 		{
 			break;
 		}
-		case CommonMsgs::ServerDeny:
+		case ServerClientMsg::ServerDeny:
 			break;
-		case CommonMsgs::ServerPing:
+		case ServerClientMsg::ServerPing:
 		{
 			std::cout << "[" << client->GetID() << "]: Server Ping\n";
 			client->Send(msg);
 		}
-			break;
-		case CommonMsgs::MessageAll:
+		break;
+
+		case ServerClientMsg::UserDisconnect:
+		{
+			std::cout << "[" << client->GetID() << "]: Disconnected\n";
+			uint32_t userID = client->GetID();
+			arc::net::Message<ServerClientMsg> msg;
+			msg.header.id = ServerClientMsg::RelayUserDisconnect;
+			msg << userID;
+			MessageAllClients(msg);
+		}
+		break;
+
+		case ServerClientMsg::MessageAll:
 		{
 			std::cout << "[" << client->GetID() << "]: Message All\n";
 
 			// Construct a new message and send it to all clients
-			arc::net::Message<CommonMsgs> msg;
-			msg.header.id = CommonMsgs::MessageAll;
+			arc::net::Message<ServerClientMsg> msg;
+			msg.header.id = ServerClientMsg::MessageAll;
 			msg << client->GetID();
 
 			MessageAllClients(msg, client);
 		}
 			break;
-		case CommonMsgs::ServerMessage:
+		case ServerClientMsg::ServerMessage:
 		{
 			break;
 		}
 
-		case CommonMsgs::SpawnEntity:
+		case ServerClientMsg::SpawnEntity:
 		{
 			std::cout << "[" << client->GetID() << "]: Spawning Entity To All\n";
 
 			MessageAllClients(msg, client);
 		}
 		break;
-		case CommonMsgs::NewUser:
+		case ServerClientMsg::NewUser:
 		{
 			std::cout << "[" << client->GetID() << "]: Spawning New User To All\n";
 			msg << client->GetID();
 			MessageAllClients(msg, client);
 		}
 		break;
-		case CommonMsgs::UserSync:
+		case ServerClientMsg::UserSync:
 		{
-			std::cout << "[" << client->GetID() << "]: Syncing User To All\n";
+			//std::cout << "[" << client->GetID() << "]: Syncing User To All\n";
+			msg << client->GetID();
 			MessageAllClients(msg, client);
 		}
 		break;
@@ -103,22 +103,26 @@ int main()
 	CustomServer server(60000);
 	server.Start();
 
-	arc::net::Message<CommonMsgs> SyncPos;
-	SyncPos.header.id = CommonMsgs::ServerSync;
+	auto current_time = std::chrono::high_resolution_clock::now();
+
+	arc::net::Message<ServerClientMsg> SyncPos;
+	SyncPos.header.id = ServerClientMsg::ServerSync;
 	int index = 0;
+	float time = 0.0f;
 	while (1)
 	{
+		auto new_time = std::chrono::high_resolution_clock::now();
+		float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
+		current_time = new_time;
+
+		time += frame_time;
+
 		server.Update(-1);
 
-
-		if (index > 1000)
+		if (time > 0.01f)
 		{
 			server.MessageAllClients(SyncPos);
-			index = 0;
-		}
-		else
-		{
-			index++;
+			time = 0.0f;
 		}
 	}
 

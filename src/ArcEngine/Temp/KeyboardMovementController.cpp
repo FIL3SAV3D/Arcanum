@@ -4,28 +4,64 @@ namespace arc
 {
 	void KeyboardMovementController::moveInPlaneXZ(GLFWwindow* window, float delta, TransformComponent& transform)
 	{
-		glm::vec3 rotate{ 0.0f };
-		if (glfwGetKey(window, Keys.lookRight) == GLFW_PRESS)
-			rotate.y += 1.0f;
-		if (glfwGetKey(window, Keys.lookLeft) == GLFW_PRESS)
-			rotate.y -= 1.0f;
-		if (glfwGetKey(window, Keys.lookUp) == GLFW_PRESS)
-			rotate.x += 1.0f;
-		if (glfwGetKey(window, Keys.lookDown) == GLFW_PRESS)
-			rotate.x -= 1.0f;
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
 
-		delta = glm::min(delta, 1.0f);
+		if (firstmouse)
+		{
+			lPosX = xpos;
+			lPosY = ypos;
+			firstmouse = false;
+		}
 
-		if(glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon())
-			transform.rotation += turn_speed * delta * glm::normalize(rotate);
+		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		{
+			move_speed = sprint;
+		}
+		else
+		{
+			move_speed = 3.0f;
+		}
+
+		float xoffset = xpos - lPosX;
+		float yoffset = lPosY - ypos;
+		lPosX = xpos;
+		lPosY = ypos;
+
+		float sensitivity = 1.0f;
+		xoffset *= sensitivity;
+		yoffset *= sensitivity;
+
+		float Delta = glm::min(delta, 1.0f);
+
+		yaw += xoffset * Delta;
+		pitch += yoffset * Delta;
+
+		if (pitch > 89.0f)
+			pitch = 89.0f;
+		if (pitch < -89.0f)
+			pitch = -89.0f;
+
+		transform.rotation.x = pitch;
+		transform.rotation.y = yaw;
+
+		glm::vec3 front;
+		front.x = cos(glm::radians(transform.rotation.y)) * cos(glm::radians(transform.rotation.x));
+		front.y = sin(glm::radians(transform.rotation.x));
+		front.z = sin(glm::radians(transform.rotation.y)) * cos(glm::radians(transform.rotation.x));
+		glm::normalize(front);
 
 		transform.rotation.x = glm::clamp(transform.rotation.x, -1.5f, 1.5f);
 		transform.rotation.y = glm::mod(transform.rotation.y, glm::two_pi<float>());
 
+		//const glm::vec3 forward_dir = front;
+		//const glm::vec3 right_dir{ front.z, 0.0f, -front.x };
+		//const glm::vec3 up_dir{ 0.0f, -1.0f, 0.0f };
+
 		float yaw = transform.rotation.y;
 		const glm::vec3 forward_dir{ glm::sin(yaw), 0.0f, glm::cos(yaw) };
 		const glm::vec3 right_dir{ forward_dir.z, 0.0f, -forward_dir.x };
-		const glm::vec3 up_dir  { 0.0f, -1.0f, 0.0f };
+		const glm::vec3 up_dir{ 0.0f, -1.0f, 0.0f };
 
 		glm::vec3 move_dir{ 0.0f };
 
@@ -43,6 +79,9 @@ namespace arc
 			move_dir -= up_dir;
 
 		if (glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon())
-			transform.position += move_speed * delta * glm::normalize(move_dir);
+			transform.position += move_speed * Delta * glm::normalize(move_dir);
+
+		printf("pos: %f %f %f\n", move_dir.x, move_dir.y, move_dir.z);
+
 	}
 }

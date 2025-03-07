@@ -32,6 +32,15 @@ namespace arc
 		User(Coordinator& coordinator, std::shared_ptr<arcModel> defaultModel);
 		~User();
 
+		bool firstmouse = true;
+
+		float lPosX = 0.0f;
+		float lPosY = 0.0f;
+
+		float yaw = 0.0f;
+		float pitch = 0.0f;
+
+		float sprint = 10.0f;
 
 		void Update(const float& deltaTime, Coordinator& coordinator, GLFWwindow* window);
 

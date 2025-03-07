@@ -6,6 +6,7 @@ int main()
 
 	try
 	{
+
 		arc::cFirstApp app{};
 		app.run();
 	}
@@ -16,5 +17,6 @@ int main()
 		return EXIT_FAILURE;
 	}
 
+	system("pause");
 	return EXIT_SUCCESS;
 }

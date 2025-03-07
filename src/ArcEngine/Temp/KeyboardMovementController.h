@@ -25,8 +25,17 @@ namespace arc
 		void moveInPlaneXZ(GLFWwindow* window, float delta, TransformComponent& transform);
 
 		KeyMappings Keys{};
+		bool firstmouse = true;
+
+		float lPosX = 0.0f;
+		float lPosY = 0.0f;
+
+		float yaw = 0.0f;
+		float pitch = 0.0f;
 
 		float move_speed{ 3.0f };
 		float turn_speed{ 1.5f };
+
+		float sprint = 6.0f;
 	};
 }

@@ -47,6 +47,7 @@ namespace arc
 					std::cerr << "Client Exception: " << e.what() << "\n";
 					return false;
 				}
+
 				return true;
 			}
 

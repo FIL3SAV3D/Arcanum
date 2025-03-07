@@ -17,6 +17,7 @@
 
 #include "LiveCollabTemp/User.h"
 #include <map>
+#include <Server/Server.h>
 
 
 namespace arc
@@ -63,6 +64,8 @@ namespace arc
 		std::vector<Entity> entities{};
 		std::map<uint32_t, User*> users{};
 		Entity CameraEntity;
+
+		std::shared_ptr<ServerInstance> ServerInst = nullptr;
 
 		std::shared_ptr<arcModel> rat_model = nullptr;
 	};
