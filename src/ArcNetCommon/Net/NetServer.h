@@ -69,7 +69,7 @@ namespace arc
 							{
 								MDeqConnections.push_back(std::move(newconn));
 
-								MDeqConnections.back()->ConnectToClient(nIDCounter++);
+								MDeqConnections.back()->ConnectToClient(this, nIDCounter++);
 
 								std::cout << "[" << MDeqConnections.back()->GetID() << "] Wizard Approved\n";
 							}
@@ -128,8 +128,11 @@ namespace arc
 						std::remove(MDeqConnections.begin(), MDeqConnections.end(), nullptr), MDeqConnections.end());
 			}
 
-			void Update(size_t nMaxMessages = -1)
+			void Update(size_t nMaxMessages = -1, bool wait = false)
 			{
+				if (wait)
+					MQMessagesIn.wait();
+
 				size_t MessageCount = 0;
 
 				while (MessageCount < nMaxMessages && !MQMessagesIn.empty())
@@ -154,6 +157,12 @@ namespace arc
 			}
 
 			virtual void OnMessage(std::shared_ptr<connection<T>> client, Message<T>& msg)
+			{
+
+			}
+
+		public:
+			virtual void OnClientValidated(std::shared_ptr<connection<T>> client)
 			{
 
 			}

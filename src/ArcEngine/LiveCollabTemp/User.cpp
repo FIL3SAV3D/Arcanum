@@ -7,7 +7,6 @@ namespace arc
 	{
 		coordinator.AddComponent(EntityID, TransformComponent());
 		coordinator.AddComponent(EntityID, ModelComponent(defaultModel));
-
 	}
 
 	User::~User()

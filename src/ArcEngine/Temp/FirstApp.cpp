@@ -278,6 +278,7 @@ namespace arc
 
 		printf("FirstApp Run\n");
 
+
 		std::vector<std::unique_ptr<cBuffer>> uboBuffers(arcSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < uboBuffers.size(); i++)
 		{
@@ -364,7 +365,7 @@ namespace arc
 			glfwSetInputMode(arc_window.getGLFWWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
 		CustomClient NetClient;
-		NetClient.Connect("172.16.201.70", 60000);
+		NetClient.Connect("172.16.201.21", 60000);
 
 		//arc::net::Message<ServerClientMsg> SyncMsg;
 		//auto pos = coordinator.GetComponent<TransformComponent>(user->EntityID);
@@ -376,7 +377,7 @@ namespace arc
 		{
 			if (NetClient.IsConnected())
 			{
-				if (!NetClient.Incoming().empty())
+				while (!NetClient.Incoming().empty())
 				{
 					auto msg = NetClient.Incoming().popfront().msg;
 
@@ -507,6 +508,10 @@ namespace arc
 				}
 			}
 
+			auto new_time = std::chrono::high_resolution_clock::now();
+			float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
+			current_time = new_time;
+
 			glfwPollEvents();
 
 			if (glfwGetKey(arc_window.getGLFWWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -517,8 +522,8 @@ namespace arc
 
 			if (glfwGetKey(arc_window.getGLFWWindow(), GLFW_KEY_0) == GLFW_PRESS)
 			{
-				auto pos = coordinator.GetComponent<TransformComponent>(CameraEntity).position;
-				auto rot = coordinator.GetComponent<TransformComponent>(CameraEntity).rotation;
+				auto pos = coordinator.GetComponent<TransformComponent>(user->EntityID).position;
+				auto rot = coordinator.GetComponent<TransformComponent>(user->EntityID).rotation;
 
 				auto entity = coordinator.CreateEntity();
 				entities.push_back(entity);
@@ -552,15 +557,18 @@ namespace arc
 				msg.header.id = ServerClientMsg::SpawnEntity;
 
 				msg << pos.x << pos.y << pos.z;
-
+				
 				NetClient.Send(msg);
 			}
 
-			auto new_time = std::chrono::high_resolution_clock::now();
-			float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
-			current_time = new_time;
-
 			physics_system.Update(frame_time, 1, &temp_allocator, &job_system);
+
+			//arc::net::Message<ServerClientMsg> ServerSyncMsg;
+			//auto transform = coordinator.GetComponent<TransformComponent>(user->EntityID);
+			//ServerSyncMsg.header.id = ServerClientMsg::ClientUpdate;
+			//ServerSyncMsg << transform.position.x << transform.position.y << transform.position.z;
+			//ServerSyncMsg << transform.rotation.x << transform.rotation.y << transform.rotation.z;
+			//NetClient.Send(ServerSyncMsg);
 
 			//cameraController.moveInPlaneXZ(arc_window.getGLFWWindow(), frame_time, coordinator.GetComponent<TransformComponent>(CameraEntity));
 

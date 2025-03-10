@@ -38,6 +38,11 @@ namespace arc
 
 		void run();
 
+		void operator() ()
+		{
+			run();
+		}
+
 	private:
 		void loadGameObjects();
 

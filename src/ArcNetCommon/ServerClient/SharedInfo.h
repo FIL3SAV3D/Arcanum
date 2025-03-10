@@ -16,4 +16,7 @@ enum class ServerClientMsg : std::uint32_t
 
 	RelayUserDisconnect,
 	UserDisconnect,
+	ClientUpdate,
 };
+
+const uint16_t UpdateFrequency = 60;

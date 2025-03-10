@@ -30,8 +30,11 @@ protected:
 	{
 		switch (msg.header.id)
 		{
-		case ServerClientMsg::ServerAccept:
+		case ServerClientMsg::ClientUpdate:
 		{
+			std::cout << "[" << client->GetID() << "]: Update\n";
+			msg.header.id = ServerClientMsg::UserSync;
+			MessageAllClients(msg);
 			break;
 		}
 		case ServerClientMsg::ServerDeny:
@@ -56,7 +59,7 @@ protected:
 
 		case ServerClientMsg::MessageAll:
 		{
-			std::cout << "[" << client->GetID() << "]: Message All\n";
+			//std::cout << "[" << client->GetID() << "]: Message All\n";
 
 			// Construct a new message and send it to all clients
 			arc::net::Message<ServerClientMsg> msg;
@@ -73,14 +76,14 @@ protected:
 
 		case ServerClientMsg::SpawnEntity:
 		{
-			std::cout << "[" << client->GetID() << "]: Spawning Entity To All\n";
+			//std::cout << "[" << client->GetID() << "]: Spawning Entity To All\n";
 
 			MessageAllClients(msg, client);
 		}
 		break;
 		case ServerClientMsg::NewUser:
 		{
-			std::cout << "[" << client->GetID() << "]: Spawning New User To All\n";
+			//std::cout << "[" << client->GetID() << "]: Spawning New User To All\n";
 			msg << client->GetID();
 			MessageAllClients(msg, client);
 		}
@@ -105,9 +108,6 @@ int main()
 
 	auto current_time = std::chrono::high_resolution_clock::now();
 
-	arc::net::Message<ServerClientMsg> SyncPos;
-	SyncPos.header.id = ServerClientMsg::ServerSync;
-	int index = 0;
 	float time = 0.0f;
 	while (1)
 	{
@@ -117,11 +117,10 @@ int main()
 
 		time += frame_time;
 
-		server.Update(-1);
-
-		if (time > 0.01f)
+		if (time >= (1.0f / UpdateFrequency))
 		{
-			server.MessageAllClients(SyncPos);
+			server.Update(-1, false);
+			//std::cout << "UPDATE:" << time << std::endl;
 			time = 0.0f;
 		}
 	}
