@@ -30,6 +30,39 @@ protected:
 	{
 		switch (msg.header.id)
 		{
+
+		case ServerClientMsg::ServerAccept:
+		{
+
+		}
+		break;
+
+		case ServerClientMsg::ServerDeny:
+		{
+
+		}
+		break;
+
+		case ServerClientMsg::ServerPing:
+		{
+			std::cout << "[" << client->GetID() << "]: Server Ping\n";
+			client->Send(msg);
+		}
+		break;
+
+		case ServerClientMsg::ServerMessageClient:
+			break;
+		case ServerClientMsg::ServerMessageAll:
+			break;
+		case ServerClientMsg::ServerMessageAllExceptSender:
+			break;
+		default:
+			break;
+		}
+
+
+		switch (msg.header.id)
+		{
 		case ServerClientMsg::ClientUpdate:
 		{
 			std::cout << "[" << client->GetID() << "]: Update\n";

@@ -3,11 +3,6 @@
     "Name": "ServerClientTesting",
     "Projects": [
       {
-        "Path": "ServerTest.vcxproj",
-        "Action": "Start",
-        "DebugTarget": "Local Windows Debugger"
-      },
-      {
         "Path": "Framework.vcxproj",
         "Action": "Start",
         "DebugTarget": "Local Windows Debugger"

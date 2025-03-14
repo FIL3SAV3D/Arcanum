@@ -348,6 +348,8 @@ namespace arc
 								// Connection is a client, so solve puzzle
 								m_nHandshakeOut = scramble(m_nHandshakeIn);
 
+								std::cout << m_nHandshakeOut << std::endl;
+
 								// Write the result
 								WriteValidation();
 							}
@@ -355,7 +357,9 @@ namespace arc
 						else
 						{
 							// Some biggerfailure occured
+
 							std::cout << "Client Disconnected (ReadValidation)" << std::endl;
+							std::cout << "Error Code: " << ec.message() << std::endl;
 							m_socket.close();
 						}
 					});

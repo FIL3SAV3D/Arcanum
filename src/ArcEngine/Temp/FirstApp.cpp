@@ -365,14 +365,16 @@ namespace arc
 			glfwSetInputMode(arc_window.getGLFWWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
 		CustomClient NetClient;
-		NetClient.Connect("172.16.201.21", 60000);
-
+		NetClient.Connect("172.16.201.23", 60000);
+		
 		//arc::net::Message<ServerClientMsg> SyncMsg;
 		//auto pos = coordinator.GetComponent<TransformComponent>(user->EntityID);
 		//SyncMsg.header.id = ServerClientMsg::NewUser;
 		//SyncMsg << pos.position.x << pos.position.y << pos.position.z;
 		//NetClient.Send(SyncMsg);
 
+		int ind = 0;
+		bool test = true;
 		while (!arc_window.shouldClose())
 		{
 			if (NetClient.IsConnected())
@@ -395,7 +397,6 @@ namespace arc
 						std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 						std::chrono::system_clock::time_point timeThen;
 						msg >> timeThen;
-						std::cout << "Server pkg Size: " << msg.size() << "\n";
 						std::cout << "Ping " << std::chrono::duration<double>(timeNow - timeThen).count() << "\n";
 						break;
 					}
@@ -518,47 +519,54 @@ namespace arc
 				break;
 
 			if (glfwGetKey(arc_window.getGLFWWindow(), GLFW_KEY_1) == GLFW_PRESS)
+			{
 				NetClient.PingServer();
+			}
 
 			if (glfwGetKey(arc_window.getGLFWWindow(), GLFW_KEY_0) == GLFW_PRESS)
 			{
-				auto pos = coordinator.GetComponent<TransformComponent>(user->EntityID).position;
-				auto rot = coordinator.GetComponent<TransformComponent>(user->EntityID).rotation;
+				if (ind == 0)
+				{
+					ind++;
+					auto pos = coordinator.GetComponent<TransformComponent>(user->EntityID).position;
+					auto rot = coordinator.GetComponent<TransformComponent>(user->EntityID).rotation;
 
-				auto entity = coordinator.CreateEntity();
-				entities.push_back(entity);
+					auto entity = coordinator.CreateEntity();
+					entities.push_back(entity);
 
-				TransformComponent TComp{
-					{pos.x, pos.y, pos.z},
-					{rot.x, rot.y, rot.z},
-					{0.1f, 0.1f, 0.1f}
-				};
-				coordinator.AddComponent(
-					entity,
-					TComp
-				);
+					TransformComponent TComp{
+						{pos.x, pos.y, pos.z},
+						{rot.x, rot.y, rot.z},
+						{0.1f, 0.1f, 0.1f}
+					};
+					coordinator.AddComponent(
+						entity,
+						TComp
+					);
 
-				coordinator.AddComponent(entity, ModelComponent{ rat_model });
+					coordinator.AddComponent(entity, ModelComponent{ rat_model });
 
-				PhysicsComponent pComp{};
-				pComp.CreateCollision(physics_system, rat_model->JPHVertArray);
-				coordinator.AddComponent(entity, pComp);
+					PhysicsComponent pComp{};
+					pComp.CreateCollision(physics_system, rat_model->JPHVertArray);
+					coordinator.AddComponent(entity, pComp);
 
-				JPH::Quat quat{};
-				quat = quat.sEulerAngles(RVec3{ TComp.rotation.x, TComp.rotation.y, TComp.rotation.z });
-				quat = quat.Normalized();
-				physics_system.GetBodyInterface().SetPositionAndRotation(
-					pComp.CollisionID,
-					{ TComp.position.x, TComp.position.y, TComp.position.z },
-					quat,
-					EActivation::Activate);
+					JPH::Quat quat{};
+					quat = quat.sEulerAngles(RVec3{ TComp.rotation.x, TComp.rotation.y, TComp.rotation.z });
+					quat = quat.Normalized();
+					physics_system.GetBodyInterface().SetPositionAndRotation(
+						pComp.CollisionID,
+						{ TComp.position.x, TComp.position.y, TComp.position.z },
+						quat,
+						EActivation::Activate);
 
-				arc::net::Message<ServerClientMsg> msg;
-				msg.header.id = ServerClientMsg::SpawnEntity;
+					arc::net::Message<ServerClientMsg> msg;
+					msg.header.id = ServerClientMsg::SpawnEntity;
 
-				msg << pos.x << pos.y << pos.z;
+					msg << pos.x << pos.y << pos.z;
+
+					NetClient.Send(msg);
+				}
 				
-				NetClient.Send(msg);
 			}
 
 			physics_system.Update(frame_time, 1, &temp_allocator, &job_system);
@@ -663,9 +671,9 @@ namespace arc
 			}
 		}
 
-		arc::net::Message<ServerClientMsg> disc;
+		/*arc::net::Message<ServerClientMsg> disc;
 		disc.header.id = ServerClientMsg::UserDisconnect;
-		NetClient.Send(disc);
+		NetClient.Send(disc);*/
 
 		vkDeviceWaitIdle(arc_device.device());
 	}
