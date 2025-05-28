@@ -44,7 +44,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/src/ArcEngine" }
 		includedirs { "../Arcanum/src/Jolt" }
 		includedirs { "../Arcanum/src/ArcNetCommon" }
-		includedirs { "C:/SDKs/asio-1.30.2/ASIO/include" }
+		includedirs { "../Arcanum/Library/asio-1.34.2/include" }
 
 
 	project "ArcEngine"
@@ -86,7 +86,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/src/Jolt" }
 		includedirs { "../Arcanum/src/ImGui" }
 		includedirs { "../Arcanum/src/ArcNetCommon" }
-		includedirs { "C:/SDKs/asio-1.30.2/ASIO/include" }
+		includedirs { "../Arcanum/Library/asio-1.34.2/include" }
 		
 	project "Jolt"
 		kind "StaticLib"
@@ -115,7 +115,7 @@ workspace "Arcanum"
 		
 		includedirs { "../Arcanum/src/ServerTest" }
 		includedirs { "../Arcanum/src/ArcNetCommon" }
-		includedirs { "C:/SDKs/asio-1.30.2/ASIO/include" }
+		includedirs { "../Arcanum/Library/asio-1.34.2/include" }
 
 	project "ClientTest"
 		kind "ConsoleApp"
@@ -132,7 +132,7 @@ workspace "Arcanum"
 		
 		includedirs { "../Arcanum/src/ClientTest" }
 		includedirs { "../Arcanum/src/ArcNetCommon" }
-		includedirs { "C:/SDKs/asio-1.30.2/ASIO/include" }
+		includedirs { "../Arcanum/Library/asio-1.34.2/include" }
 
 	project "ArcNetCommon"
 		kind "StaticLib"
@@ -145,7 +145,7 @@ workspace "Arcanum"
 		}
 		
 		includedirs { "../Arcanum/src/ArcNetCommon" }
-		includedirs { "C:/SDKs/asio-1.30.2/ASIO/include" }
+		includedirs { "../Arcanum/Library/asio-1.34.2/include" }
 		
 	project "Shaders"
 		kind "Utility"

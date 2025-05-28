@@ -64,43 +64,43 @@ namespace arc
 				client->Send(msg);
 			}
 			break;
-			case ServerClientMsg::MessageAll:
-			{
-				std::cout << "[" << client->GetID() << "]: Message All\n";
+			//case ServerClientMsg::MessageAll:
+			//{
+			//	std::cout << "[" << client->GetID() << "]: Message All\n";
 
-				// Construct a new message and send it to all clients
-				arc::net::Message<ServerClientMsg> msg;
-				msg.header.id = ServerClientMsg::MessageAll;
-				msg << client->GetID();
+			//	// Construct a new message and send it to all clients
+			//	arc::net::Message<ServerClientMsg> msg;
+			//	msg.header.id = ServerClientMsg::MessageAll;
+			//	msg << client->GetID();
 
-				MessageAllClients(msg, client);
-			}
-			break;
-			case ServerClientMsg::ServerMessage:
-			{
-				break;
-			}
+			//	MessageAllClients(msg, client);
+			//}
+			//break;
+			//case ServerClientMsg::ServerMessage:
+			//{
+			//	break;
+			//}
 
-			case ServerClientMsg::SpawnEntity:
-			{
-				std::cout << "[" << client->GetID() << "]: Spawning Entity To All\n";
+			//case ServerClientMsg::SpawnEntity:
+			//{
+			//	std::cout << "[" << client->GetID() << "]: Spawning Entity To All\n";
 
-				MessageAllClients(msg, client);
-			}
-			break;
-			case ServerClientMsg::NewUser:
-			{
-				std::cout << "[" << client->GetID() << "]: Spawning New User To All\n";
-				msg << client->GetID();
-				MessageAllClients(msg, client);
-			}
-			break;
-			case ServerClientMsg::UserSync:
-			{
-				std::cout << "[" << client->GetID() << "]: Syncing User To All\n";
-				MessageAllClients(msg, client);
-			}
-			break;
+			//	MessageAllClients(msg, client);
+			//}
+			//break;
+			//case ServerClientMsg::NewUser:
+			//{
+			//	std::cout << "[" << client->GetID() << "]: Spawning New User To All\n";
+			//	msg << client->GetID();
+			//	MessageAllClients(msg, client);
+			//}
+			//break;
+			//case ServerClientMsg::UserSync:
+			//{
+			//	std::cout << "[" << client->GetID() << "]: Syncing User To All\n";
+			//	MessageAllClients(msg, client);
+			//}
+			//break;
 			default:
 				break;
 			}

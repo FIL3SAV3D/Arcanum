@@ -61,76 +61,76 @@ protected:
 		}
 
 
-		switch (msg.header.id)
-		{
-		case ServerClientMsg::ClientUpdate:
-		{
-			std::cout << "[" << client->GetID() << "]: Update\n";
-			msg.header.id = ServerClientMsg::UserSync;
-			MessageAllClients(msg);
-			break;
-		}
-		case ServerClientMsg::ServerDeny:
-			break;
-		case ServerClientMsg::ServerPing:
-		{
-			std::cout << "[" << client->GetID() << "]: Server Ping\n";
-			client->Send(msg);
-		}
-		break;
+		//switch (msg.header.id)
+		//{
+		//case ServerClientMsg::ClientUpdate:
+		//{
+		//	std::cout << "[" << client->GetID() << "]: Update\n";
+		//	msg.header.id = ServerClientMsg::UserSync;
+		//	MessageAllClients(msg);
+		//	break;
+		//}
+		//case ServerClientMsg::ServerDeny:
+		//	break;
+		//case ServerClientMsg::ServerPing:
+		//{
+		//	std::cout << "[" << client->GetID() << "]: Server Ping\n";
+		//	client->Send(msg);
+		//}
+		//break;
 
-		case ServerClientMsg::UserDisconnect:
-		{
-			std::cout << "[" << client->GetID() << "]: Disconnected\n";
-			uint32_t userID = client->GetID();
-			arc::net::Message<ServerClientMsg> msg;
-			msg.header.id = ServerClientMsg::RelayUserDisconnect;
-			msg << userID;
-			MessageAllClients(msg);
-		}
-		break;
+		//case ServerClientMsg::UserDisconnect:
+		//{
+		//	std::cout << "[" << client->GetID() << "]: Disconnected\n";
+		//	uint32_t userID = client->GetID();
+		//	arc::net::Message<ServerClientMsg> msg;
+		//	msg.header.id = ServerClientMsg::RelayUserDisconnect;
+		//	msg << userID;
+		//	MessageAllClients(msg);
+		//}
+		//break;
 
-		case ServerClientMsg::MessageAll:
-		{
-			//std::cout << "[" << client->GetID() << "]: Message All\n";
+		//case ServerClientMsg::MessageAll:
+		//{
+		//	//std::cout << "[" << client->GetID() << "]: Message All\n";
 
-			// Construct a new message and send it to all clients
-			arc::net::Message<ServerClientMsg> msg;
-			msg.header.id = ServerClientMsg::MessageAll;
-			msg << client->GetID();
+		//	// Construct a new message and send it to all clients
+		//	arc::net::Message<ServerClientMsg> msg;
+		//	msg.header.id = ServerClientMsg::MessageAll;
+		//	msg << client->GetID();
 
-			MessageAllClients(msg, client);
-		}
-			break;
-		case ServerClientMsg::ServerMessage:
-		{
-			break;
-		}
+		//	MessageAllClients(msg, client);
+		//}
+		//	break;
+		//case ServerClientMsg::ServerMessage:
+		//{
+		//	break;
+		//}
 
-		case ServerClientMsg::SpawnEntity:
-		{
-			//std::cout << "[" << client->GetID() << "]: Spawning Entity To All\n";
+		//case ServerClientMsg::SpawnEntity:
+		//{
+		//	//std::cout << "[" << client->GetID() << "]: Spawning Entity To All\n";
 
-			MessageAllClients(msg, client);
-		}
-		break;
-		case ServerClientMsg::NewUser:
-		{
-			//std::cout << "[" << client->GetID() << "]: Spawning New User To All\n";
-			msg << client->GetID();
-			MessageAllClients(msg, client);
-		}
-		break;
-		case ServerClientMsg::UserSync:
-		{
-			//std::cout << "[" << client->GetID() << "]: Syncing User To All\n";
-			msg << client->GetID();
-			MessageAllClients(msg, client);
-		}
-		break;
-		default:
-			break;
-		}
+		//	MessageAllClients(msg, client);
+		//}
+		//break;
+		//case ServerClientMsg::NewUser:
+		//{
+		//	//std::cout << "[" << client->GetID() << "]: Spawning New User To All\n";
+		//	msg << client->GetID();
+		//	MessageAllClients(msg, client);
+		//}
+		//break;
+		//case ServerClientMsg::UserSync:
+		//{
+		//	//std::cout << "[" << client->GetID() << "]: Syncing User To All\n";
+		//	msg << client->GetID();
+		//	MessageAllClients(msg, client);
+		//}
+		//break;
+		//default:
+		//	break;
+		//}
 	}
 };
 
