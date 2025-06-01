@@ -93,7 +93,7 @@ namespace arc
 			move_dir -= up_dir;
 
 		if (glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon())
-			transform.position += move_speed * Delta * glm::normalize(move_dir);
+			transform.position += move_speed * capped_delta_time * glm::normalize(move_dir);
 	}
 
 	void User::DebugPrint(const bool& enabled)
