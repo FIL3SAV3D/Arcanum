@@ -267,14 +267,14 @@ namespace arc
 
 	void arc::cFirstApp::run()
 	{
-		//if(!NetClient.IsConnected())
-		//{
-		//	NetClient.Disconnect();
-		//	Sleep(1500);
-		//	ServerInst = std::make_shared<ServerInstance>(60000);
-		//	Sleep(1500);
-		//	NetClient.Connect(asio::ip::host_name(), 60000);
-		//}
+		/*if(!NetClient.IsConnected())
+		{
+			NetClient.Disconnect();
+			Sleep(1500);
+			ServerInst = std::make_shared<ServerInstance>(60000);
+			Sleep(1500);
+			NetClient.Connect(asio::ip::host_name(), 60000);
+		}*/
 
 		printf("FirstApp Run\n");
 
@@ -400,109 +400,6 @@ namespace arc
 						std::cout << "Ping " << std::chrono::duration<double>(timeNow - timeThen).count() << "\n";
 						break;
 					}
-					//case ServerClientMsg::MessageAll:
-					//{
-					//	uint32_t clientID;
-					//	msg >> clientID;
-					//	std::cout << "Hello from [" << clientID << "]\n";
-					//	break;
-					//}
-					//case ServerClientMsg::ServerMessage:
-					//	break;
-					//case ServerClientMsg::NewUser:
-					//{
-					//	User* newUser = new User{ coordinator, rat_model };
-					//	auto& comp = coordinator.GetComponent<TransformComponent>(newUser->EntityID);
-					//	msg >> newUser->UserID;
-					//	msg >> comp.position.z >> comp.position.y >> comp.position.x;
-					//	users[newUser->UserID] = newUser;
-					//	entities.push_back(newUser->EntityID);
-					//}
-					//break;
-
-					//case ServerClientMsg::UserSync:
-					//{
-					//	uint32_t userid;
-					//	msg >> userid;
-
-					//	if (users.find(userid) == users.end())
-					//	{
-					//		User* newUser = new User{ coordinator, rat_model };
-					//		auto& transform = coordinator.GetComponent<TransformComponent>(newUser->EntityID);
-					//		msg >> transform.rotation.z >> transform.rotation.y >> transform.rotation.x;
-					//		msg >> transform.position.z >> transform.position.y >> transform.position.x;
-					//		users[userid] = newUser;
-					//		entities.push_back(newUser->EntityID);
-					//	}
-					//	else
-					//	{
-					//		auto& transform = coordinator.GetComponent<TransformComponent>(users[userid]->EntityID);
-					//		msg >> transform.rotation.z >> transform.rotation.y >> transform.rotation.x;
-					//		msg >> transform.position.z >> transform.position.y >> transform.position.x;
-					//	}
-					//}
-					//break;
-
-					//case ServerClientMsg::RelayUserDisconnect:
-					//{
-					//	uint32_t userid;
-					//	msg >> userid;
-					//	std::cout << "Disconnecting: " << userid << "\n";
-					//	Entity entity = users[userid]->EntityID;
-					//	coordinator.DestroyEntity(entity);
-					//	entities.erase(std::remove(entities.begin(), entities.end(), entity));
-					//	users.erase(entity);
-					//}
-					//break;
-
-					//case ServerClientMsg::ServerSync:
-					//{
-					//	arc::net::Message<ServerClientMsg> ServerSyncMsg;
-					//	auto transform = coordinator.GetComponent<TransformComponent>(user->EntityID);
-					//	ServerSyncMsg.header.id = ServerClientMsg::UserSync;
-					//	ServerSyncMsg << transform.position.x << transform.position.y << transform.position.z;
-					//	ServerSyncMsg << transform.rotation.x << transform.rotation.y << transform.rotation.z;
-					//	NetClient.Send(ServerSyncMsg);
-					//}
-					//break;
-
-					//case ServerClientMsg::SpawnEntity:
-					//{
-					//	glm::vec3 pos;
-					//	msg >> pos.z >> pos.y >> pos.x;
-
-					//	auto entity = coordinator.CreateEntity();
-					//	entities.push_back(entity);
-
-					//	TransformComponent TComp{
-					//		{pos.x, pos.y, pos.z},
-					//		{0.0f, 0.0f, 0.0f},
-					//		{0.1f, 0.1f, 0.1f}
-					//	};
-					//	coordinator.AddComponent(
-					//		entity,
-					//		TComp
-					//	);
-
-					//	coordinator.AddComponent(entity, ModelComponent{ rat_model });
-
-					//	PhysicsComponent pComp{};
-					//	pComp.CreateCollision(physics_system, rat_model->JPHVertArray);
-					//	coordinator.AddComponent(entity, pComp);
-
-					//	JPH::Quat quat{};
-					//	quat = quat.sEulerAngles(RVec3{ TComp.rotation.x, TComp.rotation.y, TComp.rotation.z });
-					//	quat = quat.Normalized();
-					//	physics_system.GetBodyInterface().SetPositionAndRotation(
-					//		pComp.CollisionID,
-					//		{ TComp.position.x, TComp.position.y, TComp.position.z },
-					//		quat,
-					//		EActivation::Activate);
-					//	break;
-					//}
-					//break;
-
-
 					default:
 						break;
 					}
@@ -523,62 +420,26 @@ namespace arc
 				NetClient.PingServer();
 			}
 
-			if (glfwGetKey(arc_window.getGLFWWindow(), GLFW_KEY_0) == GLFW_PRESS)
+			if (glfwGetKey(arc_window.getGLFWWindow(), GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
 			{
-				/*if (ind == 0)
+				if (InFocus && count <= 0.0f)
 				{
-					ind++;
-					auto pos = coordinator.GetComponent<TransformComponent>(user->EntityID).position;
-					auto rot = coordinator.GetComponent<TransformComponent>(user->EntityID).rotation;
-
-					auto entity = coordinator.CreateEntity();
-					entities.push_back(entity);
-
-					TransformComponent TComp{
-						{pos.x, pos.y, pos.z},
-						{rot.x, rot.y, rot.z},
-						{0.1f, 0.1f, 0.1f}
-					};
-					coordinator.AddComponent(
-						entity,
-						TComp
-					);
-
-					coordinator.AddComponent(entity, ModelComponent{ rat_model });
-
-					PhysicsComponent pComp{};
-					pComp.CreateCollision(physics_system, rat_model->JPHVertArray);
-					coordinator.AddComponent(entity, pComp);
-
-					JPH::Quat quat{};
-					quat = quat.sEulerAngles(RVec3{ TComp.rotation.x, TComp.rotation.y, TComp.rotation.z });
-					quat = quat.Normalized();
-					physics_system.GetBodyInterface().SetPositionAndRotation(
-						pComp.CollisionID,
-						{ TComp.position.x, TComp.position.y, TComp.position.z },
-						quat,
-						EActivation::Activate);
-
-					arc::net::Message<ServerClientMsg> msg;
-					msg.header.id = ServerClientMsg::SpawnEntity;
-
-					msg << pos.x << pos.y << pos.z;
-
-					NetClient.Send(msg);
-				}*/
-				
+					InFocus = false;
+					glfwSetInputMode(arc_window.getGLFWWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+					count = cooldown;
+				}
+				else if (!InFocus && count <= 0.0f)
+				{
+					InFocus = true;
+					glfwSetInputMode(arc_window.getGLFWWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+					count = cooldown;
+				}
 			}
+			
+			if (count > 0.0f)
+				count -= delta_time;
 
 			physics_system.Update(delta_time, 1, &temp_allocator, &job_system);
-
-			//arc::net::Message<ServerClientMsg> ServerSyncMsg;
-			//auto transform = coordinator.GetComponent<TransformComponent>(user->EntityID);
-			//ServerSyncMsg.header.id = ServerClientMsg::ClientUpdate;
-			//ServerSyncMsg << transform.position.x << transform.position.y << transform.position.z;
-			//ServerSyncMsg << transform.rotation.x << transform.rotation.y << transform.rotation.z;
-			//NetClient.Send(ServerSyncMsg);
-
-			//cameraController.moveInPlaneXZ(arc_window.getGLFWWindow(), delta_time, coordinator.GetComponent<TransformComponent>(CameraEntity));
 
 			camera.setViewYXZ(coordinator.GetComponent<TransformComponent>(user->EntityID).position, coordinator.GetComponent<TransformComponent>(user->EntityID).rotation);
 
@@ -587,7 +448,10 @@ namespace arc
 			camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
 			/*game_objects.at(0).transform.rotation.y += 1.0f * delta_time;*/
 
-			user->Update(delta_time, coordinator, arc_window.getGLFWWindow());
+			if (InFocus)
+			{
+				user->Update(delta_time, coordinator, arc_window.getGLFWWindow());
+			}
 
 			if (auto command_buffer = ArcRenderer.beginFrame())
 			{
@@ -659,7 +523,20 @@ namespace arc
 				ImGui_ImplGlfw_NewFrame();
 				ImGui::NewFrame();
 
-				ImGui::ShowDemoWindow();
+				ImGui::SetNextWindowPos({ 0.0f, 0.0f });
+				auto Extent = arc_window.getExtent();
+				
+				ImGui::SetNextWindowSize({ static_cast<float>(Extent.width), 100.0f });
+
+				if (ImGui::Begin("ARCANUM", nullptr))
+				{
+					ImGui::Button("Test", { 50.0f, 50.0f });
+
+
+					ImGui::End();
+				}
+
+				//ImGui::ShowDemoWindow();
 
 				ImGui::Render();
 				ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);

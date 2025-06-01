@@ -46,12 +46,17 @@ namespace arc
 	private:
 		void loadGameObjects();
 
+		bool InFocus = true;
+		bool firstpress = false;
+		float cooldown = 1.0f;
+		float count = 0.0f;
+
 		arcWindow arc_window{WIDTH, HEIGHT, "ARCANUM"};
 		arcDevice arc_device{ arc_window };
 		arcRenderer ArcRenderer{ arc_window, arc_device };
 
 		std::unique_ptr<cDescriptorPool> global_pool{};
-		//arcGameObject::Map game_objects;
+		
 		cTexture* tex;
 		cTexture* tex_normal;
 		cTexture* tex_ORM;
