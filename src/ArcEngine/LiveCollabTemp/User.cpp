@@ -17,18 +17,12 @@ namespace arc
 	{
 		TransformComponent& transform = coordinator.GetComponent<TransformComponent>(EntityID);
 
-		double xpos_double, ypos_double;
-		float xpos, ypos;
-
-		glfwGetCursorPos(window, &xpos_double, &ypos_double);
-
-		xpos = static_cast<float>(xpos_double);
-		ypos = static_cast<float>(ypos_double);
+		glfwGetCursorPos(window, &current_mouse_position_X, &current_mouse_position_Y);
 
 		if (firstmouse)
 		{
-			lPosX = static_cast<float>(xpos);
-			lPosY = static_cast<float>(ypos);
+			last_mouse_position_X = current_mouse_position_X;
+			last_mouse_position_Y = current_mouse_position_Y;
 			firstmouse = false;
 		}
 
@@ -41,29 +35,29 @@ namespace arc
 			move_speed = 3.0f;
 		}
 
-		float xoffset = xpos - lPosX;
-		float yoffset = lPosY - ypos;
-		
+		float xoffset = static_cast<float>(current_mouse_position_X - last_mouse_position_X);
+		float yoffset = static_cast<float>(last_mouse_position_Y - current_mouse_position_Y);
 
-		float sensitivity = 1.0f;
+		last_mouse_position_X = current_mouse_position_X;
+		last_mouse_position_Y = current_mouse_position_Y;
+
 		xoffset *= sensitivity;
 		yoffset *= sensitivity;
 
-		float Delta = glm::min(deltaTime, 1.0f);
+		float capped_delta_time = glm::min(deltaTime, 1.0f);
 
-		yaw += xoffset * Delta;
-		pitch += yoffset * Delta;
+		yaw   += xoffset * capped_delta_time;
+		pitch += yoffset * capped_delta_time;
 
-		if (pitch > 89.5f)
+		if (pitch >= 1.5f)
 		{
-			pitch = 88.5f;
+			pitch = 1.49f;
+
 		}
-		else if (pitch < -89.5f)
-			pitch = -88.5f;
-		else
+
+		if (pitch <= -1.5f)
 		{
-			lPosX = xpos;
-			lPosY = ypos;
+			pitch = -1.49f;
 		}
 
 		transform.rotation.x = pitch;
@@ -100,14 +94,6 @@ namespace arc
 
 		if (glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon())
 			transform.position += move_speed * Delta * glm::normalize(move_dir);
-
-		printf("XOffset: %f\n YOffset: %f\n", xoffset, yoffset);
-
-		printf("XPOS: %f\n YPOS: %f\n", xpos, ypos);
-
-		
-		printf("ROTX: %f\n", transform.rotation.x);
-
 	}
 
 	void User::DebugPrint(const bool& enabled)

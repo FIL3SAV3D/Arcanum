@@ -34,11 +34,10 @@ namespace arc
 
 		bool firstmouse = true;
 
-		float lPosX = 0.0f;
-		float lPosY = 0.0f;
-
 		float yaw = 0.0f;
 		float pitch = 0.0f;
+
+		float sensitivity = 1.0f;
 
 		float sprint = 10.0f;
 
@@ -47,5 +46,12 @@ namespace arc
 
 		Entity EntityID = 0;
 		uint32_t UserID = 0;
+
+	private:
+		double current_mouse_position_X{ 0.0 };
+		double current_mouse_position_Y{ 0.0 };
+
+		double last_mouse_position_X{ 0.0 };
+		double last_mouse_position_Y{ 0.0 };
 	};
 }
