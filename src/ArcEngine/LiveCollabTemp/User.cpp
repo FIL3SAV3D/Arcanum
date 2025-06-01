@@ -17,13 +17,18 @@ namespace arc
 	{
 		TransformComponent& transform = coordinator.GetComponent<TransformComponent>(EntityID);
 
-		double xpos, ypos;
-		glfwGetCursorPos(window, &xpos, &ypos);
+		double xpos_double, ypos_double;
+		float xpos, ypos;
+
+		glfwGetCursorPos(window, &xpos_double, &ypos_double);
+
+		xpos = static_cast<float>(xpos_double);
+		ypos = static_cast<float>(ypos_double);
 
 		if (firstmouse)
 		{
-			lPosX = xpos;
-			lPosY = ypos;
+			lPosX = static_cast<float>(xpos);
+			lPosY = static_cast<float>(ypos);
 			firstmouse = false;
 		}
 
@@ -38,8 +43,7 @@ namespace arc
 
 		float xoffset = xpos - lPosX;
 		float yoffset = lPosY - ypos;
-		lPosX = xpos;
-		lPosY = ypos;
+		
 
 		float sensitivity = 1.0f;
 		xoffset *= sensitivity;
@@ -50,10 +54,17 @@ namespace arc
 		yaw += xoffset * Delta;
 		pitch += yoffset * Delta;
 
-		if (pitch > 89.0f)
+		if (pitch > 89.5f)
+		{
 			pitch = 88.5f;
-		if (pitch < -89.0f)
+		}
+		else if (pitch < -89.5f)
 			pitch = -88.5f;
+		else
+		{
+			lPosX = xpos;
+			lPosY = ypos;
+		}
 
 		transform.rotation.x = pitch;
 		transform.rotation.y = yaw;
@@ -89,5 +100,18 @@ namespace arc
 
 		if (glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon())
 			transform.position += move_speed * Delta * glm::normalize(move_dir);
+
+		printf("XOffset: %f\n YOffset: %f\n", xoffset, yoffset);
+
+		printf("XPOS: %f\n YPOS: %f\n", xpos, ypos);
+
+		
+		printf("ROTX: %f\n", transform.rotation.x);
+
+	}
+
+	void User::DebugPrint(const bool& enabled)
+	{
+
 	}
 }

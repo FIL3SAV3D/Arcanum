@@ -43,6 +43,7 @@ namespace arc
 		float sprint = 10.0f;
 
 		void Update(const float& deltaTime, Coordinator& coordinator, GLFWwindow* window);
+		void DebugPrint(const bool& enabled);
 
 		Entity EntityID = 0;
 		uint32_t UserID = 0;

@@ -510,7 +510,7 @@ namespace arc
 			}
 
 			auto new_time = std::chrono::high_resolution_clock::now();
-			float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
+			float delta_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
 			current_time = new_time;
 
 			glfwPollEvents();
@@ -569,7 +569,7 @@ namespace arc
 				
 			}
 
-			physics_system.Update(frame_time, 1, &temp_allocator, &job_system);
+			physics_system.Update(delta_time, 1, &temp_allocator, &job_system);
 
 			//arc::net::Message<ServerClientMsg> ServerSyncMsg;
 			//auto transform = coordinator.GetComponent<TransformComponent>(user->EntityID);
@@ -578,16 +578,16 @@ namespace arc
 			//ServerSyncMsg << transform.rotation.x << transform.rotation.y << transform.rotation.z;
 			//NetClient.Send(ServerSyncMsg);
 
-			//cameraController.moveInPlaneXZ(arc_window.getGLFWWindow(), frame_time, coordinator.GetComponent<TransformComponent>(CameraEntity));
+			//cameraController.moveInPlaneXZ(arc_window.getGLFWWindow(), delta_time, coordinator.GetComponent<TransformComponent>(CameraEntity));
 
 			camera.setViewYXZ(coordinator.GetComponent<TransformComponent>(user->EntityID).position, coordinator.GetComponent<TransformComponent>(user->EntityID).rotation);
 
 			float aspect = ArcRenderer.getAspectRatio();
 			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -10, 1000.0f);
 			camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
-			/*game_objects.at(0).transform.rotation.y += 1.0f * frame_time;*/
+			/*game_objects.at(0).transform.rotation.y += 1.0f * delta_time;*/
 
-			user->Update(frame_time, coordinator, arc_window.getGLFWWindow());
+			user->Update(delta_time, coordinator, arc_window.getGLFWWindow());
 
 			if (auto command_buffer = ArcRenderer.beginFrame())
 			{
@@ -595,7 +595,7 @@ namespace arc
 
 				frameInfo frame_info{
 					frame_index,
-					frame_time,
+					delta_time,
 					command_buffer,
 					camera,
 					globalDescriptorSets[frame_index],
