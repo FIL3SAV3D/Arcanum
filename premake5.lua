@@ -21,6 +21,7 @@ workspace "Arcanum"
     startproject "Framework"
 	
 	project "Framework"
+		location "../Arcanum/build"
 		kind "ConsoleApp"
 		targetdir "bin/%{cfg.buildcfg}"
 		dependson { "ArcEngine", "Shaders", "ArcNetCommon", ... }
@@ -33,21 +34,22 @@ workspace "Arcanum"
 
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
 		
-		links { "../Arcanum/Library/GLFW/lib-vc2022/glfw3.lib"}
+		links { "../Arcanum/library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "ArcEngine" }
 		links { "ArcNetCommon" }
 
 
 		includedirs { "$(VULKAN_SDK)/include" }
-		includedirs { "../Arcanum/Library/GLFW/include" }
-		includedirs { "../Arcanum/Library/GLM" }
+		includedirs { "../Arcanum/library/GLFW/include" }
+		includedirs { "../Arcanum/library/GLM" }
 		includedirs { "../Arcanum/src/ArcEngine" }
 		includedirs { "../Arcanum/src/Jolt" }
 		includedirs { "../Arcanum/src/ArcNetCommon" }
-		includedirs { "../Arcanum/Library/asio-1.34.2/include" }
+		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 
 
 	project "ArcEngine"
+		location "../Arcanum/build"
 		kind "StaticLib"
 		targetdir "bin/%{cfg.buildcfg}"
 		dependson { "Jolt", ... }
@@ -72,23 +74,24 @@ workspace "Arcanum"
         }
 		
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
-		links { "../Arcanum/Library/GLFW/lib-vc2022/glfw3.lib"}
+		links { "../Arcanum/library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "Jolt" }
 		links { "ArcNetCommon" }
 		
 		
 		includedirs { "$(VULKAN_SDK)/include" }
-		includedirs { "../Arcanum/Library/GLFW/include" }
-		includedirs { "../Arcanum/Library/GLM" }
-		includedirs { "../Arcanum/Library/TinyGLTF" }
-		includedirs { "../Arcanum/Library/TinyObj" }
+		includedirs { "../Arcanum/library/GLFW/include" }
+		includedirs { "../Arcanum/library/GLM" }
+		includedirs { "../Arcanum/library/TinyGLTF" }
+		includedirs { "../Arcanum/library/TinyObj" }
 		includedirs { "../Arcanum/src/ArcEngine" }
 		includedirs { "../Arcanum/src/Jolt" }
 		includedirs { "../Arcanum/src/ImGui" }
 		includedirs { "../Arcanum/src/ArcNetCommon" }
-		includedirs { "../Arcanum/Library/asio-1.34.2/include" }
+		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 		
 	project "Jolt"
+		location "../Arcanum/build"
 		kind "StaticLib"
 		targetdir "bin/%{cfg.buildcfg}"
 
@@ -100,41 +103,8 @@ workspace "Arcanum"
 
 		includedirs { "../Arcanum/src/Jolt" }
 
-	project "ServerTest"
-		kind "ConsoleApp"
-		targetdir "bin/%{cfg.buildcfg}"
-		dependson { "ArcNetCommon", ... }
-
-		files{
-			"src/ServerTest/**.h",
-			"src/ServerTest/**.cpp",
-			"src/ServerTest/**.hpp"
-		}
-
-		links { "ArcNetCommon" }
-		
-		includedirs { "../Arcanum/src/ServerTest" }
-		includedirs { "../Arcanum/src/ArcNetCommon" }
-		includedirs { "../Arcanum/Library/asio-1.34.2/include" }
-
-	project "ClientTest"
-		kind "ConsoleApp"
-		targetdir "bin/%{cfg.buildcfg}"
-		dependson { "ArcNetCommon", ... }
-
-		files{
-			"src/ClientTest/**.h",
-			"src/ClientTest/**.cpp",
-			"src/ClientTest/**.hpp"
-		}
-
-		links { "ArcNetCommon" }
-		
-		includedirs { "../Arcanum/src/ClientTest" }
-		includedirs { "../Arcanum/src/ArcNetCommon" }
-		includedirs { "../Arcanum/Library/asio-1.34.2/include" }
-
 	project "ArcNetCommon"
+		location "../Arcanum/build"
 		kind "StaticLib"
 		targetdir "bin/%{cfg.buildcfg}"
 
@@ -145,9 +115,10 @@ workspace "Arcanum"
 		}
 		
 		includedirs { "../Arcanum/src/ArcNetCommon" }
-		includedirs { "../Arcanum/Library/asio-1.34.2/include" }
+		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 		
 	project "Shaders"
+		location "../Arcanum/build"
 		kind "Utility"
 		targetdir "bin/%{cfg.buildcfg}"
 
