@@ -21,15 +21,14 @@ workspace "Arcanum"
     startproject "Framework"
 	
 	project "Framework"
-		location "../Arcanum/build"
 		kind "ConsoleApp"
 		targetdir "bin/%{cfg.buildcfg}"
 		dependson { "ArcEngine", "Shaders", "ArcNetCommon", ... }
 
 		files {
-            "src/Framework/**.h",
-            "src/Framework/**.cpp",
-            "src/Framework/**.hpp"
+            "source/Framework/**.h",
+            "source/Framework/**.cpp",
+            "source/Framework/**.hpp"
         }
 
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
@@ -42,31 +41,30 @@ workspace "Arcanum"
 		includedirs { "$(VULKAN_SDK)/include" }
 		includedirs { "../Arcanum/library/GLFW/include" }
 		includedirs { "../Arcanum/library/GLM" }
-		includedirs { "../Arcanum/src/ArcEngine" }
-		includedirs { "../Arcanum/src/Jolt" }
-		includedirs { "../Arcanum/src/ArcNetCommon" }
+		includedirs { "../Arcanum/source/ArcEngine" }
+		includedirs { "../Arcanum/source/Jolt" }
+		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 
 
 	project "ArcEngine"
-		location "../Arcanum/build"
 		kind "StaticLib"
 		targetdir "bin/%{cfg.buildcfg}"
 		dependson { "Jolt", ... }
 		
 		files {
-            "src/ArcEngine/**.h",
-            "src/ArcEngine/**.cpp",
-            "src/ArcEngine/**.hpp",
+            "source/ArcEngine/**.h",
+            "source/ArcEngine/**.cpp",
+            "source/ArcEngine/**.hpp",
 
-			"src/ImGui/*.h",
-			"src/ImGui/*.cpp",
-			"src/ImGui/*.hpp",
+			"submodules/imgui/*.h",
+			"submodules/imgui/*.cpp",
+			"submodules/imgui/*.hpp",
 
-			"src/ImGui/backends/imgui_impl_vulkan.cpp",
-			"src/ImGui/backends/imgui_impl_vulkan.h",
-			"src/ImGui/backends/imgui_impl_glfw.cpp",
-			"src/ImGui/backends/imgui_impl_glfw.h",
+			"submodules/imgui/backends/imgui_impl_vulkan.cpp",
+			"submodules/imgui/backends/imgui_impl_vulkan.h",
+			"submodules/imgui/backends/imgui_impl_glfw.cpp",
+			"submodules/imgui/backends/imgui_impl_glfw.h",
 
 			"misc/debuggers/imgui.natvis",
 			"misc/debuggers/imgui.natstepfilter",
@@ -84,59 +82,56 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/library/GLM" }
 		includedirs { "../Arcanum/library/TinyGLTF" }
 		includedirs { "../Arcanum/library/TinyObj" }
-		includedirs { "../Arcanum/src/ArcEngine" }
-		includedirs { "../Arcanum/src/Jolt" }
-		includedirs { "../Arcanum/src/ImGui" }
-		includedirs { "../Arcanum/src/ArcNetCommon" }
+		includedirs { "../Arcanum/source/ArcEngine" }
+		includedirs { "../Arcanum/source/Jolt" }
+		includedirs { "../Arcanum/submodules/imgui" }
+		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 		
 	project "Jolt"
-		location "../Arcanum/build"
 		kind "StaticLib"
 		targetdir "bin/%{cfg.buildcfg}"
 
 		files{
-			"src/Jolt/**.h",
-			"src/Jolt/**.cpp",
-			"src/Jolt/**.hpp"
+			"source/Jolt/**.h",
+			"source/Jolt/**.cpp",
+			"source/Jolt/**.hpp"
 		}
 
-		includedirs { "../Arcanum/src/Jolt" }
+		includedirs { "../Arcanum/source/Jolt" }
 
 	project "ArcNetCommon"
-		location "../Arcanum/build"
 		kind "StaticLib"
 		targetdir "bin/%{cfg.buildcfg}"
 
 		files{
-			"src/ArcNetCommon/**.h",
-			"src/ArcNetCommon/**.cpp",
-			"src/ArcNetCommon/**.hpp"
+			"source/ArcNetCommon/**.h",
+			"source/ArcNetCommon/**.cpp",
+			"source/ArcNetCommon/**.hpp"
 		}
 		
-		includedirs { "../Arcanum/src/ArcNetCommon" }
+		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 		
 	project "Shaders"
-		location "../Arcanum/build"
 		kind "Utility"
 		targetdir "bin/%{cfg.buildcfg}"
 
 		files{
-			    "src/Shaders/**.frag",
-			    "src/Shaders/**.vert"
+			    "source/Shaders/**.frag",
+			    "source/Shaders/**.vert"
 		}
 
 		filter 'files:**.frag'
             buildmessage 'Compiling %{file.relpath}'
 
-            buildcommands{ "%{vulkan_sdk}/Bin/glslc.exe %{file.abspath} -o %{wks.location}src/shaders/compiled_shaders/%{file.basename}.frag.spv" }
+            buildcommands{ "%{vulkan_sdk}/Bin/glslc.exe %{file.abspath} -o %{wks.location}source/shaders/compiled_shaders/%{file.basename}.frag.spv" }
 
-            buildoutputs { "src/shaders/compiled_shaders/%{file.basename}.frag.spv" }
+            buildoutputs { "source/shaders/compiled_shaders/%{file.basename}.frag.spv" }
 
 		filter 'files:**.vert'
             buildmessage 'Compiling %{file.relpath}'
 
-            buildcommands{ "%{vulkan_sdk}/Bin/glslc.exe %{file.abspath} -o %{wks.location}src/shaders/compiled_shaders/%{file.basename}.vert.spv" }
+            buildcommands{ "%{vulkan_sdk}/Bin/glslc.exe %{file.abspath} -o %{wks.location}source/shaders/compiled_shaders/%{file.basename}.vert.spv" }
 
-            buildoutputs { "src/shaders/compiled_shaders/%{file.basename}.vert.spv" }
+            buildoutputs { "source/shaders/compiled_shaders/%{file.basename}.vert.spv" }

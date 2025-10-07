@@ -188,8 +188,8 @@ namespace arc
 		style.Colors[ImGuiCol_Border] = ImVec4(0.501960813999176f, 0.501960813999176f, 0.501960813999176f, 1.0f);
 		style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.1568627506494522f, 0.1803921610116959f, 0.1333333402872086f, 1.0f);
 
-		style.Colors[ImGuiCol_DockingPreview] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);
-		style.Colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);
+		/*style.Colors[ImGuiCol_DockingPreview] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);
+		style.Colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);*/
 
 		style.Colors[ImGuiCol_FrameBg] = ImVec4(0.2431372553110123f, 0.2745098173618317f, 0.2156862765550613f, 1.0f);
 		style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.5882353186607361f, 0.5372549295425415f, 0.1882352977991104f, 1.0f);
@@ -244,13 +244,13 @@ namespace arc
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
+		//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
 		setupImGuiStyle();
 
 		ImGui_ImplGlfw_InitForVulkan(arc_window.getGLFWWindow(), true);
 		ImGui_ImplVulkan_InitInfo ImGuiInfo{};
 		ImGuiInfo.DescriptorPool = global_pool->GetDescriptorPool();
-		ImGuiInfo.RenderPass = ArcRenderer.getSwapChainRenderPass();
+		ImGuiInfo.UseDynamicRendering = ArcRenderer.getSwapChainRenderPass();
 		ImGuiInfo.Device = arc_device.device();
 		ImGuiInfo.PhysicalDevice = arc_device.GetPhysicalDevice();
 		ImGuiInfo.Instance = arc_device.GetInstance();
@@ -258,11 +258,8 @@ namespace arc
 		ImGuiInfo.QueueFamily = arc_device.findPhysicalQueueFamilies().graphicsFamily;
 		ImGuiInfo.ImageCount = arcSwapChain::MAX_FRAMES_IN_FLIGHT;
 		ImGuiInfo.MinImageCount = 2;
-		ImGuiInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
 		ImGui_ImplVulkan_Init(&ImGuiInfo);
-		ImGui_ImplVulkan_CreateFontsTexture();
-		ImGui_ImplVulkan_DestroyFontsTexture();
 	}
 
 	void arc::cFirstApp::run()
@@ -353,7 +350,7 @@ namespace arc
 		JPH::JobSystemThreadPool job_system(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, JPH::thread::hardware_concurrency() - 1);
 		physics_system.OptimizeBroadPhase();
 		
-		InitImGui();
+		//InitImGui();
 
 		User* user = new User(coordinator, rat_model);
 		users[0] = user;
@@ -519,27 +516,27 @@ namespace arc
 					point_light_system.render(frame_info);
 				}
 
-				ImGui_ImplVulkan_NewFrame();
-				ImGui_ImplGlfw_NewFrame();
-				ImGui::NewFrame();
+				//ImGui_ImplVulkan_NewFrame();
+				//ImGui_ImplGlfw_NewFrame();
+				//ImGui::NewFrame();
 
-				ImGui::SetNextWindowPos({ 0.0f, 0.0f });
-				auto Extent = arc_window.getExtent();
-				
-				ImGui::SetNextWindowSize({ static_cast<float>(Extent.width), 100.0f });
+				//ImGui::SetNextWindowPos({ 0.0f, 0.0f });
+				//auto Extent = arc_window.getExtent();
+				//
+				//ImGui::SetNextWindowSize({ static_cast<float>(Extent.width), 100.0f });
 
-				if (ImGui::Begin("ARCANUM", nullptr))
-				{
-					ImGui::Button("Test", { 50.0f, 50.0f });
+				//if (ImGui::Begin("ARCANUM", nullptr))
+				//{
+				//	ImGui::Button("Test", { 50.0f, 50.0f });
 
 
-					ImGui::End();
-				}
+				//	ImGui::End();
+				//}
 
-				//ImGui::ShowDemoWindow();
+				////ImGui::ShowDemoWindow();
 
-				ImGui::Render();
-				ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);
+				//ImGui::Render();
+				//ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);
 
 				ArcRenderer.endSwapChainRenderPass(command_buffer);
 				ArcRenderer.endFrame();
@@ -564,7 +561,7 @@ namespace arc
 		auto path = std::filesystem::current_path().string();
 		//std::replace(path.begin(), path.end(), '\\', '/');
 
-		rat_model = arcModel::createGLTFModelFromFile(arc_device, path + "\\Data\\Models\\glb_models\\Rat.glb");
+		rat_model = arcModel::createGLTFModelFromFile(arc_device, path + "\\Data\\Models\\GLB_Models\\Rat.glb");
 
 		std::default_random_engine generator;
 		std::uniform_real_distribution<float> randPosition(-10.0f, 10.0f);
