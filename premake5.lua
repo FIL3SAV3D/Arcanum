@@ -46,6 +46,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 		includedirs { "../Arcanum/library/GLAD/include" }
+		includedirs { "../Arcanum/library/std_image" }
 
 
 	project "ArcEngine"
@@ -91,6 +92,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 		includedirs { "../Arcanum/library/GLAD/include" }
+		includedirs { "../Arcanum/library/std_image" }
 		
 	project "Jolt"
 		kind "StaticLib"

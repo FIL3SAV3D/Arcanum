@@ -4,14 +4,36 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <fstream> 
 #include <chrono>
+#include <filesystem>
+
+#include "Shader.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 OGLSystem::OGLSystem()
 {
+	sptr_OGLWindow		= std::make_shared<OGLWindow>(screenWidth, screenHeight, windowName);
+	sptr_shaderManager	= std::make_shared<ShaderManager>();
+
+	// Manual changing of vertex color
+	Rect2D.verticesBuffer.at(0).color = glm::vec3(1.0f, 0.0f, 0.0f);
+	Rect2D.verticesBuffer.at(1).color = glm::vec3(0.0f, 1.0f, 0.0f);
+	Rect2D.verticesBuffer.at(2).color = glm::vec3(0.0f, 0.0f, 1.0f);
+	Rect2D.verticesBuffer.at(3).color = glm::vec3(1.0f, 1.0f, 0.0f);
+
+	Rect2D.verticesBuffer.at(0).texCoords = glm::vec2(1.0f, 1.0f);
+	Rect2D.verticesBuffer.at(1).texCoords = glm::vec2(1.0f, 0.0f);
+	Rect2D.verticesBuffer.at(2).texCoords = glm::vec2(0.0f, 0.0f);
+	Rect2D.verticesBuffer.at(3).texCoords = glm::vec2(0.0f, 1.0f);
 }
 
 OGLSystem::~OGLSystem()
 {
+	sptr_OGLWindow.reset();
+	sptr_shaderManager.reset();
 }
 
 void FrameBufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -29,111 +51,61 @@ void ProcessInput(GLFWwindow* window)
 
 void OGLSystem::Run()
 {
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+	Shader defaultShader("default.vert", "default.frag");
 
-	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, windowName, nullptr, nullptr);
-	if (window == nullptr)
-	{
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return;
-	}
-	glfwMakeContextCurrent(window);
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return;
-	}
-
-	glfwSwapInterval(VSync);
-
-	// Vertex Array Object
-	unsigned int VAO;
+	// Generate buffers
 	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+
+	// Bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
 	glBindVertexArray(VAO);
 
-	// Vertex Buffer
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, Rect2D.GetVerticesBufferSize(), Rect2D.verticesBuffer.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, Rect2D.GetIndiciesBufferSize(), Rect2D.indicesBuffer.data(), GL_STATIC_DRAW);
 
 	// Vertex Attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	// Vertex Shader
-	const char* vertexShaderSource = "#version 330 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"}\0";
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vertex::pos)));
+	glEnableVertexAttribArray(1);
 
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vertex::pos) + sizeof(Vertex::color)));
+	glEnableVertexAttribArray(2);
 
-	glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-	glCompileShader(vertexShader);
+	//Texture sampling
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
 
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION::FAILED\n" << infoLog << std::endl;
-	}
+	//float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+	//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-	// Fragment Shader
-	const char* fragmentShaderSource = "#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-		"}\0";
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\container.jpg", &width, &height, &nrChannels, 0);
 
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
-	glCompileShader(fragmentShader);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+	stbi_image_free(data);
 
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION::FAILED\n" << infoLog << std::endl;
-	}
+	// Debind
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	// Shader Program
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::COMPILATION::FAILED\n" << infoLog << std::endl;
-	}
-
-	// Shader Cleanup
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	glBindVertexArray(0);
 
 	glViewport(0, 0, screenWidth, screenHeight);
 
-
-	glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
+	glfwSetFramebufferSizeCallback(sptr_OGLWindow->GetWindow(), FrameBufferSizeCallback);
 	
 	// Simple FPS Counter
 	std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
@@ -143,7 +115,7 @@ void OGLSystem::Run()
 	float fps = 0.0f;
 	double timepassed = 0;
 
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(sptr_OGLWindow->GetWindow()))
 	{
 		auto new_time = std::chrono::steady_clock::now();
 		double delta_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
@@ -160,19 +132,26 @@ void OGLSystem::Run()
 		}
 
 		// Input
-		ProcessInput(window);
+		ProcessInput(sptr_OGLWindow->GetWindow());
 
 		// Rendering commands
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		defaultShader.use();
 
+		// Example on changing uniforms 
+		float timeValue = glfwGetTime();
+		float sine = (sin(timeValue) / 2.0f) + 0.5f;
+
+		defaultShader.setFloat("opacity", sine);
+
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		// Check and call events and swap buffers
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(sptr_OGLWindow->GetWindow());
 		glfwPollEvents();
 
 		frames++;
@@ -180,7 +159,7 @@ void OGLSystem::Run()
 
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	glDeleteProgram(shaderProgram);
+	glDeleteBuffers(1, &EBO);
 
 	glfwTerminate();
 
