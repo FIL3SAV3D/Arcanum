@@ -1,14 +1,18 @@
 #include "TempTest.h"
 
+#include "OpenGL/OGLSystem.h"
+
 int main()
 {
 	printf("WELCOME TO ARCANUM USER\n\n");
 
 	try
 	{
+		OGLSystem OGLApp{};
+		OGLApp.Run();
 
-		arc::cFirstApp app{};
-		app.run();
+		//arc::cFirstApp app{};
+		//app.run();
 	}
 	catch (const std::exception& e)
 	{

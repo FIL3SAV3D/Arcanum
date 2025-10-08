@@ -45,6 +45,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/source/Jolt" }
 		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
+		includedirs { "../Arcanum/library/GLAD/include" }
 
 
 	project "ArcEngine"
@@ -56,6 +57,8 @@ workspace "Arcanum"
             "source/ArcEngine/**.h",
             "source/ArcEngine/**.cpp",
             "source/ArcEngine/**.hpp",
+
+			"source/ArcEngine/**.c",
 
 			"submodules/imgui/*.h",
 			"submodules/imgui/*.cpp",
@@ -87,6 +90,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/submodules/imgui" }
 		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
+		includedirs { "../Arcanum/library/GLAD/include" }
 		
 	project "Jolt"
 		kind "StaticLib"
