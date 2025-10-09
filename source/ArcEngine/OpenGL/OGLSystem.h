@@ -1,32 +1,18 @@
 #pragma once
 
+
+
 #include <vector>
 #include <string>
 #include <memory>
 
 #include "Vertex.h"
-#include "ShaderManager.h"
 #include "OGLWindow.h"
 
-struct Mesh
-{
+#include "InputHandler.h"
 
-	std::vector<Vertex> verticesBuffer = {
-	Vertex(0.5f,  0.5f, 0.0f),
-	Vertex(0.5f, -0.5f, 0.0f),
-	Vertex(-0.5f, -0.5f, 0.0f),
-	Vertex(-0.5f,  0.5f, 0.0f)
-	};
-
-	std::vector<unsigned int> indicesBuffer = // note that we start from 0!
-	{
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
-	};
-
-	constexpr size_t GetVerticesBufferSize() { return verticesBuffer.size() * sizeof(Vertex); }
-	constexpr size_t GetIndiciesBufferSize() { return indicesBuffer.size() * sizeof(unsigned int); }
-};
+class Camera;
+class iInputListener;
 
 class OGLSystem
 {
@@ -39,7 +25,18 @@ class OGLSystem
 		float z = 0.0f;
 	};
 
-	Mesh Rect2D = {};
+	glm::vec3 cubePositions[10] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
 
 public:
 	OGLSystem();
@@ -48,17 +45,27 @@ public:
 	void Run();
 
 private:
-	std::shared_ptr<OGLWindow>		sptr_OGLWindow		= nullptr;
-	std::shared_ptr<ShaderManager>	sptr_shaderManager	= nullptr;
+	std::shared_ptr<OGLWindow> sptr_OGLWindow = nullptr;
+	std::shared_ptr<InputHandler> inputHandler = nullptr;
+
+	std::shared_ptr<Camera> camera = nullptr;
 
 private:
+
+
 	int screenWidth = 800;
 	int screenHeight = 600;
+
 	const char* windowName = "Arcanum";
 
+	float deltaTime = 0.0f;
+	float currentFrameTime = 0.0f;
+	float lastFrameTime = 0.0f;
+
+	unsigned int lightVAO = 0;
+	unsigned int cubeVAO = 0;
 
 	unsigned int VBO = 0;
-	unsigned int VAO = 0;
 	unsigned int EBO = 0;
 
 };

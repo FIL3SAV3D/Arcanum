@@ -13,27 +13,65 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include "Camera.h"
+
+#include "Model.h"
+
 OGLSystem::OGLSystem()
 {
 	sptr_OGLWindow		= std::make_shared<OGLWindow>(screenWidth, screenHeight, windowName);
-	sptr_shaderManager	= std::make_shared<ShaderManager>();
+	inputHandler = std::make_shared<InputHandler>();
 
-	// Manual changing of vertex color
-	Rect2D.verticesBuffer.at(0).color = glm::vec3(1.0f, 0.0f, 0.0f);
-	Rect2D.verticesBuffer.at(1).color = glm::vec3(0.0f, 1.0f, 0.0f);
-	Rect2D.verticesBuffer.at(2).color = glm::vec3(0.0f, 0.0f, 1.0f);
-	Rect2D.verticesBuffer.at(3).color = glm::vec3(1.0f, 1.0f, 0.0f);
+	std::vector<float> verts = {
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-	Rect2D.verticesBuffer.at(0).texCoords = glm::vec2(1.0f, 1.0f);
-	Rect2D.verticesBuffer.at(1).texCoords = glm::vec2(1.0f, 0.0f);
-	Rect2D.verticesBuffer.at(2).texCoords = glm::vec2(0.0f, 0.0f);
-	Rect2D.verticesBuffer.at(3).texCoords = glm::vec2(0.0f, 1.0f);
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+	};
+
 }
 
 OGLSystem::~OGLSystem()
 {
 	sptr_OGLWindow.reset();
-	sptr_shaderManager.reset();
+	inputHandler.reset();
 }
 
 void FrameBufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -41,62 +79,45 @@ void FrameBufferSizeCallback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void ProcessInput(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
-		glfwSetWindowShouldClose(window, true);
-	}
-}
-
 void OGLSystem::Run()
 {
 	Shader defaultShader("default.vert", "default.frag");
+	Shader lightingShader("lightingShader.vert", "lightingShader.frag");
+	Shader lightCubeShader("lightCubeShader.vert", "lightCubeShader.frag");
 
-	// Generate buffers
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+	//// Generate buffers
+	//glGenVertexArrays(1, &cubeVAO);
+	//glGenBuffers(1, &VBO);
 
-	// Bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-	glBindVertexArray(VAO);
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//glBufferData(GL_ARRAY_BUFFER, Cube.GetVerticesBufferSize(), Cube.verticesBuffer.data(), GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, Rect2D.GetVerticesBufferSize(), Rect2D.verticesBuffer.data(), GL_STATIC_DRAW);
+	//glBindVertexArray(cubeVAO);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, Rect2D.GetIndiciesBufferSize(), Rect2D.indicesBuffer.data(), GL_STATIC_DRAW);
+	//// Vertex Attribute
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	//glEnableVertexAttribArray(0);
 
-	// Vertex Attribute
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vertex::position)));
+	//glEnableVertexAttribArray(1);
+
+	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vertex::position) + sizeof(Vertex::normal)));
+	//glEnableVertexAttribArray(2);
+
+	Model backpack = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OBJ_Models\\cube.obj").c_str());
+
+	// Light array
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vertex::pos)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vertex::position)));
 	glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vertex::pos) + sizeof(Vertex::color)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vertex::position) + sizeof(Vertex::normal)));
 	glEnableVertexAttribArray(2);
-
-	//Texture sampling
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	//float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
-	//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\container.jpg", &width, &height, &nrChannels, 0);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	stbi_image_free(data);
 
 	// Debind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -107,6 +128,8 @@ void OGLSystem::Run()
 
 	glfwSetFramebufferSizeCallback(sptr_OGLWindow->GetWindow(), FrameBufferSizeCallback);
 	
+	glEnable(GL_DEPTH_TEST);
+
 	// Simple FPS Counter
 	std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
 
@@ -115,13 +138,29 @@ void OGLSystem::Run()
 	float fps = 0.0f;
 	double timepassed = 0;
 
+	if (glfwRawMouseMotionSupported())
+		glfwSetInputMode(sptr_OGLWindow->GetWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
+	camera = std::make_shared<Camera>();
+	camera->SetPosition(glm::vec3(0.0f, 1.0f, 0.0f));
+
+	inputHandler->AddListener(camera);
+
 	while (!glfwWindowShouldClose(sptr_OGLWindow->GetWindow()))
 	{
-		auto new_time = std::chrono::steady_clock::now();
-		double delta_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
-		current_time = new_time;
+		if (glfwGetKey(sptr_OGLWindow->GetWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		{
+			glfwSetWindowShouldClose(sptr_OGLWindow->GetWindow(), true);
+		}
 
-		timepassed += delta_time;
+		// Input Events
+		inputHandler->ProcessInput(sptr_OGLWindow->GetWindow());
+
+		currentFrameTime = (float)glfwGetTime();
+		deltaTime = currentFrameTime - lastFrameTime;
+		lastFrameTime = currentFrameTime;
+
+		timepassed += deltaTime;
 
 		if (timepassed - starttime > 0.25 && frames > 10)
 		{
@@ -131,24 +170,60 @@ void OGLSystem::Run()
 			printf("FPS: %f \n", fps);
 		}
 
-		// Input
-		ProcessInput(sptr_OGLWindow->GetWindow());
+		camera->Update(deltaTime);
 
 		// Rendering commands
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		defaultShader.use();
+		lightingShader.use();
+		lightingShader.setVec3f("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+		lightingShader.setVec3f("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3f("viewPos", camera->GetPosition());
 
-		// Example on changing uniforms 
-		float timeValue = glfwGetTime();
-		float sine = (sin(timeValue) / 2.0f) + 0.5f;
+		glm::mat4 projection = camera->GetProjectionMatrix();
+		glm::mat4x4 view = camera->GetViewMatrix();
+		lightingShader.setMatrix4x4f("projection", projection);
+		lightingShader.setMatrix4x4f("view", view);
 
-		defaultShader.setFloat("opacity", sine);
+		glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		lightingShader.setVec3f("lightPos", lightPos);
+		lightingShader.setVec3f("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+		lightingShader.setVec3f("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+		lightingShader.setVec3f("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+		lightingShader.setFloat("material.shininess", 32.0f);
+
+		glm::vec3 lightColor;
+		lightColor.x = sin(glfwGetTime() * 2.0f);
+		lightColor.y = sin(glfwGetTime() * 0.7f);
+		lightColor.z = sin(glfwGetTime() * 1.3f);
+
+		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
+		lightingShader.setVec3f("light.ambient", ambientColor);
+		lightingShader.setVec3f("light.diffuse", diffuseColor);
+
+		//lightingShader.setVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+		//lightingShader.setVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
+		lightingShader.setVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glm::mat4 modelback = glm::mat4(1.0f);
+		lightingShader.setMatrix4x4f("model", modelback);
+		backpack.Draw(lightingShader);
+
+		lightCubeShader.use();
+		lightCubeShader.setMatrix4x4f("projection", projection);
+		lightCubeShader.setMatrix4x4f("view", view);
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+		
+		lightCubeShader.setMatrix4x4f("model", model);
+
+		backpack.Draw(lightCubeShader);
+
 
 		// Check and call events and swap buffers
 		glfwSwapBuffers(sptr_OGLWindow->GetWindow());
@@ -157,7 +232,7 @@ void OGLSystem::Run()
 		frames++;
 	}
 
-	glDeleteVertexArrays(1, &VAO);
+	glDeleteVertexArrays(1, &cubeVAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
 

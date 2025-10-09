@@ -31,6 +31,14 @@ workspace "Arcanum"
             "source/Framework/**.hpp"
         }
 
+		filter {"configurations:Debug"}
+			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+
+		filter {"configurations:Release"}
+			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mt.lib"}
+		
+		filter{}
+
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
 		
 		links { "../Arcanum/library/GLFW/lib-vc2022/glfw3.lib"}
@@ -47,6 +55,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 		includedirs { "../Arcanum/library/GLAD/include" }
 		includedirs { "../Arcanum/library/std_image" }
+		includedirs { "../Arcanum/library/Assimp/include" }
 
 
 	project "ArcEngine"
@@ -74,7 +83,15 @@ workspace "Arcanum"
 			"misc/debuggers/imgui.natstepfilter",
 			"misc/cpp/imgui_stdlib.*"
         }
+
+		filter {"configurations:Debug"}
+			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+
+		filter {"configurations:Release"}
+			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mt.lib"}
 		
+		filter{}
+
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
 		links { "../Arcanum/library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "Jolt" }
@@ -93,6 +110,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 		includedirs { "../Arcanum/library/GLAD/include" }
 		includedirs { "../Arcanum/library/std_image" }
+		includedirs { "../Arcanum/library/Assimp/include" }
 		
 	project "Jolt"
 		kind "StaticLib"

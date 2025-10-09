@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+
+
 Shader::Shader(const char* _vertexPath, const char* _fragmentPath)
 {
 	std::string shaderSearchPath;
@@ -120,4 +122,9 @@ void Shader::setVec3f(const std::string& _name, const glm::tvec3<float>& _value)
 void Shader::setVec4f(const std::string& _name, const glm::tvec4<float>& _value) const
 {
 	glUniform4f(glGetUniformLocation(ID, _name.c_str()), _value.x, _value.y, _value.z, _value.w);
+}
+
+void Shader::setMatrix4x4f(const std::string& _name, const glm::mat4x4& _value) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(ID, _name.c_str()), 1, GL_FALSE, glm::value_ptr(_value));
 }

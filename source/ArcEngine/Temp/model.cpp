@@ -309,7 +309,7 @@ namespace arc
 					// Append data to model's vertex buffer
 					for (size_t v = 0; v < vertexCount; v++) {
 						sVertex vert{};
-						vert.position = glm::vec4(glm::vec3(positionBuffer[0 + v * 3], positionBuffer[1 + v * 3], positionBuffer[2 + v * 3]), 1.0f);
+						vert.position = glm::vec3(positionBuffer[0 + v * 3], positionBuffer[1 + v * 3], positionBuffer[2 + v * 3]);
 						vert.normal = glm::normalize(glm::vec3(normalsBuffer ? glm::vec3(normalsBuffer[0 + v * 3], normalsBuffer[1 + v * 3], normalsBuffer[2 + v * 3]) : glm::vec3(0.0f)));
 						vert.uv = texCoordsBuffer ? glm::vec2(texCoordsBuffer[0 + v * 2], texCoordsBuffer[1 + v * 2]) : glm::vec3(0.0f);
 						vert.color = glm::vec3(1.0f);
