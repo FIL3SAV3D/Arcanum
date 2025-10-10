@@ -30,7 +30,7 @@ void Model::LoadModel(std::string _path)
 		std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
 		return;
 	}
-	directory = _path.substr(0, _path.find_last_of('/'));
+	directory = _path.substr(0, _path.find_last_of('\\'));
 
 	ProcessNode(scene->mRootNode, scene);
 }
@@ -98,7 +98,7 @@ Mesh Model::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 	{
 		aiMaterial* material = _scene->mMaterials[_mesh->mMaterialIndex];
 		std::vector<Texture> diffuseMaps = LoadMaterialTextures(material,
-			aiTextureType_DIFFUSE, "texture_diffuse");
+			aiTextureType_DIFFUSE, "texture_baseColor");
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 		std::vector<Texture> specularMaps = LoadMaterialTextures(material,
 			aiTextureType_SPECULAR, "texture_specular");
@@ -141,7 +141,7 @@ std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType 
 unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma)
 {
 	std::string filename = std::string(path);
-	filename = directory + '/' + filename;
+	filename = directory + '\\' + filename;
 
 	unsigned int textureID;
 	glGenTextures(1, &textureID);

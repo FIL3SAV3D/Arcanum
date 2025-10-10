@@ -42,7 +42,7 @@ private:
 	float yaw = 0;
 	float pitch = 0;
 
-	const float speed = 2.0f;
+	const float speed = 10.0f;
 
 	glm::mat4 transform{};
 
