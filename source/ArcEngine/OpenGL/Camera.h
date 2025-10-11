@@ -33,8 +33,8 @@ public:
 
 	void LookAt(const glm::vec3& _target, const glm::vec3& _upAxis);
 
-	int screenWidth;
-	int screenHeight;
+	int screenWidth = 800;
+	int screenHeight = 600;
 
 private:
 	bool firstMouse = true;

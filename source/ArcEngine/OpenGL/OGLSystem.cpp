@@ -22,6 +22,11 @@
 #include "Model.h"
 #include <map>
 
+#include "FrameBuffer.h"
+
+#include <glm/gtc/type_ptr.hpp>
+#include "Cubemap.h"
+
 OGLSystem::OGLSystem()
 {
 	screenWidth = 800;
@@ -41,16 +46,21 @@ void OGLSystem::Run()
 	Shader defaultShader("default.vert", "default.frag");
 	Shader lightingShader("lightingShader.vert", "lightingShader.frag");
 	Shader lightingShaderInstancing("lightingShaderInstancing.vert", "lightingShaderInstancing.frag");
+	Shader screenShader("screenShader.vert", "screenShader.frag");
 
 	Shader lightCubeShader("lightCubeShader.vert", "lightCubeShader.frag");
 	Shader outlineShader("simpleOutline.vert", "simpleOutline.frag");
+
+	Shader envShader("envMapping.vert", "envMapping.frag");
+
+	Shader skyboxShader("skybox.vert", "skybox.frag");
 
 	Model backpack = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
 
 	Model planet = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\planet.obj").c_str());
 	Model asteroid = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\rock.obj").c_str());
 
-	unsigned int amount = 1000000;
+	unsigned int amount = 100000;
 	glm::mat4* modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(glfwGetTime()); // initialize random seed	
@@ -81,6 +91,51 @@ void OGLSystem::Run()
 		modelMatrices[i] = model;
 	}
 
+	float skyboxVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
 	glm::vec3 pointLightPositions[] = {
 	glm::vec3(0.7f,  0.2f,  2.0f),
 	glm::vec3(2.3f, -3.3f, -4.0f),
@@ -93,6 +148,17 @@ void OGLSystem::Run()
 	unsigned int Specular = TextureFromFile("container2_specular.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
 	unsigned int Grass = TextureFromFile("blending_transparent_window.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
 	
+	Cubemap cubemap{"TestCubeMap"};
+
+	unsigned int skyboxVAO, skyboxVBO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
 	// Light array
 	glGenVertexArrays(1, &lightVAO);
 	glBindVertexArray(lightVAO);
@@ -115,9 +181,10 @@ void OGLSystem::Run()
 
 	glfwSetWindowUserPointer(sptr_OGLWindow->GetWindow(), this);
 	glfwSetFramebufferSizeCallback(sptr_OGLWindow->GetWindow(), FrameBufferSizeCallback);
-	
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+
+	glfwSetCursorPosCallback(sptr_OGLWindow->GetWindow(), CursorCallback);
+	glfwSetScrollCallback(sptr_OGLWindow->GetWindow(), ScrollCallback);
+	glfwSetKeyCallback(sptr_OGLWindow->GetWindow(), KeyCallback);
 
 	//glEnable(GL_STENCIL_TEST);
 	//glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -128,9 +195,6 @@ void OGLSystem::Run()
 	
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-
-	// Simple FPS Counter
-	std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
 
 	int frames = 0;
 	double starttime = 0;
@@ -146,6 +210,28 @@ void OGLSystem::Run()
 	inputHandler->AddListener(camera);
 
 	std::map<float, glm::mat4> sorted;
+
+	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+		// positions   // texCoords
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
+
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
+		 1.0f,  1.0f,  1.0f, 1.0f
+	};
+
+	unsigned int quadVAO, quadVBO;
+	glGenVertexArrays(1, &quadVAO);
+	glGenBuffers(1, &quadVBO);
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
 
 	// vertex buffer object
@@ -183,20 +269,18 @@ void OGLSystem::Run()
 	ImGui::StyleColorsDark();
 	ImGui_ImplGlfw_InitForOpenGL(sptr_OGLWindow->GetWindow(), true);
 	ImGui_ImplOpenGL3_Init("#version 460");
+	
+	frameBuffer = std::make_shared<FrameBuffer>(glm::vec2(screenWidth, screenHeight));
+	// framebuffer
 
 	while (!glfwWindowShouldClose(sptr_OGLWindow->GetWindow()))
 	{
-		if (glfwGetKey(sptr_OGLWindow->GetWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		{
-			glfwSetWindowShouldClose(sptr_OGLWindow->GetWindow(), true);
-		}
-
-		// Input Events
-		inputHandler->ProcessInput(sptr_OGLWindow->GetWindow());
-
 		currentFrameTime = (float)glfwGetTime();
 		deltaTime = currentFrameTime - lastFrameTime;
 		lastFrameTime = currentFrameTime;
+
+		// Input Events
+		inputHandler->ProcessInput(sptr_OGLWindow->GetWindow());
 
 		timepassed += deltaTime;
 
@@ -211,13 +295,19 @@ void OGLSystem::Run()
 		camera->Update(deltaTime);
 
 		// Rendering commands
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-		lightingShader.use();
+		frameBuffer->Bind();
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+		
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 projection = camera->GetProjectionMatrix();
 		glm::mat4x4 view = camera->GetViewMatrix();
+
+		lightingShader.use();
+
+		
 		lightingShader.setMatrix4x4f("projection", projection);
 		lightingShader.setMatrix4x4f("view", view);
 		lightingShader.setVec3f("viewPos", camera->GetPosition());
@@ -291,11 +381,18 @@ void OGLSystem::Run()
 		//	lightingShader.setMatrix4x4f("model", it->second);
 		//	backpack.Draw(lightingShader);
 		//}
+		envShader.use();
+
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
-		lightingShader.setMatrix4x4f("model", model);
-		planet.Draw(lightingShader);
+		envShader.setMatrix4x4f("model", model);
+		envShader.setMatrix4x4f("view", view);
+		envShader.setMatrix4x4f("projection", projection);
+		envShader.setVec3f("cameraPos", camera->GetPosition());
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap.textureID);
+		planet.Draw(envShader);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, DiffuseAsteroid);
@@ -363,9 +460,7 @@ void OGLSystem::Run()
 		for (unsigned int i = 0; i < asteroid.GetMeshCount(); i++)
 		{
 			glBindVertexArray(asteroid.GetMeshes()->at(i).GetVAO());
-			glDrawElementsInstanced(
-				GL_TRIANGLES, asteroid.GetMeshes()->at(i).indices.size(), GL_UNSIGNED_INT, 0, amount
-			);
+			glDrawElementsInstanced(GL_TRIANGLES, asteroid.GetMeshes()->at(i).indices.size(), GL_UNSIGNED_INT, 0, amount);
 		}
 
 		//for (int i = 0; i < amount; i++)
@@ -410,12 +505,41 @@ void OGLSystem::Run()
 			backpack.Draw(lightCubeShader);
 		}
 
+		glDepthFunc(GL_LEQUAL);
+		skyboxShader.use();
+		skyboxShader.setMatrix4x4f("projection", projection);
+		skyboxShader.setMatrix4x4f("view", glm::mat4(glm::mat3(view)));
+
+		glBindVertexArray(skyboxVAO);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap.textureID);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDepthFunc(GL_LESS);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDisable(GL_DEPTH_TEST);
+
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		screenShader.use();
+		glBindVertexArray(quadVAO);
+		glDisable(GL_DEPTH_TEST);
+		glBindTexture(GL_TEXTURE_2D, frameBuffer->textureColorbuffer);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
 		// Imgui begin render
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		ImGui::ShowDemoWindow();
+		ImGui::SetNextWindowSize(ImVec2(screenWidth, 100));
+		ImGui::SetNextWindowPos(ImVec2(0, 0));
+		ImGui::Begin("Debug Menu", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
+		ImGui::Button("Spawn asteroid");
+		ImGui::Button("Spawn planet");
+		ImGui::End();
+
+		//ImGui::ShowDemoWindow();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -444,13 +568,45 @@ void OGLSystem::Run()
 
 void OGLSystem::FrameBufferSizeCallback(GLFWwindow* _window, int _width, int _height)
 {
-	void* ptr = glfwGetWindowUserPointer(_window);
-	OGLSystem* OGLSystemPtr = static_cast<OGLSystem*>(ptr);
-	OGLSystemPtr->screenWidth = _width;
-	OGLSystemPtr->screenHeight = _height;
+	OGLSystem* ptr = static_cast<OGLSystem*>(glfwGetWindowUserPointer(_window));
 
-	OGLSystemPtr->camera->screenWidth = _width;
-	OGLSystemPtr->camera->screenHeight = _height;
+	ptr->screenWidth = _width;
+	ptr->screenHeight = _height;
+
+	if (ptr->camera)
+	{
+		ptr->camera->screenWidth = _width;
+		ptr->camera->screenHeight = _height;
+	}
+
+	ptr->frameBuffer->Resize(glm::vec2(_width, _height));
 
 	glViewport(0, 0, _width, _height);
+}
+
+void OGLSystem::CursorCallback(GLFWwindow* _window, double _xpos, double _ypos)
+{
+	OGLSystem* ptr = static_cast<OGLSystem*>(glfwGetWindowUserPointer(_window));
+	if (ptr->inputHandler)
+	{
+		ptr->inputHandler->CursorCallBackImpl(_window, _xpos, _ypos);
+	}
+}
+
+void OGLSystem::ScrollCallback(GLFWwindow* _window, double _xoffset, double _yoffset)
+{
+	OGLSystem* ptr = static_cast<OGLSystem*>(glfwGetWindowUserPointer(_window));
+	if (ptr->inputHandler)
+	{
+		ptr->inputHandler->ScrollCallBackImpl(_window, _xoffset, _yoffset);
+	}
+}
+
+void OGLSystem::KeyCallback(GLFWwindow* _window, int _key, int _scancode, int _action, int _mods)
+{
+	OGLSystem* ptr = static_cast<OGLSystem*>(glfwGetWindowUserPointer(_window));
+	if (ptr->inputHandler)
+	{
+		ptr->inputHandler->KeyCallBackImpl(_window, _key, _scancode, _action, _mods);
+	}
 }

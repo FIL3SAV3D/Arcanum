@@ -5,7 +5,7 @@
 Shader::Shader(const char* _vertexPath, const char* _fragmentPath)
 {
 	std::string shaderSearchPath;
-	shaderSearchPath.append(std::filesystem::current_path().string());
+	shaderSearchPath.append("D:\\PersonalProjects\\Arcanum");
 	shaderSearchPath.append("\\source\\ArcEngine\\OpenGL\\Shaders\\");
 
 	std::string vertexCode;

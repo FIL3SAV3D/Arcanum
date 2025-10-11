@@ -22,6 +22,11 @@ void InputHandler::ProcessInput(GLFWwindow* window)
 {
 	glfwPollEvents();
 
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+
 	for (auto listener : listeners)
 	{
 		listener->UpdateInput(window);

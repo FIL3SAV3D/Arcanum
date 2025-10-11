@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include <vector>
 #include <string>
 #include <memory>
@@ -13,7 +11,10 @@
 
 class Camera;
 class iInputListener;
+class FrameBuffer;
+
 struct GLFWwindow;
+
 
 class OGLSystem
 {
@@ -25,6 +26,10 @@ public:
 
 	static void FrameBufferSizeCallback(GLFWwindow* _window, int _width, int _height);
 
+	// Callbacks
+	static void CursorCallback	(GLFWwindow* _window, double _xpos, double _ypos);
+	static void ScrollCallback	(GLFWwindow* _window, double xoffset, double yoffset);
+	static void KeyCallback		(GLFWwindow* _window, int _key, int _scancode, int _action, int _mods);
 
 
 private:
@@ -33,6 +38,7 @@ private:
 
 	std::shared_ptr<Camera> camera = nullptr;
 
+	std::shared_ptr<FrameBuffer> frameBuffer;
 private:
 	int screenWidth;
 	int screenHeight;
@@ -45,6 +51,8 @@ private:
 
 	unsigned int lightVAO = 0;
 	unsigned int cubeVAO = 0;
+
+	unsigned int skyboxVAO = 0;
 
 	unsigned int VBO = 0;
 	unsigned int EBO = 0;
