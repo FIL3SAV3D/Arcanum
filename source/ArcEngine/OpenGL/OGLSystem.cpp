@@ -43,7 +43,9 @@ OGLSystem::~OGLSystem()
 
 void OGLSystem::Run()
 {
-	Shader defaultShader("default.vert", "default.frag");
+	Shader defaultShader("default");
+
+
 	Shader lightingShader("lightingShader.vert", "lightingShader.frag");
 	Shader lightingShaderInstancing("lightingShaderInstancing.vert", "lightingShaderInstancing.frag");
 	Shader screenShader("screenShader.vert", "screenShader.frag");

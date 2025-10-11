@@ -25,6 +25,7 @@ class Shader
 public:
 	unsigned int ID{ 0 };
 
+	Shader(const char* _path);
 	Shader(const char* _vertexPath, const char* _fragmentPath);
 	~Shader();
 
@@ -36,6 +37,9 @@ public:
 	void setVec3f		(const std::string& _name, const glm::tvec3<float>& _value) const;
 	void setVec4f		(const std::string& _name, const glm::tvec4<float>& _value) const;
 	void setMatrix4x4f	(const std::string& _name, const glm::mat4x4&		_value) const;
+
+private:
+	void CreateShader(const char* _vertexPath, const char* _fragmentPath);
 };
 
 #endif // !SHADER_H

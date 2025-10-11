@@ -2,91 +2,22 @@
 
 
 
+Shader::Shader(const char* _path)
+{
+	std::string vert;
+	vert.append(_path);
+	vert.append(".vert");
+
+	std::string frag;
+	frag.append(_path);
+	frag.append(".frag");
+
+	CreateShader(vert.c_str(), frag.c_str());
+}
+
 Shader::Shader(const char* _vertexPath, const char* _fragmentPath)
 {
-	std::string shaderSearchPath;
-	shaderSearchPath.append("D:\\PersonalProjects\\Arcanum");
-	shaderSearchPath.append("\\source\\ArcEngine\\OpenGL\\Shaders\\");
-
-	std::string vertexCode;
-	std::string fragmentCode;
-
-	std::ifstream vShaderFile;
-	std::ifstream fShaderFile;
-
-	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	try
-	{
-		vShaderFile.open(shaderSearchPath + _vertexPath);
-		fShaderFile.open(shaderSearchPath + _fragmentPath);
-
-		std::stringstream vShaderStream;
-		std::stringstream fShaderStream;
-
-		vShaderStream << vShaderFile.rdbuf();
-		fShaderStream << fShaderFile.rdbuf();
-
-		vShaderFile.close();
-		fShaderFile.close();
-
-		vertexCode = vShaderStream.str();
-		fragmentCode = fShaderStream.str();
-	}
-	catch(std::ifstream::failure e)
-	{
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
-	}
-
-	const char* vShaderCode = vertexCode.c_str();
-	const char* fShaderCode = fragmentCode.c_str();
-
-	unsigned int vertex		= 0;
-	unsigned int fragment	= 0;
-
-	int success = 0;
-
-	char infoLog[512];
-
-	vertex		= glCreateShader(GL_VERTEX_SHADER);
-	fragment	= glCreateShader(GL_FRAGMENT_SHADER);
-
-	glShaderSource(vertex,   1, &vShaderCode, nullptr);
-	glShaderSource(fragment, 1, &fShaderCode, nullptr);
-
-	glCompileShader(vertex);
-	glCompileShader(fragment);
-
-	glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	};
-
-	glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	};
-
-	ID = glCreateProgram();
-
-	glAttachShader(ID, vertex);
-	glAttachShader(ID, fragment);
-
-	glLinkProgram(ID);
-
-	glGetProgramiv(ID, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(ID, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-
-	glDeleteShader(vertex);
-	glDeleteShader(fragment);
+	CreateShader(_vertexPath, _fragmentPath);
 }
 
 Shader::~Shader()
@@ -127,4 +58,91 @@ void Shader::setVec4f(const std::string& _name, const glm::tvec4<float>& _value)
 void Shader::setMatrix4x4f(const std::string& _name, const glm::mat4x4& _value) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(ID, _name.c_str()), 1, GL_FALSE, glm::value_ptr(_value));
+}
+
+void Shader::CreateShader(const char* _vertexPath, const char* _fragmentPath)
+{
+	std::string shaderSearchPath;
+	shaderSearchPath.append("D:\\PersonalProjects\\Arcanum");
+	shaderSearchPath.append("\\source\\ArcEngine\\OpenGL\\Shaders\\");
+
+	std::string vertexCode;
+	std::string fragmentCode;
+
+	std::ifstream vShaderFile;
+	std::ifstream fShaderFile;
+
+	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	try
+	{
+		vShaderFile.open(shaderSearchPath + _vertexPath);
+		fShaderFile.open(shaderSearchPath + _fragmentPath);
+
+		std::stringstream vShaderStream;
+		std::stringstream fShaderStream;
+
+		vShaderStream << vShaderFile.rdbuf();
+		fShaderStream << fShaderFile.rdbuf();
+
+		vShaderFile.close();
+		fShaderFile.close();
+
+		vertexCode = vShaderStream.str();
+		fragmentCode = fShaderStream.str();
+	}
+	catch (std::ifstream::failure e)
+	{
+		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+	}
+
+	const char* vShaderCode = vertexCode.c_str();
+	const char* fShaderCode = fragmentCode.c_str();
+
+	unsigned int vertex = 0;
+	unsigned int fragment = 0;
+
+	int success = 0;
+
+	char infoLog[512];
+
+	vertex = glCreateShader(GL_VERTEX_SHADER);
+	fragment = glCreateShader(GL_FRAGMENT_SHADER);
+
+	glShaderSource(vertex, 1, &vShaderCode, nullptr);
+	glShaderSource(fragment, 1, &fShaderCode, nullptr);
+
+	glCompileShader(vertex);
+	glCompileShader(fragment);
+
+	glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(vertex, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+	};
+
+	glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(fragment, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+	};
+
+	ID = glCreateProgram();
+
+	glAttachShader(ID, vertex);
+	glAttachShader(ID, fragment);
+
+	glLinkProgram(ID);
+
+	glGetProgramiv(ID, GL_LINK_STATUS, &success);
+	if (!success)
+	{
+		glGetProgramInfoLog(ID, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+	}
+
+	glDeleteShader(vertex);
+	glDeleteShader(fragment);
 }
