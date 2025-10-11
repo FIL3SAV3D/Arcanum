@@ -1,5 +1,9 @@
 #include "OGLSystem.h"
 
+#include <imgui.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <backends/imgui_impl_glfw.h>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -20,6 +24,8 @@
 
 OGLSystem::OGLSystem()
 {
+	screenWidth = 800;
+	screenHeight = 600;
 	sptr_OGLWindow		= std::make_shared<OGLWindow>(screenWidth, screenHeight, windowName);
 	inputHandler = std::make_shared<InputHandler>();
 }
@@ -30,18 +36,11 @@ OGLSystem::~OGLSystem()
 	inputHandler.reset();
 }
 
-void FrameBufferSizeCallback(GLFWwindow* window, int width, int height)
-{
-	glViewport(0, 0, width, height);
-}
-
 void OGLSystem::Run()
 {
 	Shader defaultShader("default.vert", "default.frag");
 	Shader lightingShader("lightingShader.vert", "lightingShader.frag");
-	Shader lightingShaderInstancing("lightingShaderInstancing.vert", "lightingShader.frag");
-
-	
+	Shader lightingShaderInstancing("lightingShaderInstancing.vert", "lightingShaderInstancing.frag");
 
 	Shader lightCubeShader("lightCubeShader.vert", "lightCubeShader.frag");
 	Shader outlineShader("simpleOutline.vert", "simpleOutline.frag");
@@ -51,12 +50,12 @@ void OGLSystem::Run()
 	Model planet = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\planet.obj").c_str());
 	Model asteroid = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\rock.obj").c_str());
 
-	unsigned int amount = 100000;
+	unsigned int amount = 1000000;
 	glm::mat4* modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(glfwGetTime()); // initialize random seed	
-	float radius = 60.0f;
-	float offset = 20.0f;
+	float radius = 80.0f;
+	float offset = 50.0f;
 	for (unsigned int i = 0; i < amount; i++)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
@@ -114,6 +113,7 @@ void OGLSystem::Run()
 
 	glViewport(0, 0, screenWidth, screenHeight);
 
+	glfwSetWindowUserPointer(sptr_OGLWindow->GetWindow(), this);
 	glfwSetFramebufferSizeCallback(sptr_OGLWindow->GetWindow(), FrameBufferSizeCallback);
 	
 	glEnable(GL_DEPTH_TEST);
@@ -147,6 +147,42 @@ void OGLSystem::Run()
 
 	std::map<float, glm::mat4> sorted;
 
+
+	// vertex buffer object
+	unsigned int buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+
+	for (unsigned int i = 0; i < asteroid.GetMeshCount(); i++)
+	{
+		unsigned int VAO = asteroid.GetMeshes()->at(i).GetVAO();
+		glBindVertexArray(VAO);
+		// vertex attributes
+		std::size_t vec4Size = sizeof(glm::vec4);
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+
+		glBindVertexArray(0);
+	}
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(sptr_OGLWindow->GetWindow(), true);
+	ImGui_ImplOpenGL3_Init("#version 460");
 
 	while (!glfwWindowShouldClose(sptr_OGLWindow->GetWindow()))
 	{
@@ -255,10 +291,6 @@ void OGLSystem::Run()
 		//	lightingShader.setMatrix4x4f("model", it->second);
 		//	backpack.Draw(lightingShader);
 		//}
-
-		
-
-		lightingShader.use();
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
@@ -269,10 +301,71 @@ void OGLSystem::Run()
 		glBindTexture(GL_TEXTURE_2D, DiffuseAsteroid);
 
 		// draw meteorites
-		for (unsigned int i = 0; i < amount; i++)
+		//for (unsigned int i = 0; i < amount; i++)
+		//{
+		//	lightingShader.setMatrix4x4f("model", modelMatrices[i]);
+		//	asteroid.Draw(lightingShader);
+		//}
+
+
+		lightingShaderInstancing.use();
+
+		lightingShaderInstancing.setMatrix4x4f("projection", projection);
+		lightingShaderInstancing.setMatrix4x4f("view", view);
+		lightingShaderInstancing.setVec3f("viewPos", camera->GetPosition());
+
+
+		lightingShaderInstancing.setInt("material.diffuse", 0);
+		lightingShaderInstancing.setInt("material.specular", 1);
+		lightingShaderInstancing.setFloat("material.shininess", 32.0f);
+
+		lightingShaderInstancing.setVec3f("dirLight.direction", glm::vec3(0.3f, -0.5f, 0.3f));
+		lightingShaderInstancing.setVec3f("dirLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+		lightingShaderInstancing.setVec3f("dirLight.diffuse", glm::vec3(0.3f, 0.3f, 0.3f));
+		lightingShaderInstancing.setVec3f("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+		lightingShaderInstancing.setVec3f("pointLights[0].position", pointLightPositions[0] * 10.0f);
+		lightingShaderInstancing.setVec3f("pointLights[0].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3f("pointLights[0].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3f("pointLights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+		lightingShaderInstancing.setFloat("pointLights[0].constant", 1.0f);
+		lightingShaderInstancing.setFloat("pointLights[0].linear", 0.09f);
+		lightingShaderInstancing.setFloat("pointLights[0].quadratic", 0.032f);
+
+		lightingShaderInstancing.setVec3f("pointLights[1].position", pointLightPositions[1] * 10.0f);
+		lightingShaderInstancing.setVec3f("pointLights[1].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3f("pointLights[1].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3f("pointLights[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+		lightingShaderInstancing.setFloat("pointLights[1].constant", 1.0f);
+		lightingShaderInstancing.setFloat("pointLights[1].linear", 0.09f);
+		lightingShaderInstancing.setFloat("pointLights[1].quadratic", 0.032f);
+
+		lightingShaderInstancing.setVec3f("pointLights[2].position", pointLightPositions[2] * 10.0f);
+		lightingShaderInstancing.setVec3f("pointLights[2].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3f("pointLights[2].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3f("pointLights[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+		lightingShaderInstancing.setFloat("pointLights[2].constant", 1.0f);
+		lightingShaderInstancing.setFloat("pointLights[2].linear", 0.09f);
+		lightingShaderInstancing.setFloat("pointLights[2].quadratic", 0.032f);
+
+		lightingShaderInstancing.setVec3f("pointLights[3].position", pointLightPositions[3] * 10.0f);
+		lightingShaderInstancing.setVec3f("pointLights[3].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3f("pointLights[3].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3f("pointLights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+		lightingShaderInstancing.setFloat("pointLights[3].constant", 1.0f);
+		lightingShaderInstancing.setFloat("pointLights[3].linear", 0.09f);
+		lightingShaderInstancing.setFloat("pointLights[3].quadratic", 0.032f);
+
+		for (unsigned int i = 0; i < asteroid.GetMeshCount(); i++)
 		{
-			lightingShader.setMatrix4x4f("model", modelMatrices[i]);
-			asteroid.Draw(lightingShader);
+			glBindVertexArray(asteroid.GetMeshes()->at(i).GetVAO());
+			glDrawElementsInstanced(
+				GL_TRIANGLES, asteroid.GetMeshes()->at(i).indices.size(), GL_UNSIGNED_INT, 0, amount
+			);
 		}
 
 		//for (int i = 0; i < amount; i++)
@@ -317,6 +410,17 @@ void OGLSystem::Run()
 			backpack.Draw(lightCubeShader);
 		}
 
+		// Imgui begin render
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		ImGui::ShowDemoWindow();
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		// Imgui end render
+
 
 		// Check and call events and swap buffers
 		glfwSwapBuffers(sptr_OGLWindow->GetWindow());
@@ -325,6 +429,10 @@ void OGLSystem::Run()
 		frames++;
 	}
 
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
 	glDeleteVertexArrays(1, &cubeVAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
@@ -332,4 +440,17 @@ void OGLSystem::Run()
 	glfwTerminate();
 
 	return;
+}
+
+void OGLSystem::FrameBufferSizeCallback(GLFWwindow* _window, int _width, int _height)
+{
+	void* ptr = glfwGetWindowUserPointer(_window);
+	OGLSystem* OGLSystemPtr = static_cast<OGLSystem*>(ptr);
+	OGLSystemPtr->screenWidth = _width;
+	OGLSystemPtr->screenHeight = _height;
+
+	OGLSystemPtr->camera->screenWidth = _width;
+	OGLSystemPtr->camera->screenHeight = _height;
+
+	glViewport(0, 0, _width, _height);
 }

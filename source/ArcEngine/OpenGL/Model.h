@@ -21,6 +21,9 @@ public:
 
 	std::vector<Texture> texturesLoaded;
 
+	size_t GetMeshCount() { return meshes.size(); };
+	std::vector<Mesh>* GetMeshes() { return &meshes; };
+
 private:
 	std::vector<Mesh> meshes{};
 	std::string directory{};

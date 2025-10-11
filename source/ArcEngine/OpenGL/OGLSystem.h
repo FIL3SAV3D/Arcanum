@@ -13,6 +13,7 @@
 
 class Camera;
 class iInputListener;
+struct GLFWwindow;
 
 class OGLSystem
 {
@@ -22,6 +23,10 @@ public:
 
 	void Run();
 
+	static void FrameBufferSizeCallback(GLFWwindow* _window, int _width, int _height);
+
+
+
 private:
 	std::shared_ptr<OGLWindow> sptr_OGLWindow = nullptr;
 	std::shared_ptr<InputHandler> inputHandler = nullptr;
@@ -29,10 +34,8 @@ private:
 	std::shared_ptr<Camera> camera = nullptr;
 
 private:
-
-
-	int screenWidth = 800;
-	int screenHeight = 600;
+	int screenWidth;
+	int screenHeight;
 
 	const char* windowName = "Arcanum";
 

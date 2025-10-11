@@ -28,7 +28,16 @@ workspace "Arcanum"
 		files {
             "source/Framework/**.h",
             "source/Framework/**.cpp",
-            "source/Framework/**.hpp"
+            "source/Framework/**.hpp",
+
+			"submodules/imgui/*.h",
+			"submodules/imgui/*.cpp",
+
+			"submodules/imgui/backends/imgui_impl_opengl3.h",
+			"submodules/imgui/backends/imgui_impl_opengl3.cpp",
+
+			"submodules/imgui/backends/imgui_impl_glfw.h",
+			"submodules/imgui/backends/imgui_impl_glfw.cpp",
         }
 
 		filter {"configurations:Debug"}
@@ -57,6 +66,9 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/library/std_image" }
 		includedirs { "../Arcanum/library/Assimp/include" }
 
+		-- Submodules
+		includedirs { "../Arcanum/submodules/imgui" }
+
 
 	project "ArcEngine"
 		kind "StaticLib"
@@ -72,16 +84,12 @@ workspace "Arcanum"
 
 			"submodules/imgui/*.h",
 			"submodules/imgui/*.cpp",
-			"submodules/imgui/*.hpp",
 
-			"submodules/imgui/backends/imgui_impl_vulkan.cpp",
-			"submodules/imgui/backends/imgui_impl_vulkan.h",
-			"submodules/imgui/backends/imgui_impl_glfw.cpp",
+			"submodules/imgui/backends/imgui_impl_opengl3.h",
+			"submodules/imgui/backends/imgui_impl_opengl3.cpp",
+
 			"submodules/imgui/backends/imgui_impl_glfw.h",
-
-			"misc/debuggers/imgui.natvis",
-			"misc/debuggers/imgui.natstepfilter",
-			"misc/cpp/imgui_stdlib.*"
+			"submodules/imgui/backends/imgui_impl_glfw.cpp",
         }
 
 		filter {"configurations:Debug"}
@@ -105,12 +113,14 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/library/TinyObj" }
 		includedirs { "../Arcanum/source/ArcEngine" }
 		includedirs { "../Arcanum/source/Jolt" }
-		includedirs { "../Arcanum/submodules/imgui" }
 		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 		includedirs { "../Arcanum/library/GLAD/include" }
 		includedirs { "../Arcanum/library/std_image" }
 		includedirs { "../Arcanum/library/Assimp/include" }
+
+		-- Submodules
+		includedirs { "../Arcanum/submodules/imgui" }
 		
 	project "Jolt"
 		kind "StaticLib"
