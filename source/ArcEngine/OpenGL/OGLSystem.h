@@ -15,7 +15,6 @@ class FrameBuffer;
 
 struct GLFWwindow;
 
-
 class OGLSystem
 {
 public:
@@ -56,5 +55,4 @@ private:
 
 	unsigned int VBO = 0;
 	unsigned int EBO = 0;
-
 };

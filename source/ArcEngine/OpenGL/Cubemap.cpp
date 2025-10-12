@@ -9,7 +9,7 @@ Cubemap::Cubemap(const char* _cubemapPath)
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
     std::string shaderSearchPath;
-    shaderSearchPath.append("D:\\PersonalProjects\\Arcanum");
+    shaderSearchPath.append("F:\\PersonalProjects\\Arcanum");
     shaderSearchPath.append("\\Data\\Models\\Src_Images\\");
     shaderSearchPath.append(_cubemapPath);
     shaderSearchPath.append("\\");

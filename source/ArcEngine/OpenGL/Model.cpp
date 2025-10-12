@@ -2,11 +2,14 @@
 
 #include "Shader.h"
 
+#include <glad/glad.h>
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
 #include <stb_image.h>
+#include <iostream>
 
 Model::Model(const char* _path, bool gamma):
 	gammaCorrection{ gamma }

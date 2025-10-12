@@ -45,7 +45,6 @@ void OGLSystem::Run()
 {
 	Shader defaultShader("default");
 
-
 	Shader lightingShader("lightingShader.vert", "lightingShader.frag");
 	Shader lightingShaderInstancing("lightingShaderInstancing.vert", "lightingShaderInstancing.frag");
 	Shader screenShader("screenShader.vert", "screenShader.frag");
@@ -57,16 +56,30 @@ void OGLSystem::Run()
 
 	Shader skyboxShader("skybox.vert", "skybox.frag");
 
-	Model backpack = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
+	Shader explosionGeometryShader("geoShader.vert", "geoShader.frag", "geoShader.gs");
 
-	Model planet = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\planet.obj").c_str());
-	Model asteroid = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\rock.obj").c_str());
+	Shader normals("normalViewShader.vert", "normalViewShader.frag", "normalViewShader.gs");
+
+	std::string directory;
+	std::string currentPath = std::filesystem::current_path().string();
+	const size_t last_slash_idx = currentPath.rfind('\\');
+	if (std::string::npos != last_slash_idx)
+	{
+		directory = currentPath.substr(0, last_slash_idx);
+	}
+
+	Model backpack = Model(std::string(directory + "\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
+
+	Model invertedCube = Model(std::string(directory + "\\Arcanum\\Data\\Models\\OpenGL\\InvertedCube.fbx").c_str());
+
+	Model planet = Model(std::string(directory + "\\Arcanum\\Data\\Models\\OpenGL\\planet.obj").c_str());
+	Model asteroid = Model(std::string(directory + "\\Arcanum\\Data\\Models\\OpenGL\\rock.obj").c_str());
 
 	unsigned int amount = 100000;
 	glm::mat4* modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(glfwGetTime()); // initialize random seed	
-	float radius = 80.0f;
+	float radius = 100.0f;
 	float offset = 50.0f;
 	for (unsigned int i = 0; i < amount; i++)
 	{
@@ -146,9 +159,9 @@ void OGLSystem::Run()
 	};
 
 	//unsigned int Diffuse = TextureFromFile("rock.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\");
-	unsigned int DiffuseAsteroid = TextureFromFile("rock.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\");
-	unsigned int Specular = TextureFromFile("container2_specular.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
-	unsigned int Grass = TextureFromFile("blending_transparent_window.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
+	unsigned int DiffuseAsteroid = TextureFromFile("rock.png", directory + "\\Arcanum\\Data\\Models\\OpenGL\\");
+	unsigned int Specular = TextureFromFile("container2_specular.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
+	unsigned int Grass = TextureFromFile("blending_transparent_window.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
 	
 	Cubemap cubemap{"TestCubeMap"};
 
@@ -197,6 +210,8 @@ void OGLSystem::Run()
 	
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+
+	glEnable(GL_MULTISAMPLE);
 
 	int frames = 0;
 	double starttime = 0;
@@ -275,6 +290,18 @@ void OGLSystem::Run()
 	frameBuffer = std::make_shared<FrameBuffer>(glm::vec2(screenWidth, screenHeight));
 	// framebuffer
 
+	unsigned int intermediateFBO;
+	glGenFramebuffers(1, &intermediateFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+
+	unsigned int screenTexture;
+	glGenTextures(1, &screenTexture);
+	glBindTexture(GL_TEXTURE_2D, screenTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
+
 	while (!glfwWindowShouldClose(sptr_OGLWindow->GetWindow()))
 	{
 		currentFrameTime = (float)glfwGetTime();
@@ -307,12 +334,11 @@ void OGLSystem::Run()
 		glm::mat4 projection = camera->GetProjectionMatrix();
 		glm::mat4x4 view = camera->GetViewMatrix();
 
-		lightingShader.use();
-
+		lightingShader.Use();
 		
-		lightingShader.setMatrix4x4f("projection", projection);
-		lightingShader.setMatrix4x4f("view", view);
-		lightingShader.setVec3f("viewPos", camera->GetPosition());
+		lightingShader.setMat4("projection", projection);
+		lightingShader.setMat4("view", view);
+		lightingShader.setVec3("viewPos", camera->GetPosition());
 
 
 		lightingShader.setInt("material.diffuse", 0);
@@ -329,42 +355,42 @@ void OGLSystem::Run()
 
 		// Light stuff
 
-		lightingShader.setVec3f("dirLight.direction", glm::vec3(0.3f, -0.5f, 0.3f));
-		lightingShader.setVec3f("dirLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
-		lightingShader.setVec3f("dirLight.diffuse", glm::vec3(0.3f, 0.3f, 0.3f));
-		lightingShader.setVec3f("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("dirLight.direction", glm::vec3(0.3f, -0.5f, 0.3f));
+		lightingShader.setVec3("dirLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+		lightingShader.setVec3("dirLight.diffuse", glm::vec3(0.3f, 0.3f, 0.3f));
+		lightingShader.setVec3("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-		lightingShader.setVec3f("pointLights[0].position", pointLightPositions[0] * 10.0f);
-		lightingShader.setVec3f("pointLights[0].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3f("pointLights[0].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3f("pointLights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("pointLights[0].position", pointLightPositions[0] * 10.0f);
+		lightingShader.setVec3("pointLights[0].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("pointLights[0].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("pointLights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
 		lightingShader.setFloat("pointLights[0].constant", 1.0f);
 		lightingShader.setFloat("pointLights[0].linear", 0.09f);
 		lightingShader.setFloat("pointLights[0].quadratic", 0.032f);
 
-		lightingShader.setVec3f("pointLights[1].position", pointLightPositions[1] * 10.0f);
-		lightingShader.setVec3f("pointLights[1].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3f("pointLights[1].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3f("pointLights[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("pointLights[1].position", pointLightPositions[1] * 10.0f);
+		lightingShader.setVec3("pointLights[1].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("pointLights[1].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("pointLights[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
 		lightingShader.setFloat("pointLights[1].constant", 1.0f);
 		lightingShader.setFloat("pointLights[1].linear", 0.09f);
 		lightingShader.setFloat("pointLights[1].quadratic", 0.032f);
 
-		lightingShader.setVec3f("pointLights[2].position", pointLightPositions[2] * 10.0f);
-		lightingShader.setVec3f("pointLights[2].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3f("pointLights[2].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3f("pointLights[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("pointLights[2].position", pointLightPositions[2] * 10.0f);
+		lightingShader.setVec3("pointLights[2].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("pointLights[2].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("pointLights[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
 		lightingShader.setFloat("pointLights[2].constant", 1.0f);
 		lightingShader.setFloat("pointLights[2].linear", 0.09f);
 		lightingShader.setFloat("pointLights[2].quadratic", 0.032f);
 
-		lightingShader.setVec3f("pointLights[3].position", pointLightPositions[3] * 10.0f);
-		lightingShader.setVec3f("pointLights[3].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3f("pointLights[3].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3f("pointLights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("pointLights[3].position", pointLightPositions[3] * 10.0f);
+		lightingShader.setVec3("pointLights[3].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("pointLights[3].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShader.setVec3("pointLights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
 		lightingShader.setFloat("pointLights[3].constant", 1.0f);
 		lightingShader.setFloat("pointLights[3].linear", 0.09f);
@@ -380,21 +406,32 @@ void OGLSystem::Run()
 
 		//for (std::map<float, glm::mat4>::iterator it = sorted.begin(); it != sorted.end(); ++it)
 		//{
-		//	lightingShader.setMatrix4x4f("model", it->second);
+		//	lightingShader.setMat4("model", it->second);
 		//	backpack.Draw(lightingShader);
 		//}
-		envShader.use();
+		explosionGeometryShader.Use();
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
-		envShader.setMatrix4x4f("model", model);
-		envShader.setMatrix4x4f("view", view);
-		envShader.setMatrix4x4f("projection", projection);
-		envShader.setVec3f("cameraPos", camera->GetPosition());
+		explosionGeometryShader.setMat4("model", model);
+		explosionGeometryShader.setMat4("view", view);
+		explosionGeometryShader.setMat4("projection", projection);
+		explosionGeometryShader.setVec3("cameraPos", camera->GetPosition());
+
+		explosionGeometryShader.setFloat("time", glfwGetTime());
+
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap.textureID);
-		planet.Draw(envShader);
+		planet.Draw(explosionGeometryShader);
+
+		normals.Use();
+		normals.setMat4("model", model);
+		normals.setMat4("view", view);
+		normals.setMat4("projection", projection);
+		normals.setVec3("cameraPos", camera->GetPosition());
+
+		planet.Draw(normals);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, DiffuseAsteroid);
@@ -402,58 +439,58 @@ void OGLSystem::Run()
 		// draw meteorites
 		//for (unsigned int i = 0; i < amount; i++)
 		//{
-		//	lightingShader.setMatrix4x4f("model", modelMatrices[i]);
+		//	lightingShader.setMat4("model", modelMatrices[i]);
 		//	asteroid.Draw(lightingShader);
 		//}
 
 
-		lightingShaderInstancing.use();
+		lightingShaderInstancing.Use();
 
-		lightingShaderInstancing.setMatrix4x4f("projection", projection);
-		lightingShaderInstancing.setMatrix4x4f("view", view);
-		lightingShaderInstancing.setVec3f("viewPos", camera->GetPosition());
+		lightingShaderInstancing.setMat4("projection", projection);
+		lightingShaderInstancing.setMat4("view", view);
+		lightingShaderInstancing.setVec3("viewPos", camera->GetPosition());
 
 
 		lightingShaderInstancing.setInt("material.diffuse", 0);
 		lightingShaderInstancing.setInt("material.specular", 1);
 		lightingShaderInstancing.setFloat("material.shininess", 32.0f);
 
-		lightingShaderInstancing.setVec3f("dirLight.direction", glm::vec3(0.3f, -0.5f, 0.3f));
-		lightingShaderInstancing.setVec3f("dirLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
-		lightingShaderInstancing.setVec3f("dirLight.diffuse", glm::vec3(0.3f, 0.3f, 0.3f));
-		lightingShaderInstancing.setVec3f("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("dirLight.direction", glm::vec3(0.3f, -0.5f, 0.3f));
+		lightingShaderInstancing.setVec3("dirLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+		lightingShaderInstancing.setVec3("dirLight.diffuse", glm::vec3(0.3f, 0.3f, 0.3f));
+		lightingShaderInstancing.setVec3("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-		lightingShaderInstancing.setVec3f("pointLights[0].position", pointLightPositions[0] * 10.0f);
-		lightingShaderInstancing.setVec3f("pointLights[0].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3f("pointLights[0].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3f("pointLights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("pointLights[0].position", pointLightPositions[0] * 10.0f);
+		lightingShaderInstancing.setVec3("pointLights[0].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("pointLights[0].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("pointLights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
 		lightingShaderInstancing.setFloat("pointLights[0].constant", 1.0f);
 		lightingShaderInstancing.setFloat("pointLights[0].linear", 0.09f);
 		lightingShaderInstancing.setFloat("pointLights[0].quadratic", 0.032f);
 
-		lightingShaderInstancing.setVec3f("pointLights[1].position", pointLightPositions[1] * 10.0f);
-		lightingShaderInstancing.setVec3f("pointLights[1].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3f("pointLights[1].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3f("pointLights[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("pointLights[1].position", pointLightPositions[1] * 10.0f);
+		lightingShaderInstancing.setVec3("pointLights[1].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("pointLights[1].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("pointLights[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
 		lightingShaderInstancing.setFloat("pointLights[1].constant", 1.0f);
 		lightingShaderInstancing.setFloat("pointLights[1].linear", 0.09f);
 		lightingShaderInstancing.setFloat("pointLights[1].quadratic", 0.032f);
 
-		lightingShaderInstancing.setVec3f("pointLights[2].position", pointLightPositions[2] * 10.0f);
-		lightingShaderInstancing.setVec3f("pointLights[2].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3f("pointLights[2].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3f("pointLights[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("pointLights[2].position", pointLightPositions[2] * 10.0f);
+		lightingShaderInstancing.setVec3("pointLights[2].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("pointLights[2].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("pointLights[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
 		lightingShaderInstancing.setFloat("pointLights[2].constant", 1.0f);
 		lightingShaderInstancing.setFloat("pointLights[2].linear", 0.09f);
 		lightingShaderInstancing.setFloat("pointLights[2].quadratic", 0.032f);
 
-		lightingShaderInstancing.setVec3f("pointLights[3].position", pointLightPositions[3] * 10.0f);
-		lightingShaderInstancing.setVec3f("pointLights[3].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3f("pointLights[3].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3f("pointLights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("pointLights[3].position", pointLightPositions[3] * 10.0f);
+		lightingShaderInstancing.setVec3("pointLights[3].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("pointLights[3].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		lightingShaderInstancing.setVec3("pointLights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
 		lightingShaderInstancing.setFloat("pointLights[3].constant", 1.0f);
 		lightingShaderInstancing.setFloat("pointLights[3].linear", 0.09f);
@@ -467,7 +504,7 @@ void OGLSystem::Run()
 
 		//for (int i = 0; i < amount; i++)
 		//{
-		//	lightingShader.setMatrix4x4f("model", modelMatrices.at(i));
+		//	lightingShader.setMat4("model", modelMatrices.at(i));
 		//	backpack.Draw(lightingShader);
 		//}
 
@@ -477,12 +514,12 @@ void OGLSystem::Run()
 
 		//outlineShader.use();
 
-		//outlineShader.setMatrix4x4f("projection", projection);
-		//outlineShader.setMatrix4x4f("view", view);
+		//outlineShader.setMat4("projection", projection);
+		//outlineShader.setMat4("view", view);
 
 		//for (int i = 0; i < rats; i++)
 		//{
-		//	outlineShader.setMatrix4x4f("model", glm::scale(ratMats.at(i), glm::vec3(1.1f)));
+		//	outlineShader.setMat4("model", glm::scale(ratMats.at(i), glm::vec3(1.1f)));
 		//	backpack.Draw(outlineShader);
 		//}
 
@@ -493,29 +530,34 @@ void OGLSystem::Run()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		lightCubeShader.use();
-		lightCubeShader.setMatrix4x4f("projection", projection);
-		lightCubeShader.setMatrix4x4f("view", view);
+		lightCubeShader.Use();
+		lightCubeShader.setMat4("projection", projection);
+		lightCubeShader.setMat4("view", view);
 		for (int i = 0; i < pointLightPositions->length(); i++)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, pointLightPositions[i] * 10.0f);
 			model = glm::scale(model, glm::vec3(0.1f)); // a smaller cube
 
-			lightCubeShader.setMatrix4x4f("model", model);
+			lightCubeShader.setMat4("model", model);
 
 			backpack.Draw(lightCubeShader);
 		}
 
 		glDepthFunc(GL_LEQUAL);
-		skyboxShader.use();
-		skyboxShader.setMatrix4x4f("projection", projection);
-		skyboxShader.setMatrix4x4f("view", glm::mat4(glm::mat3(view)));
+		skyboxShader.Use();
+		skyboxShader.setMat4("projection", projection);
+		skyboxShader.setMat4("view", glm::mat4(glm::mat3(view)));
 
 		glBindVertexArray(skyboxVAO);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap.textureID);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		invertedCube.Draw(skyboxShader);
 		glDepthFunc(GL_LESS);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBuffer->textureColorbuffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
+		glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glDisable(GL_DEPTH_TEST);
@@ -523,10 +565,10 @@ void OGLSystem::Run()
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		screenShader.use();
+		screenShader.Use();
 		glBindVertexArray(quadVAO);
-		glDisable(GL_DEPTH_TEST);
-		glBindTexture(GL_TEXTURE_2D, frameBuffer->textureColorbuffer);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, screenTexture);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		// Imgui begin render
