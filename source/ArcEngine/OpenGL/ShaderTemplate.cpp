@@ -47,6 +47,11 @@ void ShaderTemplate::setVec4(const char* _name, const glm::vec4& _value) const
 	glUniform4f(glGetUniformLocation(ID, _name), _value.x, _value.y, _value.z, _value.w);
 }
 
+void ShaderTemplate::setMat3(const char* _name, const glm::mat3& _value) const
+{
+	glUniformMatrix3fv(glGetUniformLocation(ID, _name), 1, GL_FALSE, glm::value_ptr(_value));
+}
+
 void ShaderTemplate::setMat4(const char* _name, const glm::mat4& _value) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(ID, _name), 1, GL_FALSE, glm::value_ptr(_value));
@@ -119,7 +124,7 @@ int ShaderTemplate::CreateFragmentShader(const char* _fragmentShaderPath)
 	glShaderSource(fragment, 1, &code, nullptr);
 	glCompileShader(fragment);
 
-	CheckCompileErrors(fragment, "VERTEX");
+	CheckCompileErrors(fragment, "FRAGMENT");
 
 	glAttachShader(ID, fragment);
 

@@ -60,6 +60,13 @@ void OGLSystem::Run()
 
 	Shader normals("normalViewShader.vert", "normalViewShader.frag", "normalViewShader.gs");
 
+	Shader blinnPhongShader("blinnPhong.vert", "blinnPhong.frag");
+
+	Shader PBRShader("PBRNoTextures.vert", "PBRNoTextures.frag");
+	Shader PBRTextureShader("PBRTextures.vert", "PBRTextures.frag");
+
+	Shader PBRInstancedShader("PBRNoTexturesInstancing.vert", "PBRNoTexturesInstancing.frag");
+
 	std::string directory;
 	std::string currentPath = std::filesystem::current_path().string();
 	const size_t last_slash_idx = currentPath.rfind('\\');
@@ -68,12 +75,15 @@ void OGLSystem::Run()
 		directory = currentPath.substr(0, last_slash_idx);
 	}
 
-	Model backpack = Model(std::string(directory + "\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
+	Model backpack = Model(std::string("F:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
 
-	Model invertedCube = Model(std::string(directory + "\\Arcanum\\Data\\Models\\OpenGL\\InvertedCube.fbx").c_str());
+	Model Rat = Model(std::string("F:\\PersonalProjects\\Arcanum\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
 
-	Model planet = Model(std::string(directory + "\\Arcanum\\Data\\Models\\OpenGL\\planet.obj").c_str());
-	Model asteroid = Model(std::string(directory + "\\Arcanum\\Data\\Models\\OpenGL\\rock.obj").c_str());
+	Model invertedCube = Model(std::string("F:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\InvertedCube.fbx").c_str());
+	Model Cube = Model(std::string("F:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
+
+	Model planet = Model(std::string("F:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\planet.obj").c_str());
+	Model asteroid = Model(std::string("F:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\rock.obj").c_str());
 
 	unsigned int amount = 100000;
 	glm::mat4* modelMatrices;
@@ -158,10 +168,27 @@ void OGLSystem::Run()
 	glm::vec3(0.0f,  0.0f, -3.0f)
 	};
 
+	glm::vec3 lightPositions[] = {
+		glm::vec3(10.0f,  0.0f, 10.0f),
+		glm::vec3(-10.0f,  0.0f, 10.0f),
+		glm::vec3(-10.0f, 0.0f, -10.0f),
+		glm::vec3(10.0f, 0.0f, -10.0f),
+	};
+	glm::vec3 lightColors[] = {
+		glm::vec3(300.0f, 300.0f, 300.0f),
+		glm::vec3(0.0f, 300.0f, 0.0f),
+		glm::vec3(0.0f, 0.0f, 300.0f),
+		glm::vec3(300.0f, 300.0f, 0.0f)
+	};
+
 	//unsigned int Diffuse = TextureFromFile("rock.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\");
 	unsigned int DiffuseAsteroid = TextureFromFile("rock.png", directory + "\\Arcanum\\Data\\Models\\OpenGL\\");
 	unsigned int Specular = TextureFromFile("container2_specular.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
 	unsigned int Grass = TextureFromFile("blending_transparent_window.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
+
+	unsigned int BC = TextureFromFile("T_Rat_BC.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
+	unsigned int N = TextureFromFile("T_Rat_N.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
+	unsigned int ORM = TextureFromFile("T_Rat_ORM.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
 	
 	Cubemap cubemap{"TestCubeMap"};
 
@@ -212,6 +239,8 @@ void OGLSystem::Run()
 	glCullFace(GL_BACK);
 
 	glEnable(GL_MULTISAMPLE);
+
+	//glEnable(GL_FRAMEBUFFER_SRGB);
 
 	int frames = 0;
 	double starttime = 0;
@@ -334,67 +363,37 @@ void OGLSystem::Run()
 		glm::mat4 projection = camera->GetProjectionMatrix();
 		glm::mat4x4 view = camera->GetViewMatrix();
 
-		lightingShader.Use();
-		
-		lightingShader.setMat4("projection", projection);
-		lightingShader.setMat4("view", view);
-		lightingShader.setVec3("viewPos", camera->GetPosition());
+		PBRTextureShader.Use();
 
+		PBRTextureShader.setMat4("view", view);
+		PBRTextureShader.setMat4("projection", projection);
 
-		lightingShader.setInt("material.diffuse", 0);
-		lightingShader.setInt("material.specular", 1);
-		lightingShader.setFloat("material.shininess", 32.0f);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, BC);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, N);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, ORM);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		PBRTextureShader.setVec3("camPos", camera->GetPosition());
 
-		
+		for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
+		{
+			glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
+			newPos = lightPositions[i];
+			PBRTextureShader.setVec3(std::string("lightPositions[" + std::to_string(i) + "]").c_str(), newPos);
+			PBRTextureShader.setVec3(std::string("lightColors[" + std::to_string(i) + "]").c_str(), lightColors[i]);
 
-		//glActiveTexture(GL_TEXTURE1);
-		//glBindTexture(GL_TEXTURE_2D, Specular);
+			auto model = glm::mat4(1.0f);
+			model = glm::translate(model, newPos);
+			model = glm::scale(model, glm::vec3(0.5f));
+			PBRTextureShader.setMat4("model", model);
+			PBRTextureShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+			Cube.Draw(PBRTextureShader);
+		}
 
-		// Light stuff
-
-		lightingShader.setVec3("dirLight.direction", glm::vec3(0.3f, -0.5f, 0.3f));
-		lightingShader.setVec3("dirLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
-		lightingShader.setVec3("dirLight.diffuse", glm::vec3(0.3f, 0.3f, 0.3f));
-		lightingShader.setVec3("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-
-		lightingShader.setVec3("pointLights[0].position", pointLightPositions[0] * 10.0f);
-		lightingShader.setVec3("pointLights[0].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3("pointLights[0].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3("pointLights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-
-		lightingShader.setFloat("pointLights[0].constant", 1.0f);
-		lightingShader.setFloat("pointLights[0].linear", 0.09f);
-		lightingShader.setFloat("pointLights[0].quadratic", 0.032f);
-
-		lightingShader.setVec3("pointLights[1].position", pointLightPositions[1] * 10.0f);
-		lightingShader.setVec3("pointLights[1].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3("pointLights[1].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3("pointLights[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-
-		lightingShader.setFloat("pointLights[1].constant", 1.0f);
-		lightingShader.setFloat("pointLights[1].linear", 0.09f);
-		lightingShader.setFloat("pointLights[1].quadratic", 0.032f);
-
-		lightingShader.setVec3("pointLights[2].position", pointLightPositions[2] * 10.0f);
-		lightingShader.setVec3("pointLights[2].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3("pointLights[2].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3("pointLights[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-
-		lightingShader.setFloat("pointLights[2].constant", 1.0f);
-		lightingShader.setFloat("pointLights[2].linear", 0.09f);
-		lightingShader.setFloat("pointLights[2].quadratic", 0.032f);
-
-		lightingShader.setVec3("pointLights[3].position", pointLightPositions[3] * 10.0f);
-		lightingShader.setVec3("pointLights[3].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3("pointLights[3].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShader.setVec3("pointLights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-
-		lightingShader.setFloat("pointLights[3].constant", 1.0f);
-		lightingShader.setFloat("pointLights[3].linear", 0.09f);
-		lightingShader.setFloat("pointLights[3].quadratic", 0.032f);
+		PBRTextureShader.setMat4("model", glm::mat4(1.0f));
+		Rat.Draw(PBRTextureShader);
 
 		//sorted.clear();
 
@@ -409,32 +408,28 @@ void OGLSystem::Run()
 		//	lightingShader.setMat4("model", it->second);
 		//	backpack.Draw(lightingShader);
 		//}
-		explosionGeometryShader.Use();
 
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
-		explosionGeometryShader.setMat4("model", model);
-		explosionGeometryShader.setMat4("view", view);
-		explosionGeometryShader.setMat4("projection", projection);
-		explosionGeometryShader.setVec3("cameraPos", camera->GetPosition());
+		//glm::mat4 model = glm::mat4(1.0f);
+		//model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		//blinnPhongShader.setVec3("cameraPos", camera->GetPosition());
 
-		explosionGeometryShader.setFloat("time", glfwGetTime());
+		////blinnPhongShader.setFloat("time", glfwGetTime());
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap.textureID);
-		planet.Draw(explosionGeometryShader);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap.textureID);
+		//planet.Draw(blinnPhongShader);
 
-		normals.Use();
-		normals.setMat4("model", model);
-		normals.setMat4("view", view);
-		normals.setMat4("projection", projection);
-		normals.setVec3("cameraPos", camera->GetPosition());
+		//normals.Use();
+		//normals.setMat4("model", model);
+		//normals.setMat4("view", view);
+		//normals.setMat4("projection", projection);
+		//normals.setVec3("cameraPos", camera->GetPosition());
 
-		planet.Draw(normals);
+		//planet.Draw(normals);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, DiffuseAsteroid);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, DiffuseAsteroid);
 
 		// draw meteorites
 		//for (unsigned int i = 0; i < amount; i++)
@@ -444,57 +439,32 @@ void OGLSystem::Run()
 		//}
 
 
-		lightingShaderInstancing.Use();
+		PBRInstancedShader.Use();
 
-		lightingShaderInstancing.setMat4("projection", projection);
-		lightingShaderInstancing.setMat4("view", view);
-		lightingShaderInstancing.setVec3("viewPos", camera->GetPosition());
+		PBRShader.setMat4("view", view);
+		PBRShader.setMat4("projection", projection);
 
+		PBRShader.setVec3("albedo", glm::vec3(1.0f, 1.0f, 1.0f));
+		PBRShader.setFloat("metallic", 0.5f);
+		PBRShader.setFloat("ao", 1.0f);
+		PBRShader.setFloat("roughness", 0.5f);
 
-		lightingShaderInstancing.setInt("material.diffuse", 0);
-		lightingShaderInstancing.setInt("material.specular", 1);
-		lightingShaderInstancing.setFloat("material.shininess", 32.0f);
+		PBRShader.setVec3("camPos", camera->GetPosition());
 
-		lightingShaderInstancing.setVec3("dirLight.direction", glm::vec3(0.3f, -0.5f, 0.3f));
-		lightingShaderInstancing.setVec3("dirLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
-		lightingShaderInstancing.setVec3("dirLight.diffuse", glm::vec3(0.3f, 0.3f, 0.3f));
-		lightingShaderInstancing.setVec3("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
+		{
+			glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
+			newPos = lightPositions[i];
+			PBRShader.setVec3(std::string("lightPositions[" + std::to_string(i) + "]").c_str(), newPos);
+			PBRShader.setVec3(std::string("lightColors[" + std::to_string(i) + "]").c_str(), lightColors[i]);
 
-		lightingShaderInstancing.setVec3("pointLights[0].position", pointLightPositions[0] * 10.0f);
-		lightingShaderInstancing.setVec3("pointLights[0].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3("pointLights[0].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3("pointLights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-
-		lightingShaderInstancing.setFloat("pointLights[0].constant", 1.0f);
-		lightingShaderInstancing.setFloat("pointLights[0].linear", 0.09f);
-		lightingShaderInstancing.setFloat("pointLights[0].quadratic", 0.032f);
-
-		lightingShaderInstancing.setVec3("pointLights[1].position", pointLightPositions[1] * 10.0f);
-		lightingShaderInstancing.setVec3("pointLights[1].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3("pointLights[1].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3("pointLights[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-
-		lightingShaderInstancing.setFloat("pointLights[1].constant", 1.0f);
-		lightingShaderInstancing.setFloat("pointLights[1].linear", 0.09f);
-		lightingShaderInstancing.setFloat("pointLights[1].quadratic", 0.032f);
-
-		lightingShaderInstancing.setVec3("pointLights[2].position", pointLightPositions[2] * 10.0f);
-		lightingShaderInstancing.setVec3("pointLights[2].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3("pointLights[2].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3("pointLights[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-
-		lightingShaderInstancing.setFloat("pointLights[2].constant", 1.0f);
-		lightingShaderInstancing.setFloat("pointLights[2].linear", 0.09f);
-		lightingShaderInstancing.setFloat("pointLights[2].quadratic", 0.032f);
-
-		lightingShaderInstancing.setVec3("pointLights[3].position", pointLightPositions[3] * 10.0f);
-		lightingShaderInstancing.setVec3("pointLights[3].ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3("pointLights[3].diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		lightingShaderInstancing.setVec3("pointLights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-
-		lightingShaderInstancing.setFloat("pointLights[3].constant", 1.0f);
-		lightingShaderInstancing.setFloat("pointLights[3].linear", 0.09f);
-		lightingShaderInstancing.setFloat("pointLights[3].quadratic", 0.032f);
+			//auto model = glm::mat4(1.0f);
+			//model = glm::translate(model, newPos);
+			//model = glm::scale(model, glm::vec3(0.5f));
+			//PBRShader.setMat4("model", model);
+			//PBRShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+			//Cube.Draw(PBRShader);
+		}
 
 		for (unsigned int i = 0; i < asteroid.GetMeshCount(); i++)
 		{

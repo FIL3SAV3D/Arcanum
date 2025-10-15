@@ -24,8 +24,11 @@ public:
 	void setBool	(const char* _name, const bool&		 _value) const;
 	void setInt		(const char* _name, const int&		 _value) const;
 	void setFloat	(const char* _name, const float&	 _value) const;
+
 	void setVec3	(const char* _name, const glm::vec3& _value) const;
 	void setVec4	(const char* _name, const glm::vec4& _value) const;
+
+	void setMat3	(const char* _name, const glm::mat3& _value) const;
 	void setMat4	(const char* _name, const glm::mat4& _value) const;
 
 protected:
