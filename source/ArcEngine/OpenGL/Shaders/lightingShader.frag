@@ -103,5 +103,5 @@ void main()
 
     FragColor = vec4(result, alpha);
 
-    //FragColor = vec4(vec3(LinearizeDepth(gl_FragCoord.z) / 500), 1.0);
+    FragColor = vec4(vec3(LinearizeDepth(gl_FragCoord.z) / 500), 1.0);
 }

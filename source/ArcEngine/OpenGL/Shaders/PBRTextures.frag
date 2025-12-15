@@ -19,6 +19,16 @@ uniform vec3 camPos;
 
 const float PI = 3.14159265359;
   
+float near = 0.1; 
+float far  = 1000.0; 
+
+float LinearizeDepth(float depth) 
+{
+    float z = depth * 2.0 - 1.0; // back to NDC 
+    return (2.0 * near * far) / (far + near - z * (far - near));	
+}
+
+  
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float a      = roughness*roughness;
@@ -110,4 +120,5 @@ void main()
     color = pow(color, vec3(1.0/2.2));  
    
     FragColor = vec4(color, alpha);
+    FragColor = vec4(vec3(LinearizeDepth(gl_FragCoord.z) / 500), 1.0);
 }
