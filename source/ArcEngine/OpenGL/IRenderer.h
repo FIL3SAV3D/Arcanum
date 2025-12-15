@@ -5,5 +5,5 @@
 class IRenderer
 {
 public:
-	virtual void RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view) = 0;
+	virtual void RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition) = 0;
 };

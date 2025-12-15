@@ -77,15 +77,15 @@ void OGLSystem::Run()
 		directory = currentPath.substr(0, last_slash_idx);
 	}
 
-	Model backpack = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
+	//Model backpack = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
 
-	Model Rat = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
+	//Model Rat = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
 
-	Model invertedCube = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\InvertedCube.fbx").c_str());
-	Model Cube = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
+	//Model invertedCube = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\InvertedCube.fbx").c_str());
+	//Model Cube = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
 
-	Model planet = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\planet.obj").c_str());
-	Model asteroid = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\rock.obj").c_str());
+	//Model planet = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\planet.obj").c_str());
+	//Model asteroid = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\rock.obj").c_str());
 
 	unsigned int amount = 100000;
 	glm::mat4* modelMatrices;
@@ -184,13 +184,13 @@ void OGLSystem::Run()
 	};
 
 	//unsigned int Diffuse = TextureFromFile("rock.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\");
-	unsigned int DiffuseAsteroid = TextureFromFile("rock.png", directory + "\\Arcanum\\Data\\Models\\OpenGL\\");
-	unsigned int Specular = TextureFromFile("container2_specular.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
-	unsigned int Grass = TextureFromFile("blending_transparent_window.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
+	//unsigned int DiffuseAsteroid = TextureFromFile("rock.png", directory + "\\Arcanum\\Data\\Models\\OpenGL\\");
+	//unsigned int Specular = TextureFromFile("container2_specular.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
+	//unsigned int Grass = TextureFromFile("blending_transparent_window.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
 
-	unsigned int BC = TextureFromFile("T_Rat_BC.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
-	unsigned int N = TextureFromFile("T_Rat_N.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
-	unsigned int ORM = TextureFromFile("T_Rat_ORM.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
+	//unsigned int BC = TextureFromFile("T_Rat_BC.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
+	//unsigned int N = TextureFromFile("T_Rat_N.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
+	//unsigned int ORM = TextureFromFile("T_Rat_ORM.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
 	
 	Cubemap cubemap{"TestCubeMap"};
 
@@ -288,28 +288,28 @@ void OGLSystem::Run()
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
 
-	for (unsigned int i = 0; i < asteroid.GetMeshCount(); i++)
-	{
-		unsigned int VAO = asteroid.GetMeshes()->at(i).GetVAO();
-		glBindVertexArray(VAO);
-		// vertex attributes
-		std::size_t vec4Size = sizeof(glm::vec4);
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
-		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
-		glEnableVertexAttribArray(5);
-		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
-		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+	//for (unsigned int i = 0; i < asteroid.GetMeshCount(); i++)
+	//{
+	//	unsigned int VAO = asteroid.GetMeshes()->at(i).GetVAO();
+	//	glBindVertexArray(VAO);
+	//	// vertex attributes
+	//	std::size_t vec4Size = sizeof(glm::vec4);
+	//	glEnableVertexAttribArray(3);
+	//	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+	//	glEnableVertexAttribArray(4);
+	//	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
+	//	glEnableVertexAttribArray(5);
+	//	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+	//	glEnableVertexAttribArray(6);
+	//	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
 
-		glVertexAttribDivisor(3, 1);
-		glVertexAttribDivisor(4, 1);
-		glVertexAttribDivisor(5, 1);
-		glVertexAttribDivisor(6, 1);
+	//	glVertexAttribDivisor(3, 1);
+	//	glVertexAttribDivisor(4, 1);
+	//	glVertexAttribDivisor(5, 1);
+	//	glVertexAttribDivisor(6, 1);
 
-		glBindVertexArray(0);
-	}
+	//	glBindVertexArray(0);
+	//}
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -334,7 +334,7 @@ void OGLSystem::Run()
 	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
 
 	std::shared_ptr<DeferredRenderer> renderer = std::make_shared<DeferredRenderer>();
-	renderer->Initialize(screenHeight, screenWidth);
+	renderer->Initialize(screenWidth, screenHeight);
 
 	while (!glfwWindowShouldClose(sptr_OGLWindow->GetWindow()))
 	{
@@ -357,25 +357,25 @@ void OGLSystem::Run()
 
 		camera->Update(deltaTime);
 
-		renderer->RenderSceneCB(camera->GetProjectionMatrix(), camera->GetViewMatrix());
+		renderer->RenderSceneCB(camera->GetProjectionMatrix(), camera->GetViewMatrix(), camera->GetPosition());
 
-		// Imgui begin render
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		//// Imgui begin render
+		//ImGui_ImplOpenGL3_NewFrame();
+		//ImGui_ImplGlfw_NewFrame();
+		//ImGui::NewFrame();
 
-		ImGui::SetNextWindowSize(ImVec2(screenWidth, 100));
-		ImGui::SetNextWindowPos(ImVec2(0, 0));
-		ImGui::Begin("Debug Menu", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
-		ImGui::Button("Spawn asteroid");
-		ImGui::Button("Spawn planet");
-		ImGui::End();
+		//ImGui::SetNextWindowSize(ImVec2(screenWidth, 100));
+		//ImGui::SetNextWindowPos(ImVec2(0, 0));
+		//ImGui::Begin("Debug Menu", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
+		//ImGui::Button("Spawn asteroid");
+		//ImGui::Button("Spawn planet");
+		//ImGui::End();
 
-		//ImGui::ShowDemoWindow();
+		////ImGui::ShowDemoWindow();
 
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		// Imgui end render
+		//ImGui::Render();
+		//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		//// Imgui end render
 
 
 		// Check and call events and swap buffers

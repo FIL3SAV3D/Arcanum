@@ -68,7 +68,7 @@ void ShaderTemplate::CreateShader(const char* _vertexShaderPath, const char* _fr
 	}
 
 	std::string shaderSearchPath;
-	shaderSearchPath.append("D:\\PersonalProjects");
+	shaderSearchPath.append("F:\\PersonalProjects");
 	shaderSearchPath.append("\\Arcanum");
 	shaderSearchPath.append("\\source\\ArcEngine\\OpenGL\\Shaders\\");
 

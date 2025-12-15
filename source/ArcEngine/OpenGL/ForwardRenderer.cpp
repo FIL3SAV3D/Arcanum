@@ -1,7 +1,7 @@
 #include "ForwardRenderer.h"
 #include <glm/ext/vector_float3.hpp>
 
-void ForwardRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view)
+void ForwardRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition)
 {
 	//// Rendering commands
 	//frameBuffer->Bind();

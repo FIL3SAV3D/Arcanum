@@ -20,12 +20,19 @@ public:
 	std::shared_ptr<Shader> m_gBufferShader;
 	std::shared_ptr<Shader> m_screenShader;
 
+	std::shared_ptr<Shader> m_debugScreenNormalShader;
+	std::shared_ptr<Shader> m_debugScreenPositionShader;
+	std::shared_ptr<Shader> m_debugScreenDiffuseShader;
+
 	std::shared_ptr<Model> m_RatModel;
 
 	unsigned int quadVAO, quadVBO;
 
+	unsigned int BC;
 
+	std::vector<glm::vec3> lightPositions;
+	std::vector<glm::vec3> lightColors;
 
 	// Inherited via IRenderer
-	void RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view) override;
+	void RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition) override;
 };

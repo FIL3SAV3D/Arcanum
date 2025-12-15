@@ -5,5 +5,5 @@
 class ForwardRenderer : public IRenderer
 {
 	// Inherited via IRenderer
-	void RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view) override;
+	void RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition) override;
 };
