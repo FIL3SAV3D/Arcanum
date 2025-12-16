@@ -12,6 +12,7 @@
 class Camera;
 class iInputListener;
 class FrameBuffer;
+class IRenderer;
 
 struct GLFWwindow;
 
@@ -38,6 +39,8 @@ private:
 	std::shared_ptr<Camera> camera = nullptr;
 
 	std::shared_ptr<FrameBuffer> frameBuffer;
+
+	std::shared_ptr<IRenderer> renderer;
 private:
 	int screenWidth;
 	int screenHeight;

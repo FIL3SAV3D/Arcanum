@@ -31,8 +31,8 @@
 
 OGLSystem::OGLSystem()
 {
-	screenWidth = 800;
-	screenHeight = 600;
+	screenWidth = 1200;
+	screenHeight = 800;
 	sptr_OGLWindow		= std::make_shared<OGLWindow>(screenWidth, screenHeight, windowName);
 	inputHandler = std::make_shared<InputHandler>();
 }
@@ -90,7 +90,7 @@ void OGLSystem::Run()
 	unsigned int amount = 100000;
 	glm::mat4* modelMatrices;
 	modelMatrices = new glm::mat4[amount];
-	srand(glfwGetTime()); // initialize random seed	
+	srand(static_cast<unsigned int>(glfwGetTime())); // initialize random seed	
 	float radius = 100.0f;
 	float offset = 50.0f;
 	for (unsigned int i = 0; i < amount; i++)
@@ -107,7 +107,7 @@ void OGLSystem::Run()
 		model = glm::translate(model, glm::vec3(x, y, z));
 
 		// 2. scale: scale between 0.05 and 0.25f
-		float scale = (rand() % 20) / 100.0f + 0.05;
+		float scale = static_cast<float>((rand() % 20) / 100.0f + 0.05);
 		model = glm::scale(model, glm::vec3(scale));
 
 		// 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
@@ -240,7 +240,7 @@ void OGLSystem::Run()
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-	glEnable(GL_MULTISAMPLE);
+	//glEnable(GL_MULTISAMPLE);
 
 	//glEnable(GL_FRAMEBUFFER_SRGB);
 
@@ -333,8 +333,8 @@ void OGLSystem::Run()
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
 
-	std::shared_ptr<DeferredRenderer> renderer = std::make_shared<DeferredRenderer>();
-	renderer->Initialize(screenWidth, screenHeight);
+	renderer = std::make_shared<DeferredRenderer>();
+	renderer->Initialize(glm::vec2(screenWidth, screenHeight));
 
 	while (!glfwWindowShouldClose(sptr_OGLWindow->GetWindow()))
 	{
@@ -411,7 +411,7 @@ void OGLSystem::FrameBufferSizeCallback(GLFWwindow* _window, int _width, int _he
 		ptr->camera->screenHeight = _height;
 	}
 
-	ptr->frameBuffer->Resize(glm::vec2(_width, _height));
+	ptr->renderer->Resize(glm::vec2(_width, _height));
 
 	glViewport(0, 0, _width, _height);
 }

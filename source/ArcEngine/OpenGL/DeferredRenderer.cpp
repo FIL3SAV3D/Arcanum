@@ -4,42 +4,44 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_transform.hpp>
 
-void DeferredRenderer::Initialize(const int& screen_width, const int& screen_height)
+void DeferredRenderer::Initialize(const glm::vec2& _size)
 {
 	m_gBuffer = std::make_shared<GBuffer>();
-	m_gBuffer->Init(screen_width, screen_height);
+	m_gBuffer->Create(_size);
 
 	m_gBufferShader = std::make_shared<Shader>("DSGeometry");
 	m_gBufferShader->Use();
 	m_gBufferShader->setInt("texture_diffuse1", 0);
+	m_gBufferShader->setInt("texture_normal1", 1);
+	m_gBufferShader->setInt("texture_ORM1", 2);
 
 	m_screenShader = std::make_shared<Shader>("DSToScreen.vert", "DSToScreen.frag");
+	m_screenDebugShader = std::make_shared<Shader>("DSToScreen.vert", "DSToScreenDEBUG.frag");
 
-	m_debugScreenNormalShader = std::make_shared<Shader>("DSToScreen.vert", "DSToScreenNormals.frag");
-	m_debugScreenDiffuseShader = std::make_shared<Shader>("DSToScreen.vert", "DSToScreenDiffuse.frag");
-	m_debugScreenPositionShader = std::make_shared<Shader>("DSToScreen.vert", "DSToScreenPosition.frag");
+	m_shaderLightBox = std::make_shared<Shader>("ShaderLightBox");
+
+	m_PPSVerticalBlur   = std::make_shared<Shader>("DSPostProcessBase.vert", "DSVerticalBlur.frag");
+	m_PPSHorizontalBlur = std::make_shared<Shader>("DSPostProcessBase.vert", "DSHorizontalBlur.frag");
+	m_PPSExtractBrightness = std::make_shared<Shader>("DSPostProcessBase.vert", "DSExtractBrightness.frag");
+	m_PPSBlend = std::make_shared<Shader>("DSPostProcessBase.vert", "DSBlend.frag");
+
+	m_screenDebugShader->Use();
+	m_screenDebugShader->setInt("gPosition", 0);
+	m_screenDebugShader->setInt("gNormal", 1);
+	m_screenDebugShader->setInt("gAlbedo", 2);
+	m_screenDebugShader->setInt("gORM", 3);
+	m_screenDebugShader->setInt("gDepth", 4);
+	m_screenDebugShader->setInt("gCombined", 5);
 
 	m_screenShader->Use();
 	m_screenShader->setInt("gPosition", 0);
 	m_screenShader->setInt("gNormal", 1);
-	m_screenShader->setInt("gAlbedoSpec", 2);
+	m_screenShader->setInt("gAlbedo", 2);
+	m_screenShader->setInt("gORM", 3);
+	m_screenShader->setInt("gDepth", 4);
 
-	m_debugScreenNormalShader->Use();
-	m_debugScreenNormalShader->setInt("gPosition", 0);
-	m_debugScreenNormalShader->setInt("gNormal", 1);
-	m_debugScreenNormalShader->setInt("gAlbedoSpec", 2);
-
-	m_debugScreenDiffuseShader->Use();
-	m_debugScreenDiffuseShader->setInt("gPosition", 0);
-	m_debugScreenDiffuseShader->setInt("gNormal", 1);
-	m_debugScreenDiffuseShader->setInt("gAlbedoSpec", 2);
-	
-	m_debugScreenPositionShader->Use();
-	m_debugScreenPositionShader->setInt("gPosition", 0);
-	m_debugScreenPositionShader->setInt("gNormal", 1);
-	m_debugScreenPositionShader->setInt("gAlbedoSpec", 2);
-
-	m_RatModel = std::make_shared<Model>(std::string("F:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\rock.obj").c_str());
+	m_RatModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
+	m_cubeModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Source\\ArcEngine\\Models\\obj_models\\cube.obj").c_str());
 
 	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
 		// positions   // texCoords
@@ -73,13 +75,15 @@ void DeferredRenderer::Initialize(const int& screen_width, const int& screen_hei
 		float zPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
 		lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
 		// also calculate random color
-		float rColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
-		float gColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
-		float bColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
+		float rColor = static_cast<float>(((rand() % 200) / 100.0f)); // between 0.5 and 1.0
+		float gColor = static_cast<float>(((rand() % 200) / 100.0f)); // between 0.5 and 1.0
+		float bColor = static_cast<float>(((rand() % 200) / 100.0f)); // between 0.5 and 1.0
 		lightColors.push_back(glm::vec3(rColor, gColor, bColor));
 	}
 
-	BC = TextureFromFile("rock.png", "F:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\");
+	BC = TextureFromFile("T_Rat_BC.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
+	N = TextureFromFile("T_Rat_N.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
+	ORM = TextureFromFile("T_Rat_ORM.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
 }
 
 void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition)
@@ -102,6 +106,10 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, BC);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, N);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, ORM);
 	
 	for (int i = 0; i < 4; i++)
 	{
@@ -117,6 +125,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	glDisable(GL_DEPTH_TEST);
 
 	m_gBuffer->BindForReading();
+	glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer->output_FBOs[0].fbo);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	m_screenShader->Use();
@@ -125,7 +134,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 		m_screenShader->setVec3(std::string("lights[" + std::to_string(i) + "].Position").c_str(), lightPositions[i]);
 		m_screenShader->setVec3(std::string("lights[" + std::to_string(i) + "].Color").c_str(), lightColors[i]);
 		// update attenuation parameters and calculate radius
-		const float linear = 0.7f;
+		const float linear = 2.0f;
 		const float quadratic = 1.8f;
 		m_screenShader->setFloat(std::string("lights[" + std::to_string(i) + "].Linear").c_str(), linear);
 		m_screenShader->setFloat(std::string("lights[" + std::to_string(i) + "].Quadratic").c_str(), quadratic);
@@ -136,47 +145,122 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	m_screenShader->setMat4("quad", quad);
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+	
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_gBuffer->m_gBuffer_fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_gBuffer->output_FBOs[0].fbo);
+	glBlitFramebuffer(
+		0, 0, static_cast<int>(m_gBuffer->bufferSize.x), static_cast<int>(m_gBuffer->bufferSize.y),
+		0, 0, static_cast<int>(m_gBuffer->bufferSize.x), static_cast<int>(m_gBuffer->bufferSize.y),
+		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer->output_FBOs[0].fbo);
 
-	m_debugScreenPositionShader->Use();
-	quad = glm::mat4x4(1.0f);
-	quad = glm::translate(quad, glm::vec3(((200.0f/800.0f) - 1), (150.0f / 600.0f) - 1.0f, 0));
-	quad = glm::scale(quad, glm::vec3(0.25f));
-	m_debugScreenPositionShader->setMat4("quad", quad);
-	glBindVertexArray(quadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-	m_debugScreenNormalShader->Use();
-	quad = glm::mat4x4(1.0f);
-	quad = glm::translate(quad, glm::vec3((-(200.0f / 800.0f)), (150.0f / 600.0f) - 1.0f, 0));
-	quad = glm::scale(quad, glm::vec3(0.25f));
-	m_debugScreenNormalShader->setMat4("quad", quad);
-	glBindVertexArray(quadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-	m_debugScreenDiffuseShader->Use();
-	quad = glm::mat4x4(1.0f);
-	quad = glm::translate(quad, glm::vec3(((200.0f / 800.0f)), (150.0f / 600.0f) - 1.0f, 0));
-	quad = glm::scale(quad, glm::vec3(0.25f));
-	m_debugScreenDiffuseShader->setMat4("quad", quad);
-	glBindVertexArray(quadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-	m_screenShader->Use();
+	// Light Rendering Using Forward Rendering
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	m_shaderLightBox->Use();
+	m_shaderLightBox->setMat4("projection", projection);
+	m_shaderLightBox->setMat4("view", view);
+	auto model = glm::mat4x4(1.0f);
 	for (unsigned int i = 0; i < lightPositions.size(); i++)
 	{
-		m_screenShader->setVec3(std::string("lights[" + std::to_string(i) + "].Position").c_str(), lightPositions[i]);
-		m_screenShader->setVec3(std::string("lights[" + std::to_string(i) + "].Color").c_str(), lightColors[i]);
-		// update attenuation parameters and calculate radius
-		const float linear = 0.7f;
-		const float quadratic = 1.8f;
-		m_screenShader->setFloat(std::string("lights[" + std::to_string(i) + "].Linear").c_str(), linear);
-		m_screenShader->setFloat(std::string("lights[" + std::to_string(i) + "].Quadratic").c_str(), quadratic);
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPositions[i]);
+		model = glm::scale(model, glm::vec3(0.25f));
+		m_shaderLightBox->setMat4("model", model);
+		m_shaderLightBox->setVec3("lightColor", lightColors[i]);
+		m_cubeModel->Draw(*m_shaderLightBox);
 	}
-	m_screenShader->setVec3("viewPos", cameraPosition);
-	quad = glm::mat4x4(1.0f);
-	quad = glm::translate(quad, glm::vec3((1 - (200.0f / 800.0f)), (150.0f / 600.0f) - 1.0f, 0));
-	quad = glm::scale(quad, glm::vec3(0.25f));
-	m_screenShader->setMat4("quad", quad);
-	glBindVertexArray(quadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDisable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
+
+	// Copy the Framebuffer to texture
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_gBuffer->output_FBOs[0].fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_gBuffer->m_gBuffer_fbo);
+	m_gBuffer->SetActiveTexture(GBuffer::GBUFFER_TEXTURE_TYPE_COMBINED);
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, 0, 0, static_cast<int>(m_gBuffer->bufferSize.x), static_cast<int>(m_gBuffer->bufferSize.y), 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//// Post Process
+	//// Extract Brightness
+	//m_gBuffer->CycleOutputFBO();
+	//m_PPSExtractBrightness->Use();
+	//m_gBuffer->CycleOutputFBO();
+	//quad = glm::mat4x4(1.0f);
+	//m_PPSExtractBrightness->setMat4("quad", quad);
+	//glBindVertexArray(quadVAO);
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//// Horizontal Blur
+	//m_PPSHorizontalBlur->Use();
+	//m_gBuffer->CycleOutputFBO();
+	//quad = glm::mat4x4(1.0f);
+	//m_PPSHorizontalBlur->setMat4("quad", quad);
+	//glBindVertexArray(quadVAO);
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//// Vertical Blur
+	//m_PPSVerticalBlur->Use();
+	//m_gBuffer->CycleOutputFBO();
+	//quad = glm::mat4x4(1.0f);
+	//m_PPSVerticalBlur->setMat4("quad", quad);
+	//glBindVertexArray(quadVAO);
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//// Blend
+	//m_gBuffer->CycleOutputFBO();
+	//m_PPSBlend->Use();
+	//m_gBuffer->CycleOutputFBO();
+	//quad = glm::mat4x4(1.0f);
+	//m_PPSBlend->setMat4("quad", quad);
+	//glBindVertexArray(quadVAO);
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	
+
+	// Render to Screen
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_gBuffer->output_FBOs[m_gBuffer->output_FBO_Current].fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(
+		0, 0, static_cast<int>(m_gBuffer->bufferSize.x), static_cast<int>(m_gBuffer->bufferSize.y),
+		0, 0, static_cast<int>(m_gBuffer->bufferSize.x), static_cast<int>(m_gBuffer->bufferSize.y), GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// Debug View
+	m_gBuffer->BindForReading();
+
+	const float screenwidth = m_gBuffer->bufferSize.x;
+	const float screenheight = m_gBuffer->bufferSize.y;
+
+	float bufferSegments = (sizeof(m_gBuffer->m_gBuffer_textures) / sizeof(m_gBuffer->m_gBuffer_textures[0]));
+	float segment = (screenwidth / bufferSegments) / screenwidth;
+ 	float segmentHeight = (screenheight * segment) / screenheight;
+
+	for (unsigned int i = 0; i < bufferSegments; i++)
+	{
+		m_screenDebugShader->Use();
+		m_screenDebugShader->setFloat("DebugPosition"	, i == 0);
+		m_screenDebugShader->setFloat("DebugNormal"		, i == 1);
+		m_screenDebugShader->setFloat("DebugAlbedo"		, i == 2);
+		m_screenDebugShader->setFloat("DebugORM"		, i == 3);
+		m_screenDebugShader->setFloat("DebugDepth"		, i == 4);
+		m_screenDebugShader->setFloat("DebugCombined"	, i == 5);
+
+		quad = glm::mat4x4(1.0f);
+		quad = glm::translate(quad, glm::vec3(segment + (segment * 2.0f * (i)) - 1.0f, segmentHeight - 1.0f, 0));
+		quad = glm::scale(quad, glm::vec3(segment));
+		m_screenDebugShader->setMat4("quad", quad);
+		glBindVertexArray(quadVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
+
+}
+
+void DeferredRenderer::Resize(const glm::vec2& _size)
+{
+	m_gBuffer->Destroy();
+	m_gBuffer->Create(_size);
 }

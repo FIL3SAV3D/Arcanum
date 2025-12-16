@@ -12,5 +12,5 @@ uniform sampler2D gORM;
 
 void main()
 { 
-    FragColor = vec4(texture(gNormal, TexCoords).rgb, 1.0);
+    FragColor = vec4(texture(gAlbedo, TexCoords).rgb, 1.0);
 }
