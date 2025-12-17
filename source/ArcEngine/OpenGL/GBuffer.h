@@ -32,9 +32,6 @@ public:
     void SetReadBuffer(GBUFFER_TEXTURE_TYPE TextureType);
     void SetActiveTexture(GBUFFER_TEXTURE_TYPE TextureType);
 
-    void CycleOutputFBO();
-    void GetActiveOutputFBO();
-
     glm::vec2 bufferSize;
 
     unsigned int m_gBuffer_fbo;

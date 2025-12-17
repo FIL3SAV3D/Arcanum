@@ -5,7 +5,9 @@
 
 struct Vertex
 {
-	glm::vec3 position{};
-	glm::vec3 normal{};
-	glm::vec2 texCoords{};
+	glm::vec3 aPosition{};
+	glm::vec3 aNormal{};
+	glm::vec2 aTexCoords{};
+	glm::vec3 aTangent{};
+	glm::vec3 aBiTangent{};
 };

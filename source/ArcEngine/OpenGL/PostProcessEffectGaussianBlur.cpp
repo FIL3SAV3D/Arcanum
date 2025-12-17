@@ -12,12 +12,12 @@ PostProcessEffectGaussianBlur::PostProcessEffectGaussianBlur()
 	m_PPSVerticalBlur->Use();
 	m_PPSVerticalBlur->setInt("gScene", 0);
 	m_PPSVerticalBlur->setInt("customInput01", 1);
-	m_PPSVerticalBlur->setInt("customInput02", 2);
+	//m_PPSVerticalBlur->setInt("customInput02", 2);
 
 	m_PPSHorizontalBlur->Use();
 	m_PPSHorizontalBlur->setInt("gScene", 0);
 	m_PPSHorizontalBlur->setInt("customInput01", 1);
-	m_PPSHorizontalBlur->setInt("customInput02", 2);
+	//m_PPSHorizontalBlur->setInt("customInput02", 2);
 }
 
 PostProcessEffectGaussianBlur::~PostProcessEffectGaussianBlur()

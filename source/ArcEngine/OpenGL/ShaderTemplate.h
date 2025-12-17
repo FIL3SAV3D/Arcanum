@@ -25,6 +25,7 @@ public:
 	void setInt		(const char* _name, const int&		 _value) const;
 	void setFloat	(const char* _name, const float&	 _value) const;
 
+	void setVec2	(const char* _name, const glm::vec2& _value) const;
 	void setVec3	(const char* _name, const glm::vec3& _value) const;
 	void setVec4	(const char* _name, const glm::vec4& _value) const;
 

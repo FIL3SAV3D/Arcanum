@@ -68,9 +68,6 @@ bool GBuffer::Create(const glm::vec2& _size)
     return true;
 }
 
-
-
-
 void GBuffer::Destroy()
 {
     if (m_gBuffer_fbo != 0) {
@@ -114,9 +111,4 @@ void GBuffer::SetActiveTexture(GBUFFER_TEXTURE_TYPE TextureType)
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_gBuffer_textures[TextureType]);
-}
-
-void GBuffer::CycleOutputFBO()
-{
-    
 }

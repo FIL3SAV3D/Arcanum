@@ -17,15 +17,14 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 	m_gBufferShader->setInt("texture_normal1", 1);
 	m_gBufferShader->setInt("texture_ORM1", 2);
 
+	m_houseShader = std::make_shared<Shader>("DSGeometry.vert", "DSHouseGEO.frag");
+	m_houseShader->Use();
+	m_houseShader->setInt("texture_diffuse1", 0);
+
 	m_screenShader = std::make_shared<Shader>("DSToScreen.vert", "DSToScreen.frag");
 	m_screenDebugShader = std::make_shared<Shader>("DSToScreen.vert", "DSToScreenDEBUG.frag");
 
 	m_shaderLightBox = std::make_shared<Shader>("ShaderLightBox");
-
-	m_PPSVerticalBlur   = std::make_shared<Shader>("DSPostProcessBase.vert", "DSVerticalBlur.frag");
-	m_PPSHorizontalBlur = std::make_shared<Shader>("DSPostProcessBase.vert", "DSHorizontalBlur.frag");
-	m_PPSExtractBrightness = std::make_shared<Shader>("DSPostProcessBase.vert", "DSExtractBrightness.frag");
-	m_PPSBlend = std::make_shared<Shader>("DSPostProcessBase.vert", "DSBlend.frag");
 
 	m_screenDebugShader->Use();
 	m_screenDebugShader->setInt("gPosition", 0);
@@ -47,6 +46,11 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 
 	m_RatModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
 	m_cubeModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Source\\ArcEngine\\Models\\obj_models\\cube.obj").c_str());
+
+	m_houseModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\american_house_MARK_2.fbx").c_str());
+
+
+	
 
 	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
 		// positions   // texCoords
@@ -71,8 +75,8 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 
 	const unsigned int NR_LIGHTS = 32;
 	
-	srand(13);
-	for (unsigned int i = 0; i < NR_LIGHTS; i++)
+	srand(9);
+	for (unsigned int i = 0; i < NR_LIGHTS - 1; i++)
 	{
 		// calculate slightly random offsets
 		float xPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
@@ -80,18 +84,25 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 		float zPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
 		lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
 		// also calculate random color
-		float rColor = static_cast<float>((rand() % 80)); // between 0.5 and 1.0
-		float gColor = static_cast<float>((rand() % 80)); // between 0.5 and 1.0
-		float bColor = static_cast<float>((rand() % 80)); // between 0.5 and 1.0
+		float rColor = static_cast<float>((rand() % 100) / 100.0f); // between 0.5 and 1.0
+		float gColor = static_cast<float>((rand() % 100) / 100.0f); // between 0.5 and 1.0
+		float bColor = static_cast<float>((rand() % 100) / 100.0f); // between 0.5 and 1.0
 		lightColors.push_back(glm::vec3(rColor, gColor, bColor));
 	}
+
+	lightPositions.push_back(glm::vec3(0.0f, 10.0f, 0.0f));
+	lightColors.push_back(glm::vec3(1000.0f, 1000.0f, 1000.0f));
 
 	BC = TextureFromFile("T_Rat_BC.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
 	N = TextureFromFile("T_Rat_N.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
 	ORM = TextureFromFile("T_Rat_ORM.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
+
+	BC_HOUSE = TextureFromFile("american_house_DIFF.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
+	N_HOUSE = TextureFromFile("T_Rat_N.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
+	ORM_HOUSE = TextureFromFile("T_Rat_ORM.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
 }
 
-void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition, const bool& _DebugMode)
+void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition, const bool& _DebugMode, const glm::vec2& _DepthRange)
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -120,11 +131,33 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	{
 		auto model = glm::mat4x4(1.0f);
 		model = glm::translate(model, glm::vec3(0, 0, -i));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.1f));
 		m_gBufferShader->setMat4("model", model);
 		m_gBufferShader->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
 		m_RatModel->Draw(*m_gBufferShader);
 	}
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, BC_HOUSE);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	m_houseShader->Use();
+	m_houseShader->setMat4("view", view);
+	m_houseShader->setMat4("projection", projection);
+
+	auto houseModel = glm::mat4x4(1.0f);
+	houseModel = glm::translate(houseModel, glm::vec3(0, 0, 15.0f));
+	houseModel = glm::rotate(houseModel, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	houseModel = glm::scale(houseModel, glm::vec3(0.01f));
+	m_houseShader->setMat4("model", houseModel);
+	m_houseShader->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(houseModel))));
+
+	m_houseModel->Draw(*m_houseShader);
+
 	glDepthMask(GL_FALSE);
 
 	glDisable(GL_DEPTH_TEST);
@@ -192,7 +225,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 
 	if (_DebugMode)
 	{
-		DebugQuads();
+		DebugQuads(_DepthRange);
 	}
 
 }
@@ -200,10 +233,12 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 void DeferredRenderer::Resize(const glm::vec2& _size)
 {
 	m_gBuffer->Destroy();
+	m_postProcessChain->Destroy();
 	m_gBuffer->Create(_size);
+	m_postProcessChain->Create(m_gBuffer);
 }
 
-void DeferredRenderer::DebugQuads()
+void DeferredRenderer::DebugQuads(const glm::vec2& _DepthRange)
 {
 	// Debug View
 	m_gBuffer->BindForReading();
@@ -226,6 +261,8 @@ void DeferredRenderer::DebugQuads()
 		m_screenDebugShader->setFloat("DebugORM", i == 3);
 		m_screenDebugShader->setFloat("DebugDepth", i == 4);
 		m_screenDebugShader->setFloat("DebugCombined", i == 5);
+
+		m_screenDebugShader->setVec2("DebugDepthRange", _DepthRange);
 
 		quad = glm::mat4x4(1.0f);
 		quad = glm::translate(quad, glm::vec3(segment + (segment * 2.0f * (i)) - 1.0f, segmentHeight - 1.0f, 0));

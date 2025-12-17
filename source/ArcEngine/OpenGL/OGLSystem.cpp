@@ -29,6 +29,8 @@
 
 #include "DeferredRenderer.h"
 
+#include <glm/detail/type_float.hpp>
+
 OGLSystem::OGLSystem()
 {
 	screenWidth = 1200;
@@ -45,30 +47,6 @@ OGLSystem::~OGLSystem()
 
 void OGLSystem::Run()
 {
-	//Shader defaultShader("default");
-
-	//Shader lightingShader("lightingShader.vert", "lightingShader.frag");
-	//Shader lightingShaderInstancing("lightingShaderInstancing.vert", "lightingShaderInstancing.frag");
-	//Shader screenShader("screenShader.vert", "screenShader.frag");
-
-	//Shader lightCubeShader("lightCubeShader.vert", "lightCubeShader.frag");
-	//Shader outlineShader("simpleOutline.vert", "simpleOutline.frag");
-
-	//Shader envShader("envMapping.vert", "envMapping.frag");
-
-	//Shader skyboxShader("skybox.vert", "skybox.frag");
-
-	//Shader explosionGeometryShader("geoShader.vert", "geoShader.frag", "geoShader.gs");
-
-	//Shader normals("normalViewShader.vert", "normalViewShader.frag", "normalViewShader.gs");
-
-	//Shader blinnPhongShader("blinnPhong.vert", "blinnPhong.frag");
-
-	//Shader PBRShader("PBRNoTextures.vert", "PBRNoTextures.frag");
-	//Shader PBRTextureShader("PBRTextures.vert", "PBRTextures.frag");
-
-	//Shader PBRInstancedShader("PBRNoTexturesInstancing.vert", "PBRNoTexturesInstancing.frag");
-
 	std::string directory;
 	std::string currentPath = std::filesystem::current_path().string();
 	const size_t last_slash_idx = currentPath.rfind('\\');
@@ -76,16 +54,6 @@ void OGLSystem::Run()
 	{
 		directory = currentPath.substr(0, last_slash_idx);
 	}
-
-	//Model backpack = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
-
-	//Model Rat = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
-
-	//Model invertedCube = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\InvertedCube.fbx").c_str());
-	//Model Cube = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
-
-	//Model planet = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\planet.obj").c_str());
-	//Model asteroid = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\rock.obj").c_str());
 
 	unsigned int amount = 100000;
 	glm::mat4* modelMatrices;
@@ -182,15 +150,6 @@ void OGLSystem::Run()
 		glm::vec3(0.0f, 0.0f, 300.0f),
 		glm::vec3(300.0f, 300.0f, 0.0f)
 	};
-
-	//unsigned int Diffuse = TextureFromFile("rock.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\");
-	//unsigned int DiffuseAsteroid = TextureFromFile("rock.png", directory + "\\Arcanum\\Data\\Models\\OpenGL\\");
-	//unsigned int Specular = TextureFromFile("container2_specular.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
-	//unsigned int Grass = TextureFromFile("blending_transparent_window.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
-
-	//unsigned int BC = TextureFromFile("T_Rat_BC.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
-	//unsigned int N = TextureFromFile("T_Rat_N.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
-	//unsigned int ORM = TextureFromFile("T_Rat_ORM.png", directory + "\\Arcanum\\Data\\Models\\Src_Images\\");
 	
 	Cubemap cubemap{"TestCubeMap"};
 
@@ -203,18 +162,18 @@ void OGLSystem::Run()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-	// Light array
-	glGenVertexArrays(1, &lightVAO);
-	glBindVertexArray(lightVAO);
+	//// Light array
+	//glGenVertexArrays(1, &lightVAO);
+	//glBindVertexArray(lightVAO);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-	glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	//glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vertex::position)));
-	glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vertex::A)));
+	//glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vertex::position) + sizeof(Vertex::normal)));
-	glEnableVertexAttribArray(2);
+	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vertex::position) + sizeof(Vertex::normal)));
+	//glEnableVertexAttribArray(2);
 
 	// Debind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -317,24 +276,11 @@ void OGLSystem::Run()
 	ImGui::StyleColorsDark();
 	ImGui_ImplGlfw_InitForOpenGL(sptr_OGLWindow->GetWindow(), true);
 	ImGui_ImplOpenGL3_Init("#version 460");
-	
-	//frameBuffer = std::make_shared<FrameBuffer>(glm::vec2(screenWidth, screenHeight));
-	// framebuffer
-
-	/*unsigned int intermediateFBO;
-	glGenFramebuffers(1, &intermediateFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);*/
-
-	//unsigned int screenTexture;
-	//glGenTextures(1, &screenTexture);
-	//glBindTexture(GL_TEXTURE_2D, screenTexture);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
 
 	renderer = std::make_shared<DeferredRenderer>();
 	renderer->Initialize(glm::vec2(screenWidth, screenHeight));
+
+	glm::vec2 test = glm::vec2(0.0f, 1.0f);
 
 	while (!glfwWindowShouldClose(sptr_OGLWindow->GetWindow()))
 	{
@@ -347,29 +293,27 @@ void OGLSystem::Run()
 
 		timepassed += deltaTime;
 
-		if (timepassed - starttime > 0.25 && frames > 10)
+		if (timepassed - starttime > 0.10 && frames > 10)
 		{
 			fps = static_cast<float>((double)frames / (timepassed - starttime));
 			starttime = timepassed;
 			frames = 0;
-			printf("FPS: %f \n", fps);
 		}
 
 		camera->Update(deltaTime);
 
-		renderer->RenderSceneCB(camera->GetProjectionMatrix(), camera->GetViewMatrix(), camera->GetPosition(), debugMode);
+		renderer->RenderSceneCB(camera->GetProjectionMatrix(), camera->GetViewMatrix(), camera->GetPosition(), debugMode, test);
 
 		// Imgui begin render
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		//ImGui::SetNextWindowSize(ImVec2(screenWidth, 100));
-		//ImGui::SetNextWindowPos(ImVec2(0, 0));
 		if (ImGui::BeginMainMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
 			{
+				if (ImGui::MenuItem("Save", "CTRL+S")) {  }
 				if (ImGui::MenuItem("Exit", "ESCAPE")) { glfwSetWindowShouldClose(sptr_OGLWindow->GetWindow(), true); }
 				ImGui::EndMenu();
 			}
@@ -386,17 +330,18 @@ void OGLSystem::Run()
 			if (ImGui::BeginMenu("Debug"))
 			{
 				if (ImGui::Checkbox("Debug Rendering", &debugMode)) {}
+				if (ImGui::SliderFloat2("Depth Range", glm::value_ptr(test), 0.0f, 1.0f)) {}
+
 				ImGui::EndMenu();
 			}
+			if (ImGui::BeginMenu("Post Process"))
+			{
+				ImGui::EndMenu();
+			}
+			
+			ImGui::Text((std::string("FPS: ") + std::to_string(static_cast<int>(fps))).c_str());
 			ImGui::EndMainMenuBar();
 		}
-		/*ImGui::Begin("Debug Menu", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
-		if (ImGui::BeginMainMenuBar())
-		{
-			ImGui::EndMainMenuBar();
-		}
-		ImGui::Checkbox("Debug Rendering", &debugMode);
-		ImGui::End();*/
 
 		//ImGui::ShowDemoWindow();
 

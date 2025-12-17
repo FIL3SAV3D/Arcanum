@@ -9,7 +9,7 @@ class GBuffer;
 class IDeferredPostProcess;
 
 #define LIVE_FRAME_BUFFERS 2
-#define OUTPUT_FBO_CUSTOM_TEXTURE_SIZE 2
+#define OUTPUT_FBO_CUSTOM_TEXTURE_SIZE 1
 
 class DeferredPostProcessChain
 {

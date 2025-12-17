@@ -18,18 +18,15 @@ public:
 	std::shared_ptr<GBuffer> m_gBuffer;
 
 	std::shared_ptr<Shader> m_gBufferShader;
+	std::shared_ptr<Shader> m_houseShader;
 	std::shared_ptr<Shader> m_screenShader;
 	std::shared_ptr<Shader> m_screenDebugShader;
 
 	std::shared_ptr<Shader> m_shaderLightBox;
 
-	std::shared_ptr<Shader> m_PPSHorizontalBlur;
-	std::shared_ptr<Shader> m_PPSVerticalBlur;
-	std::shared_ptr<Shader> m_PPSExtractBrightness;
-	std::shared_ptr<Shader> m_PPSBlend;
-
 	std::shared_ptr<Model> m_RatModel;
 	std::shared_ptr<Model> m_cubeModel;
+	std::shared_ptr<Model> m_houseModel;
 
 	std::shared_ptr<DeferredPostProcessChain> m_postProcessChain;
 
@@ -39,14 +36,18 @@ public:
 	unsigned int N;
 	unsigned int ORM;
 
+	unsigned int BC_HOUSE;
+	unsigned int N_HOUSE;
+	unsigned int ORM_HOUSE;
+
 	std::vector<glm::vec3> lightPositions;
 	std::vector<glm::vec3> lightColors;
 
 	// Inherited via IRenderer
-	void RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition, const bool& _DebugMode) override;
+	void RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition, const bool& _DebugMode, const glm::vec2& _DepthRange) override;
 
 	// Inherited via IRenderer
 	void Resize(const glm::vec2& _size) override;
 
-	void DebugQuads();
+	void DebugQuads(const glm::vec2& _DepthRange);
 };

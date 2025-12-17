@@ -6,6 +6,7 @@
 
 #include "IDeferredPostProcess.h"
 #include "PostProcessEffectGaussianBlur.h"
+#include "PostProcessEffectBloom.h"
 
 #include <functional>
 
@@ -87,8 +88,9 @@ bool DeferredPostProcessChain::Create(std::shared_ptr<GBuffer> _GBuffer)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
     std::shared_ptr<PostProcessEffectGaussianBlur> blur = std::make_shared<PostProcessEffectGaussianBlur>();
+    std::shared_ptr<PostProcessEffectBloom> bloom = std::make_shared<PostProcessEffectBloom>();
 
-    m_postProcessChain.push_back(blur);
+    m_postProcessChain.push_back(bloom);
 
     return true;
 }

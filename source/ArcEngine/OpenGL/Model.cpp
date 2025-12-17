@@ -26,7 +26,7 @@ void Model::Draw(Shader& _shader)
 void Model::LoadModel(std::string _path)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_GenNormals);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -68,22 +68,32 @@ Mesh Model::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 		vector.x = _mesh->mVertices[i].x;
 		vector.y = _mesh->mVertices[i].y;
 		vector.z = _mesh->mVertices[i].z;
-		vertex.position = vector;
+		vertex.aPosition = vector;
 
 		vector.x = _mesh->mNormals[i].x;
 		vector.y = _mesh->mNormals[i].y;
 		vector.z = _mesh->mNormals[i].z;
-		vertex.normal = vector;
+		vertex.aNormal = vector;
+
+		vector.x = _mesh->mTangents[i].x;
+		vector.y = _mesh->mTangents[i].y;
+		vector.z = _mesh->mTangents[i].z;
+		vertex.aTangent = vector;
+
+		vector.x = _mesh->mBitangents[i].x;
+		vector.y = _mesh->mBitangents[i].y;
+		vector.z = _mesh->mBitangents[i].z;
+		vertex.aBiTangent = vector;
 
 		if (_mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
 		{
 			glm::vec2 vec;
 			vec.x = _mesh->mTextureCoords[0][i].x;
 			vec.y = _mesh->mTextureCoords[0][i].y;
-			vertex.texCoords = vec;
+			vertex.aTexCoords = vec;
 		}
 		else
-			vertex.texCoords = glm::vec2(0.0f, 0.0f);
+			vertex.aTexCoords = glm::vec2(0.0f, 0.0f);
 
 		vertices.push_back(vertex);
 	}
@@ -95,6 +105,8 @@ Mesh Model::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 		for (unsigned int j = 0; j < face.mNumIndices; j++)
 			indices.push_back(face.mIndices[j]);
 	}
+
+	
 
 	// process material
 	if (_mesh->mMaterialIndex >= 0)
