@@ -357,25 +357,52 @@ void OGLSystem::Run()
 
 		camera->Update(deltaTime);
 
-		renderer->RenderSceneCB(camera->GetProjectionMatrix(), camera->GetViewMatrix(), camera->GetPosition());
+		renderer->RenderSceneCB(camera->GetProjectionMatrix(), camera->GetViewMatrix(), camera->GetPosition(), debugMode);
 
-		//// Imgui begin render
-		//ImGui_ImplOpenGL3_NewFrame();
-		//ImGui_ImplGlfw_NewFrame();
-		//ImGui::NewFrame();
+		// Imgui begin render
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
 
 		//ImGui::SetNextWindowSize(ImVec2(screenWidth, 100));
 		//ImGui::SetNextWindowPos(ImVec2(0, 0));
-		//ImGui::Begin("Debug Menu", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
-		//ImGui::Button("Spawn asteroid");
-		//ImGui::Button("Spawn planet");
-		//ImGui::End();
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Exit", "ESCAPE")) { glfwSetWindowShouldClose(sptr_OGLWindow->GetWindow(), true); }
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Edit"))
+			{
+				if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+				if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {} // Disabled item
+				ImGui::Separator();
+				if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+				if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+				if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Debug"))
+			{
+				if (ImGui::Checkbox("Debug Rendering", &debugMode)) {}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+		}
+		/*ImGui::Begin("Debug Menu", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
+		if (ImGui::BeginMainMenuBar())
+		{
+			ImGui::EndMainMenuBar();
+		}
+		ImGui::Checkbox("Debug Rendering", &debugMode);
+		ImGui::End();*/
 
-		////ImGui::ShowDemoWindow();
+		//ImGui::ShowDemoWindow();
 
-		//ImGui::Render();
-		//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		//// Imgui end render
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		// Imgui end render
 
 
 		// Check and call events and swap buffers

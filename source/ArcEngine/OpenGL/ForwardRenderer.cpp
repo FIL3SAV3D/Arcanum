@@ -1,7 +1,7 @@
 #include "ForwardRenderer.h"
 #include <glm/ext/vector_float3.hpp>
 
-void ForwardRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition)
+void ForwardRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition, const bool& _DebugMode)
 {
 	//// Rendering commands
 	//frameBuffer->Bind();
@@ -198,4 +198,12 @@ void ForwardRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat4
 	//glActiveTexture(GL_TEXTURE0);
 	//glBindTexture(GL_TEXTURE_2D, screenTexture);
 	//glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void ForwardRenderer::Initialize(const glm::vec2& _size)
+{
+}
+
+void ForwardRenderer::Resize(const glm::vec2& _size)
+{
 }

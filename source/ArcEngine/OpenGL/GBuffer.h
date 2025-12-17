@@ -4,7 +4,7 @@
 #include <vector>
 
 constexpr int OUTPUT_FBO_SIZE = 2;
-constexpr int OUTPUT_FBO_CUSTOM_TEXTURE_SIZE = 2;
+
 
 class GBuffer
 {
@@ -18,13 +18,6 @@ public:
         GBUFFER_TEXTURE_TYPE_DEPTH,
         GBUFFER_TEXTURE_TYPE_COMBINED,
         GBUFFER_NUM_TEXTURES
-    };
-
-    struct FBO
-    {
-        unsigned int fbo          = 0;
-        unsigned int texture[OUTPUT_FBO_CUSTOM_TEXTURE_SIZE];
-        unsigned int depthTexture = 0;
     };
 
     GBuffer();
@@ -43,10 +36,6 @@ public:
     void GetActiveOutputFBO();
 
     glm::vec2 bufferSize;
-
-    std::vector<FBO> output_FBOs;
-    unsigned int output_FBO_Current;
-    unsigned int internal_FBO_Current;
 
     unsigned int m_gBuffer_fbo;
     unsigned int m_gBuffer_textures[GBUFFER_NUM_TEXTURES] = {};

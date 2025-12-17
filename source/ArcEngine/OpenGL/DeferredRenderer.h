@@ -8,6 +8,8 @@
 #include "Shader.h"
 #include "Model.h"
 
+class DeferredPostProcessChain;
+
 class DeferredRenderer : public IRenderer
 {
 public:
@@ -29,6 +31,8 @@ public:
 	std::shared_ptr<Model> m_RatModel;
 	std::shared_ptr<Model> m_cubeModel;
 
+	std::shared_ptr<DeferredPostProcessChain> m_postProcessChain;
+
 	unsigned int quadVAO, quadVBO;
 
 	unsigned int BC;
@@ -39,8 +43,10 @@ public:
 	std::vector<glm::vec3> lightColors;
 
 	// Inherited via IRenderer
-	void RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition) override;
+	void RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition, const bool& _DebugMode) override;
 
 	// Inherited via IRenderer
 	void Resize(const glm::vec2& _size) override;
+
+	void DebugQuads();
 };

@@ -58,4 +58,6 @@ private:
 
 	unsigned int VBO = 0;
 	unsigned int EBO = 0;
+
+	bool debugMode = true;
 };
