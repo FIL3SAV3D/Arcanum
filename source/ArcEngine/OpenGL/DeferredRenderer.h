@@ -2,13 +2,14 @@
 
 #include "IRenderer.h"
 
-#include "GBuffer.h"
 #include <memory>
-
-#include "Shader.h"
-#include "Model.h"
+#include <vector>
 
 class DeferredPostProcessChain;
+class HDRCubemap;
+class GBuffer;
+class Model;
+class Shader;
 
 class DeferredRenderer : public IRenderer
 {
@@ -24,13 +25,24 @@ public:
 
 	std::shared_ptr<Shader> m_shaderLightBox;
 
+	std::shared_ptr<Shader> m_shaderSkyBox;
+
 	std::shared_ptr<Model> m_RatModel;
 	std::shared_ptr<Model> m_cubeModel;
 	std::shared_ptr<Model> m_houseModel;
 
+	std::shared_ptr<Model> m_invertedCube;
+
+	std::shared_ptr<Model> m_ratHat;
+
+	std::shared_ptr<HDRCubemap> m_cubemap;
+
 	std::shared_ptr<DeferredPostProcessChain> m_postProcessChain;
 
 	unsigned int quadVAO, quadVBO;
+
+	unsigned int skyboxVAO, skyboxVBO;
+
 
 	unsigned int BC;
 	unsigned int N;
@@ -39,6 +51,13 @@ public:
 	unsigned int BC_HOUSE;
 	unsigned int N_HOUSE;
 	unsigned int ORM_HOUSE;
+
+	const unsigned int NR_OF_RATS = 1000;
+	
+	std::vector<glm::vec3> ratPositions;
+	std::vector<glm::vec3> ratRotation;
+
+
 
 	std::vector<glm::vec3> lightPositions;
 	std::vector<glm::vec3> lightColors;

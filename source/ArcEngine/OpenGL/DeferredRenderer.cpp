@@ -5,9 +5,20 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "DeferredPostProcessChain.h"
+#include "Cubemap.h"
+
+#include "GBuffer.h"
+
+#include "Shader.h"
+#include "Model.h"
+#include "HDRCubemap.h"
 
 void DeferredRenderer::Initialize(const glm::vec2& _size)
 {
+	m_cubemap = std::make_shared<HDRCubemap>("qwantani_sunset_1k.hdr", _size.x, _size.y);
+
+	glViewport(0, 0, static_cast<int>(_size.x), _size.y);
+
 	m_gBuffer = std::make_shared<GBuffer>();
 	m_gBuffer->Create(_size);
 
@@ -26,6 +37,10 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 
 	m_shaderLightBox = std::make_shared<Shader>("ShaderLightBox");
 
+	m_shaderSkyBox = std::make_shared<Shader>("skybox");
+	m_shaderSkyBox->Use();
+	m_shaderSkyBox->setInt("skybox", 0);
+
 	m_screenDebugShader->Use();
 	m_screenDebugShader->setInt("gPosition", 0);
 	m_screenDebugShader->setInt("gNormal", 1);
@@ -40,6 +55,7 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 	m_screenShader->setInt("gAlbedo", 2);
 	m_screenShader->setInt("gORM", 3);
 	m_screenShader->setInt("gDepth", 4);
+	m_screenShader->setInt("irradianceMap", 5);
 
 	m_postProcessChain = std::make_shared<DeferredPostProcessChain>();
 	m_postProcessChain->Create(m_gBuffer);
@@ -49,7 +65,9 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 
 	m_houseModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\american_house_MARK_2.fbx").c_str());
 
+	m_invertedCube = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\InvertedCube.fbx").c_str());
 
+	m_ratHat = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Ratsmas_Hat.fbx").c_str());
 	
 
 	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
@@ -73,6 +91,59 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
+	float skyboxVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
 	const unsigned int NR_LIGHTS = 32;
 	
 	srand(9);
@@ -91,15 +162,33 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 	}
 
 	lightPositions.push_back(glm::vec3(0.0f, 10.0f, 0.0f));
-	lightColors.push_back(glm::vec3(1000.0f, 1000.0f, 1000.0f));
+	lightColors.push_back(glm::vec3(1.0f, 1.0f, 1.0f));
 
 	BC = TextureFromFile("T_Rat_BC.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
 	N = TextureFromFile("T_Rat_N.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
 	ORM = TextureFromFile("T_Rat_ORM.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
 
 	BC_HOUSE = TextureFromFile("american_house_DIFF.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
-	N_HOUSE = TextureFromFile("T_Rat_N.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
 	ORM_HOUSE = TextureFromFile("T_Rat_ORM.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
+
+
+	N_HOUSE = TextureFromFile("T_Ratsmashat_BC.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
+
+	srand(10);
+	for (unsigned int i = 0; i < NR_OF_RATS; i++)
+	{
+		// calculate slightly random offsets
+		float xPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
+		float yPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 4.0);
+		float zPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
+		ratPositions.push_back(glm::vec3(xPos, yPos, zPos));
+		// also calculate random color
+		float rColor = static_cast<float>((rand() % 180)); // between 0.5 and 1.0
+		float gColor = static_cast<float>((rand() % 180)); // between 0.5 and 1.0
+		float bColor = static_cast<float>((rand() % 180)); // between 0.5 and 1.0
+		ratRotation.push_back(glm::vec3(rColor, gColor, bColor));
+	}
+
 }
 
 void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition, const bool& _DebugMode, const glm::vec2& _DepthRange)
@@ -127,15 +216,35 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, ORM);
 	
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < NR_OF_RATS; i++)
 	{
 		auto model = glm::mat4x4(1.0f);
-		model = glm::translate(model, glm::vec3(0, 0, -i));
+		model = glm::translate(model, ratPositions[i]);
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.1f));
 		m_gBufferShader->setMat4("model", model);
 		m_gBufferShader->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
 		m_RatModel->Draw(*m_gBufferShader);
+
+	}
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, N_HOUSE);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	for (int i = 0; i < NR_OF_RATS; i++)
+	{
+		auto model = glm::mat4x4(1.0f);
+		model = glm::translate(model, glm::vec3(0, 0.025f, 0.35f));
+		model = glm::translate(model, ratPositions[i]);
+		model = glm::rotate(model, glm::radians(8.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.015f));
+		m_gBufferShader->setMat4("model", model);
+		m_gBufferShader->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+		m_ratHat->Draw(*m_gBufferShader);
 	}
 
 	glActiveTexture(GL_TEXTURE0);
@@ -171,12 +280,15 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 		m_screenShader->setVec3(std::string("lights[" + std::to_string(i) + "].Position").c_str(), lightPositions[i]);
 		m_screenShader->setVec3(std::string("lights[" + std::to_string(i) + "].Color").c_str(), lightColors[i]);
 		// update attenuation parameters and calculate radius
-		const float linear = 2.0f;
+		const float linear = 1.0f;
 		const float quadratic = 1.8f;
 		m_screenShader->setFloat(std::string("lights[" + std::to_string(i) + "].Linear").c_str(), linear);
 		m_screenShader->setFloat(std::string("lights[" + std::to_string(i) + "].Quadratic").c_str(), quadratic);
 	}
 	m_screenShader->setVec3("viewPos", cameraPosition);
+
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemap->irradianceMap);
 
 	auto quad = glm::mat4x4(1.0f);
 	m_screenShader->setMat4("quad", quad);
@@ -207,6 +319,19 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 		m_shaderLightBox->setVec3("lightColor", lightColors[i]);
 		m_cubeModel->Draw(*m_shaderLightBox);
 	}
+
+	glDepthFunc(GL_LEQUAL);
+	m_shaderSkyBox->Use();
+	m_shaderSkyBox->setMat4("projection", projection);
+	m_shaderSkyBox->setMat4("view", glm::mat4(glm::mat3(view)));
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemap->irradianceMap);
+
+	m_invertedCube->Draw(*m_shaderSkyBox);
+
+	glDepthFunc(GL_LESS);
+
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
 
@@ -216,6 +341,8 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	m_gBuffer->SetActiveTexture(GBuffer::GBUFFER_TEXTURE_TYPE_COMBINED);
 	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, 0, 0, static_cast<int>(m_gBuffer->bufferSize.x), static_cast<int>(m_gBuffer->bufferSize.y), 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// Make a initializer to be able to bypass PPS
 
 	// Post Process
 	m_postProcessChain->ApplyPostProcessChain();
@@ -232,6 +359,8 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 
 void DeferredRenderer::Resize(const glm::vec2& _size)
 {
+	throw "FIX YO SHIT AND RESIZE EVERYTHING";
+
 	m_gBuffer->Destroy();
 	m_postProcessChain->Destroy();
 	m_gBuffer->Create(_size);

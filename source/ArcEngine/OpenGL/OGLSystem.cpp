@@ -151,7 +151,7 @@ void OGLSystem::Run()
 		glm::vec3(300.0f, 300.0f, 0.0f)
 	};
 	
-	Cubemap cubemap{"TestCubeMap"};
+	
 
 	unsigned int skyboxVAO, skyboxVBO;
 	glGenVertexArrays(1, &skyboxVAO);
