@@ -9,7 +9,7 @@ uniform sampler2D customInput02;
 layout (location = 0) out vec4 customOutput01;
 layout (location = 1) out vec4 customOutput02;
 
-uniform float exposure = 0.9;
+uniform float exposure = 1.0;
 
 
 void main()

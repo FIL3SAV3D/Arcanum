@@ -6,16 +6,16 @@ layout (location = 2) out vec4 gAlbedo;
 layout (location = 3) out vec3 gORM;
 layout (location = 4) out float gDepth;
 
+in vec3 WorldPos;
 in vec2 TexCoords;
-in vec3 FragPos;
 in mat3 TBN;
 
-uniform sampler2D texture_diffuse1;
-uniform sampler2D texture_normal1;
-uniform sampler2D texture_ORM1;
+uniform sampler2D texture_albedo;
+uniform sampler2D texture_normal;
+uniform sampler2D texture_ORM;
 
 float near = 0.1;
-float far  = 100.0;
+float far  = 1000.0;
 
 float LinearizeDepth(float depth) 
 {
@@ -25,15 +25,15 @@ float LinearizeDepth(float depth)
 
 void main()
 {
-    gPosition = FragPos;
+    gPosition = WorldPos;
 
-    vec3 normalMap = texture(texture_normal1, TexCoords).rgb;
+    vec3 normalMap = texture(texture_normal, TexCoords).rgb;
     normalMap = normalMap * 2.0 - 1.0;
     gNormal = normalize(TBN * normalMap);
 
-    gAlbedo = texture(texture_diffuse1, TexCoords);
+    gAlbedo = texture(texture_albedo, TexCoords);
 
-    gORM = texture(texture_ORM1, TexCoords).rgb;
+    gORM = texture(texture_ORM, TexCoords).rgb;
 
     gDepth = LinearizeDepth(gl_FragCoord.z) / far;
 

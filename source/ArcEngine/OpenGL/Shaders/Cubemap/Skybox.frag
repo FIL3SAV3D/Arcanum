@@ -1,12 +1,12 @@
 #version 460 core
 
-in vec3 localPos;
+in vec3 WorldPos;
 
 uniform samplerCube skybox;
 
 out vec4 FragColor;
 
 void main()
-{    
-    FragColor = texture(skybox, localPos);
+{
+    FragColor = textureLod(skybox, WorldPos, 2.0);
 }

@@ -17,30 +17,33 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 {
 	m_cubemap = std::make_shared<HDRCubemap>("qwantani_sunset_1k.hdr", _size.x, _size.y);
 
-	glViewport(0, 0, static_cast<int>(_size.x), _size.y);
+	glViewport(0, 0, static_cast<int>(_size.x), static_cast<int>(_size.y));
 
 	m_gBuffer = std::make_shared<GBuffer>();
 	m_gBuffer->Create(_size);
 
-	m_gBufferShader = std::make_shared<Shader>("DSGeometry");
-	m_gBufferShader->Use();
-	m_gBufferShader->setInt("texture_diffuse1", 0);
-	m_gBufferShader->setInt("texture_normal1", 1);
-	m_gBufferShader->setInt("texture_ORM1", 2);
+	m_shaderGeometryPass = std::make_shared<Shader>("Deferred\\PBR\\DeferredPBRGeometryPass.vert", "Deferred\\PBR\\DeferredPBRGeometryPass.frag");
+	m_shaderGeometryPass->Use();
+	m_shaderGeometryPass->setInt("texture_albedo", 0);
+	m_shaderGeometryPass->setInt("texture_normal", 1);
+	m_shaderGeometryPass->setInt("texture_ORM", 2);
 
-	m_houseShader = std::make_shared<Shader>("DSGeometry.vert", "DSHouseGEO.frag");
-	m_houseShader->Use();
-	m_houseShader->setInt("texture_diffuse1", 0);
-
-	m_screenShader = std::make_shared<Shader>("DSToScreen.vert", "DSToScreen.frag");
-	m_screenDebugShader = std::make_shared<Shader>("DSToScreen.vert", "DSToScreenDEBUG.frag");
+	m_shaderScreenPass = std::make_shared<Shader>("Deferred\\PBR\\DeferredPBRScreenPass.vert", "Deferred\\PBR\\DeferredPBRScreenPass.frag");
+	m_shaderScreenPass->Use();
+	m_shaderScreenPass->setInt("gPosition", 0);
+	m_shaderScreenPass->setInt("gNormal", 1);
+	m_shaderScreenPass->setInt("gAlbedo", 2);
+	m_shaderScreenPass->setInt("gORM", 3);
+	m_shaderScreenPass->setInt("gDepth", 4);
+	m_shaderScreenPass->setInt("irradianceMap", 5);
 
 	m_shaderLightBox = std::make_shared<Shader>("ShaderLightBox");
 
-	m_shaderSkyBox = std::make_shared<Shader>("skybox");
+	m_shaderSkyBox = std::make_shared<Shader>("Cubemap\\Cubemap.vert", "Cubemap\\Skybox.frag");
 	m_shaderSkyBox->Use();
 	m_shaderSkyBox->setInt("skybox", 0);
 
+	m_screenDebugShader = std::make_shared<Shader>("DSToScreen.vert", "DSToScreenDEBUG.frag");
 	m_screenDebugShader->Use();
 	m_screenDebugShader->setInt("gPosition", 0);
 	m_screenDebugShader->setInt("gNormal", 1);
@@ -49,21 +52,13 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 	m_screenDebugShader->setInt("gDepth", 4);
 	m_screenDebugShader->setInt("gCombined", 5);
 
-	m_screenShader->Use();
-	m_screenShader->setInt("gPosition", 0);
-	m_screenShader->setInt("gNormal", 1);
-	m_screenShader->setInt("gAlbedo", 2);
-	m_screenShader->setInt("gORM", 3);
-	m_screenShader->setInt("gDepth", 4);
-	m_screenShader->setInt("irradianceMap", 5);
+	
 
 	m_postProcessChain = std::make_shared<DeferredPostProcessChain>();
 	m_postProcessChain->Create(m_gBuffer);
 
 	m_RatModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
 	m_cubeModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Source\\ArcEngine\\Models\\obj_models\\cube.obj").c_str());
-
-	m_houseModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\american_house_MARK_2.fbx").c_str());
 
 	m_invertedCube = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\InvertedCube.fbx").c_str());
 
@@ -205,9 +200,9 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 
 	glDisable(GL_BLEND);
 
-	m_gBufferShader->Use();
-	m_gBufferShader->setMat4("view", view);
-	m_gBufferShader->setMat4("projection", projection);
+	m_shaderGeometryPass->Use();
+	m_shaderGeometryPass->setMat4("view", view);
+	m_shaderGeometryPass->setMat4("projection", projection);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, BC);
@@ -222,9 +217,9 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 		model = glm::translate(model, ratPositions[i]);
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.1f));
-		m_gBufferShader->setMat4("model", model);
-		m_gBufferShader->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-		m_RatModel->Draw(*m_gBufferShader);
+		m_shaderGeometryPass->setMat4("model", model);
+		m_shaderGeometryPass->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+		m_RatModel->Draw(*m_shaderGeometryPass);
 
 	}
 
@@ -242,30 +237,10 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 		model = glm::translate(model, ratPositions[i]);
 		model = glm::rotate(model, glm::radians(8.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.015f));
-		m_gBufferShader->setMat4("model", model);
-		m_gBufferShader->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-		m_ratHat->Draw(*m_gBufferShader);
+		m_shaderGeometryPass->setMat4("model", model);
+		m_shaderGeometryPass->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+		m_ratHat->Draw(*m_shaderGeometryPass);
 	}
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, BC_HOUSE);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	m_houseShader->Use();
-	m_houseShader->setMat4("view", view);
-	m_houseShader->setMat4("projection", projection);
-
-	auto houseModel = glm::mat4x4(1.0f);
-	houseModel = glm::translate(houseModel, glm::vec3(0, 0, 15.0f));
-	houseModel = glm::rotate(houseModel, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	houseModel = glm::scale(houseModel, glm::vec3(0.01f));
-	m_houseShader->setMat4("model", houseModel);
-	m_houseShader->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(houseModel))));
-
-	m_houseModel->Draw(*m_houseShader);
 
 	glDepthMask(GL_FALSE);
 
@@ -274,24 +249,24 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	m_gBuffer->BindForReading();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	m_screenShader->Use();
+	m_shaderScreenPass->Use();
 	for (unsigned int i = 0; i < lightPositions.size(); i++)
 	{
-		m_screenShader->setVec3(std::string("lights[" + std::to_string(i) + "].Position").c_str(), lightPositions[i]);
-		m_screenShader->setVec3(std::string("lights[" + std::to_string(i) + "].Color").c_str(), lightColors[i]);
+		m_shaderScreenPass->setVec3(std::string("lights[" + std::to_string(i) + "].Position").c_str(), lightPositions[i]);
+		m_shaderScreenPass->setVec3(std::string("lights[" + std::to_string(i) + "].Color").c_str(), lightColors[i]);
 		// update attenuation parameters and calculate radius
 		const float linear = 1.0f;
 		const float quadratic = 1.8f;
-		m_screenShader->setFloat(std::string("lights[" + std::to_string(i) + "].Linear").c_str(), linear);
-		m_screenShader->setFloat(std::string("lights[" + std::to_string(i) + "].Quadratic").c_str(), quadratic);
+		m_shaderScreenPass->setFloat(std::string("lights[" + std::to_string(i) + "].Linear").c_str(), linear);
+		m_shaderScreenPass->setFloat(std::string("lights[" + std::to_string(i) + "].Quadratic").c_str(), quadratic);
 	}
-	m_screenShader->setVec3("viewPos", cameraPosition);
+	m_shaderScreenPass->setVec3("viewPos", cameraPosition);
 
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemap->irradianceMap);
 
 	auto quad = glm::mat4x4(1.0f);
-	m_screenShader->setMat4("quad", quad);
+	m_shaderScreenPass->setMat4("quad", quad);
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	
@@ -321,6 +296,8 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	}
 
 	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 	m_shaderSkyBox->Use();
 	m_shaderSkyBox->setMat4("projection", projection);
 	m_shaderSkyBox->setMat4("view", glm::mat4(glm::mat3(view)));
@@ -330,6 +307,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 
 	m_invertedCube->Draw(*m_shaderSkyBox);
 
+	glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	glDepthFunc(GL_LESS);
 
 	glDisable(GL_DEPTH_TEST);
@@ -344,11 +322,22 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 
 	// Make a initializer to be able to bypass PPS
 
-	// Post Process
+	//// Post Process
 	m_postProcessChain->ApplyPostProcessChain();
 
-	// Render to Screen
+	//// Render to Screen
 	m_postProcessChain->FinalBlitToScreen();
+
+	//m_gBuffer->BindForReading();
+
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, m_gBuffer->m_gBuffer_textures[GBuffer::GBUFFER_TEXTURE_TYPE_COMBINED]);
+
+	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	//glBlitFramebuffer(
+	//	0, 0, static_cast<int>(m_gBuffer->bufferSize.x), static_cast<int>(m_gBuffer->bufferSize.y),
+	//	0, 0, static_cast<int>(m_gBuffer->bufferSize.x), static_cast<int>(m_gBuffer->bufferSize.y), GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	if (_DebugMode)
 	{

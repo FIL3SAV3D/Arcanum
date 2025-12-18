@@ -56,7 +56,7 @@ void PostProcessEffectBloom::ApplyPostProcess(unsigned int& _QuadVAO, std::funct
 
 	glGenerateTextureMipmap(0);
 
-	for (unsigned int i = 0; i < 10; i++)
+	for (unsigned int i = 0; i < 5; i++)
 	{
 		// Horizontal Blur
 		_PingPongCallback();

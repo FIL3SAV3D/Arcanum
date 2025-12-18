@@ -18,18 +18,18 @@ public:
 
 	std::shared_ptr<GBuffer> m_gBuffer;
 
-	std::shared_ptr<Shader> m_gBufferShader;
-	std::shared_ptr<Shader> m_houseShader;
-	std::shared_ptr<Shader> m_screenShader;
+	std::shared_ptr<Shader> m_shaderGeometryPass;
+	std::shared_ptr<Shader> m_shaderScreenPass;
+
+	std::shared_ptr<Shader> m_shaderSkyBox;
+
 	std::shared_ptr<Shader> m_screenDebugShader;
 
 	std::shared_ptr<Shader> m_shaderLightBox;
 
-	std::shared_ptr<Shader> m_shaderSkyBox;
 
 	std::shared_ptr<Model> m_RatModel;
 	std::shared_ptr<Model> m_cubeModel;
-	std::shared_ptr<Model> m_houseModel;
 
 	std::shared_ptr<Model> m_invertedCube;
 
@@ -52,7 +52,7 @@ public:
 	unsigned int N_HOUSE;
 	unsigned int ORM_HOUSE;
 
-	const unsigned int NR_OF_RATS = 1000;
+	const unsigned int NR_OF_RATS = 100;
 	
 	std::vector<glm::vec3> ratPositions;
 	std::vector<glm::vec3> ratRotation;
