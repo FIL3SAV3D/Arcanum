@@ -25,7 +25,7 @@ uniform vec3 viewPos;
 const float PI = 3.14159265359;
   
 float near = 0.1; 
-float far  = 100.0; 
+float far  = 1000.0; 
 
 float LinearizeDepth(float depth) 
 {
@@ -72,6 +72,11 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
+
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}   
 
 void main()
 { 
@@ -132,7 +137,7 @@ void main()
     }   
     
     // ambient lighting (we now use IBL as the ambient term)
-    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+    vec3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;	  
     vec3 irradiance = texture(irradianceMap, N).rgb;

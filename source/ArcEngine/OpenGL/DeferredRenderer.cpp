@@ -28,6 +28,8 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 	m_shaderGeometryPass->setInt("texture_normal", 1);
 	m_shaderGeometryPass->setInt("texture_ORM", 2);
 
+	m_shaderGeometryPassNoTextures = std::make_shared<Shader>("Deferred\\PBR\\DeferredPBRGeometryPassNoTextures.vert", "Deferred\\PBR\\DeferredPBRGeometryPassNoTextures.frag");
+
 	m_shaderScreenPass = std::make_shared<Shader>("Deferred\\PBR\\DeferredPBRScreenPass.vert", "Deferred\\PBR\\DeferredPBRScreenPass.frag");
 	m_shaderScreenPass->Use();
 	m_shaderScreenPass->setInt("gPosition", 0);
@@ -52,8 +54,6 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 	m_screenDebugShader->setInt("gDepth", 4);
 	m_screenDebugShader->setInt("gCombined", 5);
 
-	
-
 	m_postProcessChain = std::make_shared<DeferredPostProcessChain>();
 	m_postProcessChain->Create(m_gBuffer);
 
@@ -63,6 +63,9 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 	m_invertedCube = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\InvertedCube.fbx").c_str());
 
 	m_ratHat = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Ratsmas_Hat.fbx").c_str());
+
+
+	m_plane = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\plane.fbx").c_str());
 	
 
 	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
@@ -242,8 +245,29 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 		m_ratHat->Draw(*m_shaderGeometryPass);
 	}
 
-	glDepthMask(GL_FALSE);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
+	m_shaderGeometryPassNoTextures->Use();
+	m_shaderGeometryPassNoTextures->setMat4("view", view);
+	m_shaderGeometryPassNoTextures->setMat4("projection", projection);
+
+	m_shaderGeometryPassNoTextures->setVec4("color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	m_shaderGeometryPassNoTextures->setVec3("ORM", glm::vec3(0.9f, 0.1f, 1.0f));
+
+	auto planeMatrix = glm::mat4x4(1.0f);
+	planeMatrix = glm::translate(planeMatrix, glm::vec3(0, -5.025f, 0.0f));
+	planeMatrix = glm::rotate(planeMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	planeMatrix = glm::scale(planeMatrix, glm::vec3(10.0f));
+	m_shaderGeometryPassNoTextures->setMat4("model", planeMatrix);
+	m_shaderGeometryPassNoTextures->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(planeMatrix))));
+	m_plane->Draw(*m_shaderGeometryPassNoTextures);
+
+	glDepthMask(GL_FALSE);
 	glDisable(GL_DEPTH_TEST);
 
 	m_gBuffer->BindForReading();
@@ -295,6 +319,8 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 		m_cubeModel->Draw(*m_shaderLightBox);
 	}
 
+	glDepthMask(GL_FALSE);
+
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
@@ -303,7 +329,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	m_shaderSkyBox->setMat4("view", glm::mat4(glm::mat3(view)));
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemap->irradianceMap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemap->envCubemap);
 
 	m_invertedCube->Draw(*m_shaderSkyBox);
 
@@ -311,7 +337,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	glDepthFunc(GL_LESS);
 
 	glDisable(GL_DEPTH_TEST);
-	glDepthMask(GL_FALSE);
+	
 
 	// Copy the Framebuffer to texture
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
@@ -352,6 +378,7 @@ void DeferredRenderer::Resize(const glm::vec2& _size)
 
 	m_gBuffer->Destroy();
 	m_postProcessChain->Destroy();
+
 	m_gBuffer->Create(_size);
 	m_postProcessChain->Create(m_gBuffer);
 }

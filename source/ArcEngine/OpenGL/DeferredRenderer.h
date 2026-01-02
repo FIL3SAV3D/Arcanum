@@ -19,6 +19,9 @@ public:
 	std::shared_ptr<GBuffer> m_gBuffer;
 
 	std::shared_ptr<Shader> m_shaderGeometryPass;
+
+	std::shared_ptr<Shader> m_shaderGeometryPassNoTextures;
+	
 	std::shared_ptr<Shader> m_shaderScreenPass;
 
 	std::shared_ptr<Shader> m_shaderSkyBox;
@@ -34,6 +37,8 @@ public:
 	std::shared_ptr<Model> m_invertedCube;
 
 	std::shared_ptr<Model> m_ratHat;
+
+	std::shared_ptr<Model> m_plane;
 
 	std::shared_ptr<HDRCubemap> m_cubemap;
 
