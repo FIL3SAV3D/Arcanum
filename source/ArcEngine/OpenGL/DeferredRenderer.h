@@ -30,6 +30,8 @@ public:
 
 	std::shared_ptr<Shader> m_shaderLightBox;
 
+	std::shared_ptr<Shader> m_shadowMap;
+
 
 	std::shared_ptr<Model> m_RatModel;
 	std::shared_ptr<Model> m_cubeModel;
@@ -47,6 +49,12 @@ public:
 	unsigned int quadVAO, quadVBO;
 
 	unsigned int skyboxVAO, skyboxVBO;
+
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+
+	unsigned int depthMapFBO;
+	unsigned int depthMap;
+
 
 
 	unsigned int BC;

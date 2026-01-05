@@ -13,6 +13,8 @@
 #include "Model.h"
 #include "HDRCubemap.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 void DeferredRenderer::Initialize(const glm::vec2& _size)
 {
 	m_cubemap = std::make_shared<HDRCubemap>("qwantani_sunset_1k.hdr", _size.x, _size.y);
@@ -37,13 +39,16 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 	m_shaderScreenPass->setInt("gAlbedo", 2);
 	m_shaderScreenPass->setInt("gORM", 3);
 	m_shaderScreenPass->setInt("gDepth", 4);
-	m_shaderScreenPass->setInt("irradianceMap", 5);
+	m_shaderScreenPass->setInt("shadowMap", 5);
+	m_shaderScreenPass->setInt("irradianceMap", 6);
 
 	m_shaderLightBox = std::make_shared<Shader>("ShaderLightBox");
 
 	m_shaderSkyBox = std::make_shared<Shader>("Cubemap\\Cubemap.vert", "Cubemap\\Skybox.frag");
 	m_shaderSkyBox->Use();
 	m_shaderSkyBox->setInt("skybox", 0);
+
+	m_shadowMap = std::make_shared<Shader>("ShadowMap");
 
 	m_screenDebugShader = std::make_shared<Shader>("DSToScreen.vert", "DSToScreenDEBUG.frag");
 	m_screenDebugShader->Use();
@@ -187,6 +192,23 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 		ratRotation.push_back(glm::vec3(rColor, gColor, bColor));
 	}
 
+	glGenFramebuffers(1, &depthMapFBO);
+
+
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 }
 
 void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat4x4& view, const glm::vec3& cameraPosition, const bool& _DebugMode, const glm::vec2& _DepthRange)
@@ -194,14 +216,42 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	m_gBuffer->BindForWriting();
 	glDepthMask(GL_TRUE);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	glEnable(GL_DEPTH_TEST);
-
 	glDisable(GL_BLEND);
+
+	//Render ShadowMap
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	float near_plane = 0.1f, far_plane = 1000.0f;
+	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+
+	glm::mat4 lightView = glm::lookAt(glm::vec3(2.0f, 4.0f, -1.0f),
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 1.0f, 0.0f));
+
+	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+	m_shadowMap->Use();
+	m_shadowMap->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+	for (int i = 0; i < NR_OF_RATS; i++)
+	{
+		auto model = glm::mat4x4(1.0f);
+		model = glm::translate(model, ratPositions[i]);
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.1f));
+		m_shadowMap->setMat4("model", model);
+		m_RatModel->Draw(*m_shadowMap);
+	}
+
+	// Render Normal
+	glViewport(0, 0, m_gBuffer->bufferSize.x, m_gBuffer->bufferSize.y);
+	m_gBuffer->BindForWriting();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	m_shaderGeometryPass->Use();
 	m_shaderGeometryPass->setMat4("view", view);
@@ -257,7 +307,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	m_shaderGeometryPassNoTextures->setMat4("projection", projection);
 
 	m_shaderGeometryPassNoTextures->setVec4("color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	m_shaderGeometryPassNoTextures->setVec3("ORM", glm::vec3(0.9f, 0.1f, 1.0f));
+	m_shaderGeometryPassNoTextures->setVec3("ORM", glm::vec3(0.9f, 0.3f, 0.3f));
 
 	auto planeMatrix = glm::mat4x4(1.0f);
 	planeMatrix = glm::translate(planeMatrix, glm::vec3(0, -5.025f, 0.0f));
@@ -287,9 +337,17 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	m_shaderScreenPass->setVec3("viewPos", cameraPosition);
 
 	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+
+	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemap->irradianceMap);
 
 	auto quad = glm::mat4x4(1.0f);
+	m_shaderScreenPass->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+	const glm::vec3 forward = normalize(glm::vec3(lightSpaceMatrix[2]));
+
+	m_shaderScreenPass->setVec3("lightDir", forward);
 	m_shaderScreenPass->setMat4("quad", quad);
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
