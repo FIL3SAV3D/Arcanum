@@ -71,6 +71,11 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 
 
 	m_plane = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\plane.fbx").c_str());
+
+	m_deccerCubes = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\SM_Deccer_Cubes.fbx").c_str());
+	m_deccerCubesTex = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\SM_Deccer_Cubes_Textured.fbx").c_str());
+
+	
 	
 
 	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
@@ -200,8 +205,10 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
@@ -317,6 +324,12 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	m_shaderGeometryPassNoTextures->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(planeMatrix))));
 	m_plane->Draw(*m_shaderGeometryPassNoTextures);
 
+	planeMatrix = glm::mat4x4(1.0f);
+	planeMatrix = glm::translate(planeMatrix, glm::vec3(1.0f, 0.0f, 0.0f));
+	planeMatrix = glm::rotate(planeMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	planeMatrix = glm::scale(planeMatrix, glm::vec3(1));
+ 	m_deccerCubes->Draw(*m_shaderGeometryPassNoTextures);
+
 	glDepthMask(GL_FALSE);
 	glDisable(GL_DEPTH_TEST);
 
@@ -345,9 +358,9 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	auto quad = glm::mat4x4(1.0f);
 	m_shaderScreenPass->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-	const glm::vec3 forward = normalize(glm::vec3(lightSpaceMatrix[2]));
-
+	const glm::vec3 forward = normalize(glm::vec3(lightSpaceMatrix[1]));
 	m_shaderScreenPass->setVec3("lightDir", forward);
+
 	m_shaderScreenPass->setMat4("quad", quad);
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);

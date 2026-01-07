@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "Vertex.h"
-#include "Texture.h"
+#include "Material.h"
 
 class Shader;
 
@@ -12,9 +12,9 @@ class Mesh
 public:
 	std::vector<Vertex>			vertices{};
 	std::vector<unsigned int>	indices	{};
-	std::vector<Texture>		textures{};
+	std::vector<Material>		textures{};
 
-	Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices, std::vector<Texture> _textures);
+	Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices);
 	void Draw(Shader& _shader);
 
 	unsigned int GetVAO() { return VAO; };

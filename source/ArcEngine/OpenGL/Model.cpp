@@ -112,6 +112,15 @@ Mesh Model::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 	if (_mesh->mMaterialIndex >= 0)
 	{
 		aiMaterial* material = _scene->mMaterials[_mesh->mMaterialIndex];
+
+		int isMaterialPBR = 0;
+		aiGetMaterialInteger(material, AI_MATKEY_SHADING_MODEL, &isMaterialPBR);
+
+		if (isMaterialPBR == aiShadingMode_PBR_BRDF)
+		{
+			std::printf(std::string("Material Is PBR: ").append(_mesh->mName.C_Str()).c_str());
+		}
+
 		std::vector<Texture> diffuseMaps = LoadMaterialTextures(material,
 			aiTextureType_DIFFUSE, "texture_baseColor");
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
@@ -120,7 +129,7 @@ Mesh Model::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	}
 
-	return Mesh(vertices, indices, textures);
+	return Mesh(vertices, indices);
 }
 
 std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
