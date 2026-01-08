@@ -6,7 +6,7 @@
 #include "ECS/Systems/MeshRenderSystem.h"
 #include "ECS/Systems/UIRenderSystem.h"
 
-//#include "ECS/Components/TransformComponent.h"
+#include "ECS/Components/TransformComponent.h"
 //#include "ECS/Components/ModelComponent.h"
 //#include "ECS/Components/PhysicsComponent.h"
 //#include "ECS/Components/PointLightComponent.h"
@@ -30,11 +30,11 @@ ArcEngine::ArcEngine()
 
     coordinator->mSystemManager->RecalculateUpdateOrder();
 
-   /* coordinator->RegisterComponent<ModelComponent>();
+    //coordinator->RegisterComponent<ModelComponent>();
     coordinator->RegisterComponent<TransformComponent>();
-    coordinator->RegisterComponent<PhysicsComponent>();
-    coordinator->RegisterComponent<PointLightComponent>();
-    coordinator->RegisterComponent<CameraComponent>();*/
+    //coordinator->RegisterComponent<PhysicsComponent>();
+    //coordinator->RegisterComponent<PointLightComponent>();
+    //coordinator->RegisterComponent<CameraComponent>();*/
 }
 
 ArcEngine::~ArcEngine()	
