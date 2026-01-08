@@ -5,9 +5,16 @@ language "C++"
 staticruntime "off"
 
 filter "configurations:Debug"
-    runtime "Debug"
-    symbols "on"
-    defines { "ARC_DEBUG" }
+	runtime "Debug"
+	symbols "on"
+	defines { "ARC_DEBUG" }
+
+filter "configurations:DebugAsan"
+	runtime "Debug"
+	symbols "on"
+	defines { "ARC_DEBUG_ASAN" }
+	sanitize { "Address" }
+	debugformat ("c7")
 
 filter "configurations:Release"
 	runtime "Release"
@@ -17,7 +24,7 @@ filter "configurations:Release"
 
 workspace "Arcanum"
 	architecture "x86_64"
-    configurations { "Debug","Release" }
+    configurations { "Debug", "DebugAsan","Release" }
     startproject "Framework"
 	
 	project "Framework"
@@ -36,11 +43,17 @@ workspace "Arcanum"
 			"submodules/imgui/backends/imgui_impl_opengl3.h",
 			"submodules/imgui/backends/imgui_impl_opengl3.cpp",
 
+			"submodules/imgui/backends/imgui_impl_vulkan.h",
+			"submodules/imgui/backends/imgui_impl_vulkan.cpp",
+
 			"submodules/imgui/backends/imgui_impl_glfw.h",
 			"submodules/imgui/backends/imgui_impl_glfw.cpp",
         }
 
 		filter {"configurations:Debug"}
+			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+
+		filter {"configurations:DebugAsan"}
 			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
 
 		filter {"configurations:Release"}
@@ -88,11 +101,17 @@ workspace "Arcanum"
 			"submodules/imgui/backends/imgui_impl_opengl3.h",
 			"submodules/imgui/backends/imgui_impl_opengl3.cpp",
 
+			"submodules/imgui/backends/imgui_impl_vulkan.h",
+			"submodules/imgui/backends/imgui_impl_vulkan.cpp",
+
 			"submodules/imgui/backends/imgui_impl_glfw.h",
 			"submodules/imgui/backends/imgui_impl_glfw.cpp",
         }
 
 		filter {"configurations:Debug"}
+			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+
+		filter {"configurations:DebugAsan"}
 			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
 
 		filter {"configurations:Release"}

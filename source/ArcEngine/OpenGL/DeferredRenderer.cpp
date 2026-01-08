@@ -325,9 +325,12 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	m_plane->Draw(*m_shaderGeometryPassNoTextures);
 
 	planeMatrix = glm::mat4x4(1.0f);
-	planeMatrix = glm::translate(planeMatrix, glm::vec3(1.0f, 0.0f, 0.0f));
-	planeMatrix = glm::rotate(planeMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	planeMatrix = glm::scale(planeMatrix, glm::vec3(1));
+	planeMatrix = glm::translate(planeMatrix, glm::vec3(10.0f, 0.0f, 0.0f));
+	//planeMatrix = glm::rotate(planeMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	planeMatrix = glm::scale(planeMatrix, glm::vec3(0.01));
+	m_shaderGeometryPassNoTextures->setMat4("model", planeMatrix);
+	m_shaderGeometryPassNoTextures->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(planeMatrix))));
+	//m_RatModel->Draw(*m_shaderGeometryPassNoTextures);
  	m_deccerCubes->Draw(*m_shaderGeometryPassNoTextures);
 
 	glDepthMask(GL_FALSE);

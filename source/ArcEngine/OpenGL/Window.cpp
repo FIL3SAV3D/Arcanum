@@ -1,11 +1,11 @@
-#include "OGLWindow.h"
+#include "Window.h"
 
 #include <iostream>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-OGLWindow::OGLWindow(const int& screenWidth, const int& screenHeight, const char* windowName)
+Window::Window(const int& _screenWidth, const int& _screenHeight, const char* windowName)
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -13,7 +13,7 @@ OGLWindow::OGLWindow(const int& screenWidth, const int& screenHeight, const char
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 1);
 
-	window = glfwCreateWindow(screenWidth, screenHeight, windowName, nullptr, nullptr);
+	window = glfwCreateWindow(_screenWidth, _screenHeight, windowName, nullptr, nullptr);
 	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -34,8 +34,11 @@ OGLWindow::OGLWindow(const int& screenWidth, const int& screenHeight, const char
 
 	//VSYNC
 	glfwSwapInterval(VSync);
+
+	screenHeight = _screenHeight;
+	screenWidth = _screenWidth;
 }
 
-OGLWindow::~OGLWindow()
+Window::~Window()
 {
 }

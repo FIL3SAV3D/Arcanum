@@ -27,15 +27,15 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Cubemap.h"
 
-#include "DeferredRenderer.h"
 
 #include <glm/detail/type_float.hpp>
+#include "DeferredRenderer.h"
 
 OGLSystem::OGLSystem()
 {
 	screenWidth = 1200;
 	screenHeight = 800;
-	sptr_OGLWindow		= std::make_shared<OGLWindow>(screenWidth, screenHeight, windowName);
+	sptr_OGLWindow		= std::make_shared<Window>(screenWidth, screenHeight, windowName);
 	inputHandler = std::make_shared<InputHandler>();
 }
 

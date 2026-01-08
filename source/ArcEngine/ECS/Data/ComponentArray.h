@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EntityComponentSystem/TempInfo.h"
+#include "ECS/Data/ECSTypeInfo.h"
 
 // std
 #include <assert.h>

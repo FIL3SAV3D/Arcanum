@@ -1,27 +1,43 @@
 #pragma once
 
-#include "EntityComponentSystem/TempInfo.h"
-#include "EntityComponentSystem/System.h"
-
-// std
 #include <typeinfo>
 #include <unordered_map>
 #include <memory>
+#include <map>
+#include <cassert>
+
+#include "ECS/Data/ECSTypeInfo.h"
+#include "ECS/Interfaces/ISystem.h"
+
+#include <GLFW/glfw3.h>
 
 class SystemManager
 {
 public:
-	template<typename T>
-	std::shared_ptr<T> RegisterSystem()
+	template<typename T, const int priority, typename ...Args>
+	std::shared_ptr<T> RegisterSystem(Args ..._args)
 	{
 		const char* typeName = typeid(T).name();
 
 		assert(mSystems.find(typeName) == mSystems.end() && "Registering system more than once.");
 
 		// Create a pointer to the system and return it so it can be used externally
-		auto system = std::make_shared<T>();
+		auto system = std::make_shared<T>(_args...);
 		mSystems.insert({ typeName, system });
+
+		mUpdateOrderHolder[priority] = system;
+
 		return system;
+	}
+
+	void RecalculateUpdateOrder()
+	{
+		mSystemsUpdateOrder.clear();
+
+		for (std::map<int, std::shared_ptr<ISystem>>::iterator it = mUpdateOrderHolder.begin(); it != mUpdateOrderHolder.end(); it++)
+		{
+			mSystemsUpdateOrder.push_back((*it).second);
+		}
 	}
 
 	template<typename T>
@@ -69,10 +85,45 @@ public:
 		}
 	}
 
+	void OnCreate()
+	{
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnCreate();
+		}
+	}
+
+	void OnUpdate()
+	{
+		currentFrameTime = (float)glfwGetTime();
+		deltaTime = currentFrameTime - lastFrameTime;
+		lastFrameTime = currentFrameTime;
+
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnUpdate(deltaTime);
+		}
+	}
+
+	void OnDestroy()
+	{
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnDestroy();
+		}
+	}
+
 private:
+	float deltaTime = 0.0f;
+	float currentFrameTime = 0.0f;
+	float lastFrameTime = 0.0f;
+
 	// Map from system type string pointer to a signature
 	std::unordered_map<const char*, Signature> mSignatures{};
 
 	// Map from system type string pointer to a system pointer
-	std::unordered_map<const char*, std::shared_ptr<System>> mSystems{};
+	std::unordered_map<const char*, std::shared_ptr<ISystem>> mSystems{};
+
+	std::map<int, std::shared_ptr<ISystem>> mUpdateOrderHolder{};
+	std::vector<std::shared_ptr<ISystem>> mSystemsUpdateOrder;
 };

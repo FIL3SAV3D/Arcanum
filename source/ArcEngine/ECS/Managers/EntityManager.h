@@ -1,12 +1,10 @@
 #pragma once
 
-#include "EntityComponentSystem/TempInfo.h"
-
-// std
 #include <queue>
 #include <array>
 #include <assert.h>
 
+#include "ECS/Data/ECSTypeInfo.h"
 
 class EntityManager
 {

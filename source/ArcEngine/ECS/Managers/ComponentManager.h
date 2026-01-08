@@ -1,12 +1,11 @@
 #pragma once
 
-#include "EntityComponentSystem/TempInfo.h"
-#include "EntityComponentSystem/ComponentArray.h"
-
-// std
 #include <typeinfo>
 #include <unordered_map>
 #include <memory>
+
+#include "ECS/Data/ECSTypeInfo.h"
+#include "ECS/Data/ComponentArray.h"
 
 class ComponentManager
 {

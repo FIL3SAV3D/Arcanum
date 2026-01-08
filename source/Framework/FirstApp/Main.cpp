@@ -1,25 +1,23 @@
-#include "TempTest.h"
+#include <iostream>
 
-#include "OpenGL/OGLSystem.h"
+#include "ArcEngine.h"
+#include "ECS/Interfaces/ISystem.h"
 
 int main()
 {
-	printf("WELCOME TO ARCANUM USER\n\n");
+    std::printf("WELCOME TO ARCANUM USER\n\n");
 
-	try
-	{
-		OGLSystem OGLApp{};
-		OGLApp.Run();
+    try
+    {
+        ArcEngine engine;
+        engine.Run();
+    }
+    catch (const std::exception& e)
+    {
+        std::printf(e.what());
+        system("pause");
+        return EXIT_FAILURE;
+    }
 
-		//arc::cFirstApp app{};
-		//app.run();
-	}
-	catch (const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-		system("pause");
-		return EXIT_FAILURE;
-	}
-
-	return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }

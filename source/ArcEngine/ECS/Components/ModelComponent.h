@@ -4,5 +4,5 @@
 
 struct ModelComponent
 {
-	std::shared_ptr<arc::arcModel> model = nullptr;
+	//std::shared_ptr<arc::arcModel> model = nullptr;
 };

@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "Vertex.h"
-#include "OGLWindow.h"
+#include "Window.h"
 
 #include "InputHandler.h"
 
@@ -33,7 +33,7 @@ public:
 
 
 private:
-	std::shared_ptr<OGLWindow> sptr_OGLWindow = nullptr;
+	std::shared_ptr<Window> sptr_OGLWindow = nullptr;
 	std::shared_ptr<InputHandler> inputHandler = nullptr;
 
 	std::shared_ptr<Camera> camera = nullptr;
