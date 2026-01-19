@@ -25,29 +25,67 @@ filter "configurations:Release"
 workspace "Arcanum"
 	architecture "x86_64"
     configurations { "Debug", "DebugAsan","Release" }
-    startproject "Framework"
-	
-	project "Framework"
+    startproject "Standalone"
+
+	project "ArcanumEditor"
 		kind "ConsoleApp"
 		targetdir "bin/%{cfg.buildcfg}"
-		dependson { "ArcEngine", "Shaders", "ArcNetCommon", ... }
+		dependson { "Framework", ... }
+
+	files {
+            "source/ArcanumEditor/**.h",
+            "source/ArcanumEditor/**.cpp",
+            "source/ArcanumEditor/**.hpp",
+        }
+
+		filter {"configurations:Debug"}
+			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+
+		filter {"configurations:DebugAsan"}
+			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+
+		filter {"configurations:Release"}
+			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mt.lib"}
+		
+		filter{}
+
+		links { "ArcEngine" }
+
+	project "Standalone"
+		kind "ConsoleApp"
+		targetdir "bin/%{cfg.buildcfg}"
+		dependson { "Framework", ... }
+
+	files {
+            "source/Standalone/**.h",
+            "source/Standalone/**.cpp",
+            "source/Standalone/**.hpp",
+        }
+
+		filter {"configurations:Debug"}
+			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+
+		filter {"configurations:DebugAsan"}
+			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+
+		filter {"configurations:Release"}
+			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mt.lib"}
+		
+		filter{}
+
+		links { "ArcEngine" }
+
+		includedirs { "../Arcanum/source/Framework" }
+	
+	project "Framework"
+		kind "StaticLib"
+		targetdir "bin/%{cfg.buildcfg}"
+		dependson { "ArcEngine", ... }
 
 		files {
             "source/Framework/**.h",
             "source/Framework/**.cpp",
             "source/Framework/**.hpp",
-
-			"submodules/imgui/*.h",
-			"submodules/imgui/*.cpp",
-
-			"submodules/imgui/backends/imgui_impl_opengl3.h",
-			"submodules/imgui/backends/imgui_impl_opengl3.cpp",
-
-			"submodules/imgui/backends/imgui_impl_vulkan.h",
-			"submodules/imgui/backends/imgui_impl_vulkan.cpp",
-
-			"submodules/imgui/backends/imgui_impl_glfw.h",
-			"submodules/imgui/backends/imgui_impl_glfw.cpp",
         }
 
 		filter {"configurations:Debug"}
@@ -66,7 +104,6 @@ workspace "Arcanum"
 		links { "../Arcanum/library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "ArcEngine" }
 		links { "ArcNetCommon" }
-
 
 		includedirs { "$(VULKAN_SDK)/include" }
 		includedirs { "../Arcanum/library/GLFW/include" }
