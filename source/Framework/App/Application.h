@@ -2,18 +2,17 @@
 
 #include <memory>
 
-#include "States/StateManager.h"
+#include "Modes/ModeManager.h"
+
+#include "OpenGL/Window.h"
+#include "OpenGL/InputHandler.h"
+#include <Misc/Clock.h>
 
 class Application
 {
 public:
 	Application();
 	~Application();
-
-	Application(const Application& other) = delete; // copy constructor
-	Application(Application&& other) noexcept = delete; // move constructor
-	Application& operator=(const Application& other) = delete; // copy assignment
-	Application& operator=(Application&& other) noexcept = delete; // move assignment
 
 	void Create();
 
@@ -23,6 +22,18 @@ public:
 
 	bool IsQuitting();
 
+	void UseMode(std::string _Name);
+
+	template<typename T>
+	void PushMode() { modeManger->PushMode<T>(); }
+
+	void PushLayer();
+
 private:
-	std::unique_ptr<StateManger> stateManger;
+	std::shared_ptr<Window> window;
+
+	std::unique_ptr<ModeManager> modeManger;
+	std::unique_ptr<InputHandler> inputHandler;
+
+	std::unique_ptr<Clock> clock;
 };

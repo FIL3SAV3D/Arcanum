@@ -46,14 +46,14 @@ void ArcEngine::Run()
 {
     coordinator->mSystemManager->OnCreate();
 
-    while (!glfwWindowShouldClose(window->GetWindow()))
+    while (!glfwWindowShouldClose(window->GetNativeWindow()))
     {
         inputHandler = std::make_shared<InputHandler>();
 
         coordinator->mSystemManager->OnUpdate();
 
         // Check and call events and swap buffers
-        glfwSwapBuffers(window->GetWindow());
+        glfwSwapBuffers(window->GetNativeWindow());
         glfwPollEvents();
     }
 

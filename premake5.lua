@@ -74,8 +74,10 @@ workspace "Arcanum"
 		filter{}
 
 		links { "ArcEngine" }
+		links { "Framework" }
 
 		includedirs { "../Arcanum/source/Framework" }
+		includedirs { "../Arcanum/source/ArcEngine" }
 	
 	project "Framework"
 		kind "StaticLib"
@@ -109,6 +111,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/library/GLFW/include" }
 		includedirs { "../Arcanum/library/GLM" }
 		includedirs { "../Arcanum/source/ArcEngine" }
+		includedirs { "../Arcanum/source/Framework" }
 		includedirs { "../Arcanum/source/Jolt" }
 		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }

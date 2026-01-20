@@ -10,7 +10,6 @@
 #include "ECS/Interfaces/ISystem.h"
 
 #include <GLFW/glfw3.h>
-#include "ILayer.h"
 
 class SystemManager
 {

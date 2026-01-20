@@ -8,7 +8,9 @@ public:
 	Window(const int& screenWidth, const int& screenHeight, const char* windowName);
 	~Window();
 
-	constexpr GLFWwindow* GetWindow() const { return window; }
+
+
+	GLFWwindow* GetNativeWindow() const { return window; }
 
 	int screenWidth;
 	int screenHeight;

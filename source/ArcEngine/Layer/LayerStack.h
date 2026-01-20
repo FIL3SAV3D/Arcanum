@@ -2,6 +2,7 @@
 
 #include "ILayer.h"
 #include <vector>
+#include <memory>
 
 class LayerStack
 {
@@ -9,11 +10,11 @@ public:
 	LayerStack();
 	~LayerStack();
 
-	void PushLayer(ILayer* layer);
-	void PopLayer(ILayer* layer);
+	void PushLayer(std::shared_ptr<ILayer> layer);
+	void PopLayer(std::shared_ptr<ILayer> layer);
 
-	std::vector<ILayer*>::iterator begin() { return m_Layers.begin(); }
-
+	std::vector<std::shared_ptr<ILayer>> m_Layers;
 private:
-	std::vector<ILayer*> m_Layers;
+	unsigned int m_LayerInsertIndex;
+
 };

@@ -47,12 +47,12 @@ OGLSystem::~OGLSystem()
 
 void OGLSystem::Run()
 {
-	glfwSetWindowUserPointer(sptr_OGLWindow->GetWindow(), this);
-	glfwSetFramebufferSizeCallback(sptr_OGLWindow->GetWindow(), FrameBufferSizeCallback);
+	glfwSetWindowUserPointer(sptr_OGLWindow->GetNativeWindow(), this);
+	glfwSetFramebufferSizeCallback(sptr_OGLWindow->GetNativeWindow(), FrameBufferSizeCallback);
 
-	glfwSetCursorPosCallback(sptr_OGLWindow->GetWindow(), CursorCallback);
-	glfwSetScrollCallback(sptr_OGLWindow->GetWindow(), ScrollCallback);
-	glfwSetKeyCallback(sptr_OGLWindow->GetWindow(), KeyCallback);
+	glfwSetCursorPosCallback(sptr_OGLWindow->GetNativeWindow(), CursorCallback);
+	glfwSetScrollCallback(sptr_OGLWindow->GetNativeWindow(), ScrollCallback);
+	glfwSetKeyCallback(sptr_OGLWindow->GetNativeWindow(), KeyCallback);
 
 	//glEnable(GL_STENCIL_TEST);
 	//glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -73,7 +73,7 @@ void OGLSystem::Run()
 	double timepassed = 0;
 
 	if (glfwRawMouseMotionSupported())
-		glfwSetInputMode(sptr_OGLWindow->GetWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+		glfwSetInputMode(sptr_OGLWindow->GetNativeWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
 	camera = std::make_shared<Camera>();
 	camera->SetPosition(glm::vec3(0.0f, 1.0f, 0.0f));
@@ -84,7 +84,7 @@ void OGLSystem::Run()
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
-	ImGui_ImplGlfw_InitForOpenGL(sptr_OGLWindow->GetWindow(), true);
+	ImGui_ImplGlfw_InitForOpenGL(sptr_OGLWindow->GetNativeWindow(), true);
 	ImGui_ImplOpenGL3_Init("#version 460");
 
 	renderer = std::make_shared<DeferredRenderer>();
@@ -92,14 +92,14 @@ void OGLSystem::Run()
 
 	glm::vec2 test = glm::vec2(0.0f, 1.0f);
 
-	while (!glfwWindowShouldClose(sptr_OGLWindow->GetWindow()))
+	while (!glfwWindowShouldClose(sptr_OGLWindow->GetNativeWindow()))
 	{
 		currentFrameTime = (float)glfwGetTime();
 		deltaTime = currentFrameTime - lastFrameTime;
 		lastFrameTime = currentFrameTime;
 
 		// Input Events
-		inputHandler->ProcessInput(sptr_OGLWindow->GetWindow());
+		inputHandler->ProcessInput(sptr_OGLWindow->GetNativeWindow());
 
 		timepassed += deltaTime;
 
@@ -124,7 +124,7 @@ void OGLSystem::Run()
 			if (ImGui::BeginMenu("File"))
 			{
 				if (ImGui::MenuItem("Save", "CTRL+S")) {  }
-				if (ImGui::MenuItem("Exit", "ESCAPE")) { glfwSetWindowShouldClose(sptr_OGLWindow->GetWindow(), true); }
+				if (ImGui::MenuItem("Exit", "ESCAPE")) { glfwSetWindowShouldClose(sptr_OGLWindow->GetNativeWindow(), true); }
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Edit"))
@@ -161,7 +161,7 @@ void OGLSystem::Run()
 
 
 		// Check and call events and swap buffers
-		glfwSwapBuffers(sptr_OGLWindow->GetWindow());
+		glfwSwapBuffers(sptr_OGLWindow->GetNativeWindow());
 		glfwPollEvents();
 
 		frames++;

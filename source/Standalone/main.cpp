@@ -2,6 +2,8 @@
 
 #include "App/Application.h"
 
+#include "StandaloneMode.h"
+
 int main(int /*NumArgs*/, char** /*ppArgs*/)
 {
     try

@@ -1,28 +1,58 @@
 #include "Application.h"
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include <format>
+#include "Modes/ModeMain.h"
+
 Application::Application():
-	stateManger{std::make_unique<StateManger>()}
+	modeManger{std::make_unique<ModeManager>()},
+	window      {std::make_shared<Window>      (800,600, "Arcanum")},
+	inputHandler{std::make_unique<InputHandler>()},
+	clock{std::make_unique<Clock>()}
 {
+	glfwSetWindowUserPointer(window->GetNativeWindow(), this);
+	//glfwSetFramebufferSizeCallback(window->GetNativeWindow(), FrameBufferSizeCallback);
+
+	glfwSetCursorPosCallback(window->GetNativeWindow(), InputHandler::CursorCallBackImpl);
+	glfwSetScrollCallback(window->GetNativeWindow(), InputHandler::ScrollCallBackImpl);
+	glfwSetKeyCallback(window->GetNativeWindow(), InputHandler::KeyCallBackImpl);
+
 }
 
 Application::~Application()
 {
 }
 
-Application::Application(const Application& other)
+void Application::Create()
 {
+	modeManger->PushMode<ModeMain>("Main", window);
+
+	modeManger->SwitchMode("Main");
 }
 
-Application::Application(Application&& other) noexcept
+void Application::Run()
 {
+	inputHandler->ProcessInput(window->GetNativeWindow());
+
+	clock->Update();
+	//std::printf(std::format("App Time: {}\n", clock->GetTime()).c_str());
+
+	modeManger->Update(clock->GetDeltaTime());
+
+	for (auto kv : modeManger->m_Modes)
+	{
+		std::printf(std::string(kv.first).append("\n").c_str());
+	}
 }
 
-Application& Application::operator=(const Application& other)
+void Application::Destroy()
 {
-	// TODO: insert return statement here
+
 }
 
-Application& Application::operator=(Application&& other) noexcept
+bool Application::IsQuitting()
 {
-	// TODO: insert return statement here
+	return glfwWindowShouldClose(window->GetNativeWindow());
 }
