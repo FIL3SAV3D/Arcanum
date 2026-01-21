@@ -11,7 +11,6 @@ ModeManager::~ModeManager()
 
 void ModeManager::Update(const float& _DeltaTime)
 {
-	currentMode->Update(_DeltaTime);
 }
 
 

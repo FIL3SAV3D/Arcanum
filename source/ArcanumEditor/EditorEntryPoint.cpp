@@ -1,0 +1,27 @@
+#include <iostream>
+
+#include "App/EditorApplication.h"
+
+int main(int /*NumArgs*/, char** /*ppArgs*/)
+{
+    try
+    {
+        EditorApplication* application = new EditorApplication();
+        application->Create();
+
+        while (!application->IsQuitting())
+        {
+            application->Run();
+        }
+
+        application->Destroy();
+    }
+    catch (const std::exception& e)
+    {
+        std::printf(e.what());
+        system("pause");
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}

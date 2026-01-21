@@ -50,6 +50,19 @@ workspace "Arcanum"
 		filter{}
 
 		links { "ArcEngine" }
+		includedirs { "../Arcanum/source/ArcEngine" }
+
+		links { "Framework" }
+		includedirs { "../Arcanum/source/Framework" }
+
+		links { "ArcanumEditor" }
+		includedirs { "../Arcanum/source/ArcanumEditor" }
+
+		includedirs { "../Arcanum/library/GLFW/include" }
+		includedirs { "../Arcanum/library/GLM" }
+
+		-- Submodules
+		includedirs { "../Arcanum/submodules/imgui" }
 
 	project "Standalone"
 		kind "ConsoleApp"
@@ -78,6 +91,12 @@ workspace "Arcanum"
 
 		includedirs { "../Arcanum/source/Framework" }
 		includedirs { "../Arcanum/source/ArcEngine" }
+
+		includedirs { "../Arcanum/library/GLFW/include" }
+		includedirs { "../Arcanum/library/GLM" }
+
+		-- Submodules
+		includedirs { "../Arcanum/submodules/imgui" }
 	
 	project "Framework"
 		kind "StaticLib"

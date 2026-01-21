@@ -7,6 +7,7 @@
 #include "Modes/ModeMain.h"
 
 Application::Application():
+	m_LayerStack{std::make_unique<LayerStack>()},
 	modeManger{std::make_unique<ModeManager>()},
 	window      {std::make_shared<Window>      (800,600, "Arcanum")},
 	inputHandler{std::make_unique<InputHandler>()},
@@ -29,7 +30,7 @@ void Application::Create()
 {
 	modeManger->PushMode<ModeMain>("Main", window);
 
-	modeManger->SwitchMode("Main");
+	//modeManger->SwitchMode("Main");
 }
 
 void Application::Run()
@@ -37,14 +38,8 @@ void Application::Run()
 	inputHandler->ProcessInput(window->GetNativeWindow());
 
 	clock->Update();
-	//std::printf(std::format("App Time: {}\n", clock->GetTime()).c_str());
 
-	modeManger->Update(clock->GetDeltaTime());
-
-	for (auto kv : modeManger->m_Modes)
-	{
-		std::printf(std::string(kv.first).append("\n").c_str());
-	}
+	m_LayerStack->Update(clock->GetDeltaTime());
 }
 
 void Application::Destroy()

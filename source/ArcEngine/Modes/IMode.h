@@ -21,16 +21,6 @@ public:
 
 	virtual void Update(const float& _delta_time) = 0;
 
-	void Pushlayer(std::shared_ptr<ILayer> layer) { m_LayerStack->PushLayer(layer); }
-	void Poplayer(std::shared_ptr<ILayer> layer) { m_LayerStack->PopLayer(layer); }
-
-	void UpdateLayer(const float& _DeltaTime) {
-		for (auto layer : m_LayerStack->m_Layers)
-		{
-			layer->OnUpdate(_DeltaTime);
-		}
-	};
-
 	std::string name;
 private:
 	std::shared_ptr<LayerStack> m_LayerStack;

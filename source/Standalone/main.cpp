@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "App/Application.h"
+#include "StandaloneGame.h"
 
 #include "StandaloneMode.h"
 
@@ -8,15 +8,15 @@ int main(int /*NumArgs*/, char** /*ppArgs*/)
 {
     try
     {
-        Application* application = new Application();
-        application->Create();
+        StandaloneGame* game = new StandaloneGame();
+        game->Create();
 
-        while (!application->IsQuitting())
+        while (!game->IsQuitting())
         {
-            application->Run();
+            game->Run();
         }
 
-        application->Destroy();
+        game->Destroy();
     }
     catch (const std::exception& e)
     {
