@@ -41,3 +41,7 @@ obj/
 *.log
 *.tlog
 *.log
+
+# Ignore volatile UI-related state
+ArcanumRoadMap/.obsidian/workspace.json
+ArcanumRoadMap/.obsidian/app.json
