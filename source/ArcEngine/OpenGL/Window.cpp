@@ -5,6 +5,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <backends/imgui_impl_glfw.h>
+
 Window::Window(const int& _screenWidth, const int& _screenHeight, const char* windowName)
 {
 	glfwInit();
@@ -13,7 +15,17 @@ Window::Window(const int& _screenWidth, const int& _screenHeight, const char* wi
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 1);
 
-	window = glfwCreateWindow(_screenWidth, _screenHeight, windowName, nullptr, nullptr);
+	auto monitor = glfwGetPrimaryMonitor();
+
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+
+	float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor());
+
+	window = glfwCreateWindow(_screenWidth * main_scale, _screenHeight * main_scale, windowName, nullptr, nullptr);
+	
+	//glfwSetWindowMonitor(window, monitor,0, 0, _screenWidth * main_scale, _screenHeight * main_scale, 60);
+
 	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;

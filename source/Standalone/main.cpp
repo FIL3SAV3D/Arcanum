@@ -1,14 +1,12 @@
 #include <iostream>
 
-#include "StandaloneGame.h"
-
-#include "StandaloneMode.h"
+#include "App/StandaloneApplication.h"
 
 int main(int /*NumArgs*/, char** /*ppArgs*/)
 {
     try
     {
-        StandaloneGame* game = new StandaloneGame();
+        StandaloneApplication* game = new StandaloneApplication();
         game->Create();
 
         while (!game->IsQuitting())

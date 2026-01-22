@@ -9,7 +9,7 @@ class EditorApplication : public Application
 {
 public:
 	EditorApplication():
-		Application{}
+		Application{ ApplicationSpecification{ std::string("ARCANUM EDITOR"), glm::vec2(1920, 1080), false }}
 	{
 		PushLayer<EditorLayer>(GetWindow());
 	}

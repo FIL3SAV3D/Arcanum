@@ -61,6 +61,8 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/library/GLFW/include" }
 		includedirs { "../Arcanum/library/GLM" }
 
+		includedirs { "../Arcanum/library/GLAD/include" }
+
 		-- Submodules
 		includedirs { "../Arcanum/submodules/imgui" }
 
@@ -86,6 +88,9 @@ workspace "Arcanum"
 		
 		filter{}
 
+		links { "Standalone" }
+		includedirs { "../Arcanum/source/Standalone" }
+
 		links { "ArcEngine" }
 		links { "Framework" }
 
@@ -94,6 +99,8 @@ workspace "Arcanum"
 
 		includedirs { "../Arcanum/library/GLFW/include" }
 		includedirs { "../Arcanum/library/GLM" }
+
+		includedirs { "../Arcanum/library/GLAD/include" }
 
 		-- Submodules
 		includedirs { "../Arcanum/submodules/imgui" }

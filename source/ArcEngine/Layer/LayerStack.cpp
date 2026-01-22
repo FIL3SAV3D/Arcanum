@@ -26,12 +26,12 @@ void LayerStack::PopLayer(std::shared_ptr<ILayer> layer)
 
 void LayerStack::Update(const float& _DeltaTime)
 {
-	int i = 0;
+	//int i = 0;
 	for (auto layer : m_LayerPriorities)
 	{
-		std::printf(std::format("{}: Layer: {} Priority: {}\n", i, layer->GetName(), layer->GetPriority()).c_str());
+		//std::printf(std::format("{}: Layer: {} Priority: {}\n", i, layer->GetName(), layer->GetPriority()).c_str());
 
 		layer->OnUpdate(_DeltaTime);
-		i++;
+		//i++;
 	}
 }
