@@ -20,6 +20,8 @@ void ModeMain::OnCreate()
 	//Pushlayer(std::static_pointer_cast<ILayer>(std::make_shared<GameLayer>(window)));
 }
 
+
+
 void ModeMain::OnDestroy()
 {
 }

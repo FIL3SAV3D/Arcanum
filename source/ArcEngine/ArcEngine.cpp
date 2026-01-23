@@ -4,7 +4,7 @@
 
 #include "ECS/Coordinator.h"
 #include "ECS/Systems/MeshRenderSystem.h"
-#include "ECS/Systems/UIRenderSystem.h"
+//#include "ECS/Systems/UIRenderSystem.h"
 
 #include "ECS/Components/TransformComponent.h"
 //#include "ECS/Components/ModelComponent.h"
@@ -26,9 +26,9 @@ ArcEngine::ArcEngine()
     coordinator = std::make_shared<Coordinator>();
 
     coordinator->RegisterSystem<MeshRenderSystem, 100>(window, MeshRenderSystem::DEFFERED);
-    coordinator->RegisterSystem<UIRenderSystem, 101>(window);
+    //coordinator->RegisterSystem<UIRenderSystem, 101>(window);
 
-    coordinator->mSystemManager->RecalculateUpdateOrder();
+    //coordinator->mSystemManager->RecalculateUpdateOrder();
 
     //coordinator->RegisterComponent<ModelComponent>();
     coordinator->RegisterComponent<TransformComponent>();
@@ -44,20 +44,20 @@ ArcEngine::~ArcEngine()
 
 void ArcEngine::Run()
 {
-    coordinator->mSystemManager->OnCreate();
+    //coordinator->mSystemManager->OnCreate();
 
     while (!glfwWindowShouldClose(window->GetNativeWindow()))
     {
         inputHandler = std::make_shared<InputHandler>();
 
-        coordinator->mSystemManager->OnUpdate();
+        //coordinator->mSystemManager->OnUpdate();
 
         // Check and call events and swap buffers
         glfwSwapBuffers(window->GetNativeWindow());
         glfwPollEvents();
     }
 
-    coordinator->mSystemManager->OnDestroy();
+    //coordinator->mSystemManager->OnDestroy();
 
     glfwTerminate();
 }

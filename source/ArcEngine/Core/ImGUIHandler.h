@@ -20,12 +20,12 @@ public:
 
 	void ShowExampleAppDockSpace(bool* p_open);
 
+	glm::vec4 clear_color{0.1f, 0.1f, 0.1f, 1.0f};
 private:
 	bool show_demo_window = true;
 	bool open = true;
 	bool show_another_window = true;
 
-	glm::vec4 clear_color{0.1f, 0.1f, 0.1f, 1.0f};
 
 	ImGuiIO* io;
 

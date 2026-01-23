@@ -4,6 +4,9 @@
 
 #include "ECS/Interfaces/ISystem.h"
 
+#include "Core/ImGUIHandler.h"
+
+#include "glm/vec4.hpp"
 
 class Window;
 
@@ -14,9 +17,12 @@ public:
 	~UIRenderSystem();
 
 	void OnCreate() override;
-	void OnUpdate(const float& _deltaTime) override;
+	void OnRenderUI(std::shared_ptr<IRenderer> _Renderer) override;
 	void OnDestroy() override;
 
+	glm::vec4 clear_color{ 0.1f, 0.1f, 0.1f, 1.0f };
 private:
+	std::unique_ptr<ImGUIHandler> m_ImGUIHandler;
+
 	std::shared_ptr<Window> window;
 };

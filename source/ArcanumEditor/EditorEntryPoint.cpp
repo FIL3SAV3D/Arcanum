@@ -7,14 +7,14 @@ int main(int /*NumArgs*/, char** /*ppArgs*/)
     try
     {
         EditorApplication* application = new EditorApplication();
-        application->Create();
+        application->OnCreate();
 
         while (!application->IsQuitting())
         {
             application->Run();
         }
 
-        application->Destroy();
+        application->OnDestroy();
     }
     catch (const std::exception& e)
     {

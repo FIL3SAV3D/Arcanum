@@ -6,6 +6,8 @@
 #include "ECS/Managers/EntityManager.h"
 #include "ECS/Managers/ComponentManager.h"
 
+#include "OpenGL/IRenderer.h"
+
 class Coordinator
 {
 public:
@@ -13,13 +15,13 @@ public:
     {
         mEntityManager    = std::make_unique<EntityManager>();
         mComponentManager = std::make_unique<ComponentManager>();
-        mSystemManager    = std::make_unique<SystemManager>();
+        m_SystemManager    = std::make_unique<SystemManager>();
     }
     ~Coordinator()
     {
         mEntityManager.reset();
         mComponentManager.reset();
-        mSystemManager.reset();
+        m_SystemManager.reset();
     }
 
     // Entity methods
@@ -34,7 +36,7 @@ public:
 
         mComponentManager->EntityDestroyed(entity);
 
-        mSystemManager->EntityDestroyed(entity);
+        m_SystemManager->EntityDestroyed(entity);
     }
 
     // Component methods
@@ -53,7 +55,7 @@ public:
         signature.set(mComponentManager->GetComponentType<T>(), true);
         mEntityManager->SetSignature(entity, signature);
 
-        mSystemManager->EntitySignatureChanged(entity, signature);
+        m_SystemManager->EntitySignatureChanged(entity, signature);
     }
 
     template<typename T>
@@ -65,7 +67,7 @@ public:
         signature.set(mComponentManager->GetComponentType<T>(), false);
         mEntityManager->SetSignature(entity, signature);
 
-        mSystemManager->EntitySignatureChanged(entity, signature);
+        m_SystemManager->EntitySignatureChanged(entity, signature);
     }
 
     template<typename T>
@@ -88,19 +90,55 @@ public:
 
     // System methods
     template<typename T, const int priority, typename... Args >
-    std::shared_ptr<T> RegisterSystem(Args ..._args)
+    std::weak_ptr<T> RegisterSystem(Args ..._args)
     {
-        return mSystemManager->RegisterSystem<T, priority, Args... >(_args...);
+        return m_SystemManager->RegisterSystem<T, priority, Args... >(_args...);
     }
 
     template<typename T>
     void SetSystemSignature(Signature signature)
     {
-        mSystemManager->SetSignature<T>(signature);
+        m_SystemManager->SetSignature<T>(signature);
+    }
+
+public:
+    void OnCreate()
+    {
+        m_SystemManager->OnCreate();
+    }
+
+    void OnInput()
+    {
+        m_SystemManager->OnInput();
+    }
+    void OnUpdate(const float& _DeltaTime)
+    {
+        m_SystemManager->OnUpdate(_DeltaTime);
+    }
+    void OnLateUpdate(const float& _DeltaTime)
+    {
+        m_SystemManager->OnLateUpdate(_DeltaTime);
+    }
+    void OnRender(std::shared_ptr<IRenderer> _Renderer)
+    {
+        m_SystemManager->OnRender(_Renderer);
+    }
+    void OnRenderUI(std::shared_ptr<IRenderer> _Renderer)
+    {
+        m_SystemManager->OnRenderUI(_Renderer);
+    }
+
+    void OnApplicationPause()
+    {
+        m_SystemManager->OnApplicationPause();
+    }
+    void OnCheckForDisabled()
+    {
+        m_SystemManager->OnApplicationPause();
     }
 
 public:
     std::unique_ptr<ComponentManager> mComponentManager;
     std::unique_ptr<EntityManager> mEntityManager;
-    std::unique_ptr<SystemManager> mSystemManager;
+    std::unique_ptr<SystemManager> m_SystemManager;
 };

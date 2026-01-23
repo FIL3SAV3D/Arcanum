@@ -93,15 +93,59 @@ public:
 		}
 	}
 
-	void OnUpdate()
+	void OnInput()
 	{
-		currentFrameTime = (float)glfwGetTime();
-		deltaTime = currentFrameTime - lastFrameTime;
-		lastFrameTime = currentFrameTime;
-
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnUpdate(deltaTime);
+			system->OnInput();
+		}
+	}
+
+	void OnUpdate(const float& _DeltaTime)
+	{
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnUpdate(_DeltaTime);
+		}
+	}
+
+	void OnLateUpdate(const float& _DeltaTime)
+	{
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnLateUpdate(_DeltaTime);
+		}
+	}
+
+	void OnRender(std::shared_ptr<IRenderer> _Renderer)
+	{
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnRender(_Renderer);
+		}
+	}
+
+	void OnRenderUI(std::shared_ptr<IRenderer> _Renderer)
+	{
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnRenderUI(_Renderer);
+		}
+	}
+
+	void OnApplicationPause()
+	{
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnApplicationPause();
+		}
+	}
+
+	void OnCheckForDisabled()
+	{
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnCheckForDisabled();
 		}
 	}
 

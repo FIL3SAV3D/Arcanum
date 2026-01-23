@@ -11,6 +11,5 @@ public:
 	EditorApplication():
 		Application{ ApplicationSpecification{ std::string("ARCANUM EDITOR"), glm::vec2(1920, 1080), false }}
 	{
-		PushLayer<EditorLayer>(GetWindow());
 	}
 };

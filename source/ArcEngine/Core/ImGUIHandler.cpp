@@ -37,7 +37,7 @@ bool ImGUIHandler::Initialize(std::shared_ptr<Window> _Window)
 
 	if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
-		style.WindowRounding = 0.0f;
+		style.WindowRounding = 1.0f;
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	}
 
@@ -63,54 +63,54 @@ void ImGUIHandler::Update()
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::DockSpaceOverViewport();
+	//ImGui::DockSpaceOverViewport();
 
-	if (ImGui::BeginMainMenuBar())
-	{
-		if (ImGui::BeginMenu("File"))
-		{
-			if (ImGui::MenuItem("Save", "CTRL+S")) {}
-			if (ImGui::MenuItem("Build Release", ""))
-			{
-				system("MSBuild.exe Arcanum.sln /t:Standalone /p:Configuration=\"Release\" /p:Platform=\"x64\" /p:BuildProjectReferences=false");
-			}
-			if (ImGui::MenuItem("Build & Run Release", ""))
-			{
-				if (system("MSBuild.exe Arcanum.sln /t:Standalone /p:Configuration=\"Release\" /p:Platform=\"x64\" /p:BuildProjectReferences=false") == 0)
-				{
-					system("%cd%/bin/Release/Standalone.exe");
-				}
-			}
-			if (ImGui::MenuItem("Exit", "ESCAPE")) { glfwSetWindowShouldClose(window->GetNativeWindow(), true); }
-			ImGui::EndMenu();
-		}
-		if (ImGui::BeginMenu("Edit"))
-		{
-			if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-			if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {} // Disabled item
-			ImGui::Separator();
-			if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-			if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-			if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-			ImGui::EndMenu();
-		}
-		if (ImGui::BeginMenu("Debug"))
-		{
-			//if (ImGui::Checkbox("Debug Rendering", &debugMode)) {}
-			//if (ImGui::SliderFloat2("Depth Range", glm::value_ptr(test), 0.0f, 1.0f)) {}
+	//if (ImGui::BeginMainMenuBar())
+	//{
+	//	if (ImGui::BeginMenu("File"))
+	//	{
+	//		if (ImGui::MenuItem("Save", "CTRL+S")) {}
+	//		if (ImGui::MenuItem("Build Release", ""))
+	//		{
+	//			system("MSBuild.exe Arcanum.sln /t:Standalone /p:Configuration=\"Release\" /p:Platform=\"x64\" /p:BuildProjectReferences=false");
+	//		}
+	//		if (ImGui::MenuItem("Build & Run Release", ""))
+	//		{
+	//			if (system("MSBuild.exe Arcanum.sln /t:Standalone /p:Configuration=\"Release\" /p:Platform=\"x64\" /p:BuildProjectReferences=false") == 0)
+	//			{
+	//				system("%cd%/bin/Release/Standalone.exe");
+	//			}
+	//		}
+	//		if (ImGui::MenuItem("Exit", "ESCAPE")) { glfwSetWindowShouldClose(window->GetNativeWindow(), true); }
+	//		ImGui::EndMenu();
+	//	}
+	//	if (ImGui::BeginMenu("Edit"))
+	//	{
+	//		if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+	//		if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {} // Disabled item
+	//		ImGui::Separator();
+	//		if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+	//		if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+	//		if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+	//		ImGui::EndMenu();
+	//	}
+	//	if (ImGui::BeginMenu("Debug"))
+	//	{
+	//		//if (ImGui::Checkbox("Debug Rendering", &debugMode)) {}
+	//		//if (ImGui::SliderFloat2("Depth Range", glm::value_ptr(test), 0.0f, 1.0f)) {}
 
-			ImGui::EndMenu();
-		}
-		if (ImGui::BeginMenu("Post Process"))
-		{
-			ImGui::EndMenu();
-		}
+	//		ImGui::EndMenu();
+	//	}
+	//	if (ImGui::BeginMenu("Post Process"))
+	//	{
+	//		ImGui::EndMenu();
+	//	}
 
-		//ImGui::Text((std::string("FPS: ") + std::to_string(static_cast<int>(fps))).c_str());
-		ImGui::EndMainMenuBar();
-	}
+	//	//ImGui::Text((std::string("FPS: ") + std::to_string(static_cast<int>(fps))).c_str());
+	//	ImGui::EndMainMenuBar();
+	//}
 
-	ShowExampleAppDockSpace(&open);
+	//ShowExampleAppDockSpace(&open);
 
 
 
@@ -152,11 +152,6 @@ void ImGUIHandler::Update()
 	}
 
 	ImGui::Render();
-	int display_w, display_h;
-	glfwGetFramebufferSize(window->GetNativeWindow(), &display_w, &display_h);
-	glViewport(0, 0, display_w, display_h);
-	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-	glClear(GL_COLOR_BUFFER_BIT);
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	// Imgui end render
 
@@ -238,8 +233,26 @@ void ImGUIHandler::ShowExampleAppDockSpace(bool* p_open)
 		//ShowDockingDisabledMessage();
 	}
 
-	if (ImGui::BeginMenuBar())
+	if (ImGui::BeginMainMenuBar())
 	{
+		if (ImGui::BeginMenu("File"))
+				{
+					if (ImGui::MenuItem("Save", "CTRL+S")) {}
+					if (ImGui::MenuItem("Build Release", ""))
+					{
+						system("MSBuild.exe Arcanum.sln /t:Standalone /p:Configuration=\"Release\" /p:Platform=\"x64\" /p:BuildProjectReferences=false");
+					}
+					if (ImGui::MenuItem("Build & Run Release", ""))
+					{
+						if (system("MSBuild.exe Arcanum.sln /t:Standalone /p:Configuration=\"Release\" /p:Platform=\"x64\" /p:BuildProjectReferences=false") == 0)
+						{
+							system("%cd%/bin/Release/Standalone.exe");
+						}
+					}
+					if (ImGui::MenuItem("Exit", "ESCAPE")) { glfwSetWindowShouldClose(window->GetNativeWindow(), true); }
+					ImGui::EndMenu();
+				}
+
 		if (ImGui::BeginMenu("Options"))
 		{
 			// Disabling fullscreen would allow the window to be moved to the front of other windows,
@@ -255,8 +268,8 @@ void ImGUIHandler::ShowExampleAppDockSpace(bool* p_open)
 			if (ImGui::MenuItem("Flag: PassthruCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen)) { dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode; }
 			ImGui::Separator();
 
-			if (ImGui::MenuItem("Close", NULL, false, p_open != NULL))
-				*p_open = false;
+			/*if (ImGui::MenuItem("Close", NULL, false, p_open != NULL))
+				*p_open = false;*/
 			ImGui::EndMenu();
 		}
 		/*HelpMarker(
@@ -269,7 +282,7 @@ void ImGUIHandler::ShowExampleAppDockSpace(bool* p_open)
 			"This demo app only demonstrate the use of ImGui::DockSpace() which allows you to manually create a docking node _within_ another window." "\n\n"
 			"Read comments in ShowExampleAppDockSpace() for more details.");*/
 
-		ImGui::EndMenuBar();
+		ImGui::EndMainMenuBar();
 	}
 
 	ImGui::End();
