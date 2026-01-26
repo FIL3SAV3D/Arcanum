@@ -10,7 +10,7 @@
 #include <OpenGL/IRenderer.h>
 #include <ECS/Coordinator.h>
 
-#include "ECS/UIRenderSystem.h"
+#include "ECS/Systems/UIRenderSystem.h"
 
 struct ApplicationSpecification
 {
@@ -71,7 +71,7 @@ public:
 	std::shared_ptr<ILayer> PushLayer(Args... _Args) { return m_LayerStack->PushLayer<T>(_Args...); }
 
 private:
-	std::unique_ptr<Coordinator> coordinator;
+	std::shared_ptr<Coordinator> coordinator;
 
 	std::shared_ptr<IRenderer> renderer;
 

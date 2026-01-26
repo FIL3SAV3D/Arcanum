@@ -17,7 +17,7 @@ class Model
 public:
 	Model(const char* _path, bool gamma = false);
 
-	void Draw(Shader& _shader);
+	void Draw(Shader* _shader);
 
 	std::vector<Texture> texturesLoaded;
 

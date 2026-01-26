@@ -113,7 +113,7 @@ void HDRCubemap::ConvertEquirectangularToCubemap(const unsigned int& _format)
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        cube.Draw(equirectangularToCubemapShader); // renders a 1x1 cube
+        cube.Draw(&equirectangularToCubemapShader); // renders a 1x1 cube
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -167,7 +167,7 @@ void HDRCubemap::ConvertCubemapToIrradiance(const unsigned int& _format)
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        cube.Draw(irradianceShader);
+        cube.Draw(&irradianceShader);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -228,7 +228,7 @@ void HDRCubemap::PrefilterHDRMap(const unsigned int& _format)
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mip);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            cube.Draw(prefilterShader);
+            cube.Draw(&prefilterShader);
         }
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

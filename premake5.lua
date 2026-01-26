@@ -58,6 +58,9 @@ workspace "Arcanum"
 		links { "ArcanumEditor" }
 		includedirs { "../Arcanum/source/ArcanumEditor" }
 
+		links { "Jolt" }
+		includedirs { "../Arcanum/source/Jolt" }
+
 		includedirs { "../Arcanum/library/GLFW/include" }
 		includedirs { "../Arcanum/library/GLM" }
 
@@ -133,12 +136,14 @@ workspace "Arcanum"
 		links { "ArcEngine" }
 		links { "ArcNetCommon" }
 
+		links { "Jolt" }
+		includedirs { "../Arcanum/source/Jolt" }
+
 		includedirs { "$(VULKAN_SDK)/include" }
 		includedirs { "../Arcanum/library/GLFW/include" }
 		includedirs { "../Arcanum/library/GLM" }
 		includedirs { "../Arcanum/source/ArcEngine" }
 		includedirs { "../Arcanum/source/Framework" }
-		includedirs { "../Arcanum/source/Jolt" }
 		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 		includedirs { "../Arcanum/library/GLAD/include" }
@@ -176,12 +181,14 @@ workspace "Arcanum"
 		links { "ArcEngine" }
 		links { "ArcNetCommon" }
 
+		links { "Jolt" }
+		includedirs { "../Arcanum/source/Jolt" }
+
 		includedirs { "$(VULKAN_SDK)/include" }
 		includedirs { "../Arcanum/library/GLFW/include" }
 		includedirs { "../Arcanum/library/GLM" }
 		includedirs { "../Arcanum/source/ArcEngine" }
 		includedirs { "../Arcanum/source/Framework" }
-		includedirs { "../Arcanum/source/Jolt" }
 		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 		includedirs { "../Arcanum/library/GLAD/include" }
@@ -230,7 +237,6 @@ workspace "Arcanum"
 
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
 		links { "../Arcanum/library/GLFW/lib-vc2022/glfw3.lib"}
-		links { "Jolt" }
 		links { "ArcNetCommon" }
 		
 		
@@ -240,6 +246,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/library/TinyGLTF" }
 		includedirs { "../Arcanum/library/TinyObj" }
 		includedirs { "../Arcanum/source/ArcEngine" }
+		links { "Jolt" }
 		includedirs { "../Arcanum/source/Jolt" }
 		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
@@ -256,10 +263,13 @@ workspace "Arcanum"
 
 		files{
 			"source/Jolt/**.h",
+			"source/Jolt/**.inl",
+			"source/Jolt/**.c",
 			"source/Jolt/**.cpp",
 			"source/Jolt/**.hpp"
 		}
 
+		links { "Jolt" }
 		includedirs { "../Arcanum/source/Jolt" }
 
 	project "ArcNetCommon"

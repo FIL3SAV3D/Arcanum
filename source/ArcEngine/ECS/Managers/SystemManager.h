@@ -11,18 +11,21 @@
 
 #include <GLFW/glfw3.h>
 
+class Coordinator;
+
 class SystemManager
 {
 public:
 	template<typename T, const int priority, typename ...Args>
-	std::shared_ptr<T> RegisterSystem(Args ..._args)
+	std::shared_ptr<ISystem> RegisterSystem(std::shared_ptr<Coordinator> _Coordinator, Args ..._args)
 	{
 		const char* typeName = typeid(T).name();
 
 		assert(mSystems.find(typeName) == mSystems.end() && "Registering system more than once.");
 
 		// Create a pointer to the system and return it so it can be used externally
-		auto system = std::make_shared<T>(_args...);
+		std::shared_ptr<ISystem> system = std::static_pointer_cast<ISystem>(std::make_shared<T>(_args...));
+		system->coordinator = _Coordinator;
 		mSystems.insert({ typeName, system });
 
 		mUpdateOrderHolder[priority] = system;

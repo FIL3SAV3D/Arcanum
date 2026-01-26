@@ -252,7 +252,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.1f));
 		m_shadowMap->setMat4("model", model);
-		m_RatModel->Draw(*m_shadowMap);
+		m_RatModel->Draw(m_shadowMap.get());
 	}
 
 	// Render Normal
@@ -279,7 +279,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 		model = glm::scale(model, glm::vec3(0.1f));
 		m_shaderGeometryPass->setMat4("model", model);
 		m_shaderGeometryPass->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-		m_RatModel->Draw(*m_shaderGeometryPass);
+		m_RatModel->Draw(m_shaderGeometryPass.get());
 
 	}
 
@@ -299,7 +299,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 		model = glm::scale(model, glm::vec3(0.015f));
 		m_shaderGeometryPass->setMat4("model", model);
 		m_shaderGeometryPass->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-		m_ratHat->Draw(*m_shaderGeometryPass);
+		m_ratHat->Draw(m_shaderGeometryPass.get());
 	}
 
 	glActiveTexture(GL_TEXTURE0);
@@ -322,7 +322,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	planeMatrix = glm::scale(planeMatrix, glm::vec3(10.0f));
 	m_shaderGeometryPassNoTextures->setMat4("model", planeMatrix);
 	m_shaderGeometryPassNoTextures->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(planeMatrix))));
-	m_plane->Draw(*m_shaderGeometryPassNoTextures);
+	m_plane->Draw(m_shaderGeometryPassNoTextures.get());
 
 	planeMatrix = glm::mat4x4(1.0f);
 	planeMatrix = glm::translate(planeMatrix, glm::vec3(10.0f, 0.0f, 0.0f));
@@ -331,7 +331,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	m_shaderGeometryPassNoTextures->setMat4("model", planeMatrix);
 	m_shaderGeometryPassNoTextures->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(planeMatrix))));
 	//m_RatModel->Draw(*m_shaderGeometryPassNoTextures);
- 	m_deccerCubes->Draw(*m_shaderGeometryPassNoTextures);
+ 	m_deccerCubes->Draw(m_shaderGeometryPassNoTextures.get());
 
 	glDepthMask(GL_FALSE);
 	glDisable(GL_DEPTH_TEST);
@@ -390,7 +390,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 		model = glm::scale(model, glm::vec3(0.25f));
 		m_shaderLightBox->setMat4("model", model);
 		m_shaderLightBox->setVec3("lightColor", lightColors[i]);
-		m_cubeModel->Draw(*m_shaderLightBox);
+		m_cubeModel->Draw(m_shaderLightBox.get());
 	}
 
 	glDepthMask(GL_FALSE);
@@ -405,7 +405,7 @@ void DeferredRenderer::RenderSceneCB(const glm::mat4& projection, const glm::mat
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemap->envCubemap);
 
-	m_invertedCube->Draw(*m_shaderSkyBox);
+	m_invertedCube->Draw(m_shaderSkyBox.get());
 
 	glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	glDepthFunc(GL_LESS);

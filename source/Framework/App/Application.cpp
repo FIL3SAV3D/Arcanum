@@ -9,7 +9,18 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 
-#include "ECS/UIRenderSystem.h"
+#include "ECS/Systems/UIRenderSystem.h"
+#include <ECS/Systems/MeshRenderSystem.h>
+#include <ECS/Components/RenderComponent.h>
+#include <ECS/Components/TransformComponent.h>
+
+#include <random>
+#include <OpenGL/Model.h>
+
+#include "Jolt/Jolt.h"
+#include "Jolt/Math/Vec3.h"
+#include "Jolt/Math/Quat.h"
+#include <ECS/Systems/PhysicsSystem.h>
 
 Application::Application(const ApplicationSpecification& _Spec):
 	m_LayerStack{std::make_unique<LayerStack>()},
@@ -17,7 +28,7 @@ Application::Application(const ApplicationSpecification& _Spec):
 	window{ std::make_shared<Window>(static_cast<int>(_Spec.windowSize.x), static_cast<int>(_Spec.windowSize.y), _Spec.name.c_str()) },
 	inputHandler{std::make_unique<InputHandler>()},
 	clock{std::make_unique<Clock>()},
-	coordinator{ std::make_unique<Coordinator>() }
+	coordinator{ std::make_shared<Coordinator>() }
 
 {
 	glfwSetWindowUserPointer(window->GetNativeWindow(), this);
@@ -43,9 +54,10 @@ void Application::Run()
 	OnUpdate(deltaTime);
 
 	OnLateUpdate(deltaTime);
-	auto color = UI.lock()->clear_color;
+	//auto color = UI.lock()->clear_color;
 
-	glClearColor(color.x, color.y, color.z, 1.0f);
+	//glClearColor(color.x, color.y, color.z, 1.0f);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	OnRender();
@@ -64,11 +76,49 @@ void Application::Run()
 // Start
 void Application::OnCreate()
 {
-	UI = coordinator->RegisterSystem<UIRenderSystem, 10>(window);
+	coordinator->RegisterComponent<RenderComponent>();
+	coordinator->RegisterComponent<TransformComponent>();
+
+	//UI = std::static_pointer_cast<UIRenderSystem>(coordinator->RegisterSystem<UIRenderSystem, 10>(window));
+	coordinator->RegisterSystem<ECSPhysicsSystem, 20>();
+	coordinator->RegisterSystem<MeshRenderSystem, 10>();
 
 	coordinator->m_SystemManager->RecalculateUpdateOrder();
 
 	coordinator->OnCreate();
+
+	auto m_cubeModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Source\\ArcEngine\\Models\\obj_models\\cube.obj").c_str());
+
+	std::vector<Entity> entities(100);
+
+	std::default_random_engine generator;
+	std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
+	std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
+	std::uniform_real_distribution<float> randScale(3.0f, 5.0f);
+	std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
+
+	float scale = randScale(generator);
+
+	for (auto& entity : entities)
+	{
+		entity = coordinator->CreateEntity();
+
+		coordinator->AddComponent(
+			entity,
+			TransformComponent{
+				.position = JPH::Vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
+				.rotation = JPH::Quat().sEulerAngles(JPH::Vec3(randRotation(generator), randRotation(generator), randRotation(generator))),
+				.scale = JPH::Vec3(scale, scale, scale)
+			});
+
+		RenderComponent renderComponent = {};
+		renderComponent.model = m_cubeModel;
+
+		coordinator->AddComponent(
+			entity,
+			renderComponent);
+	}
+
 }
 
 void Application::OnEnable()

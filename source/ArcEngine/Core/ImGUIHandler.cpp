@@ -63,7 +63,7 @@ void ImGUIHandler::Update()
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	//ImGui::DockSpaceOverViewport();
+	ImGui::DockSpaceOverViewport();
 
 	//if (ImGui::BeginMainMenuBar())
 	//{
@@ -110,7 +110,7 @@ void ImGUIHandler::Update()
 	//	ImGui::EndMainMenuBar();
 	//}
 
-	//ShowExampleAppDockSpace(&open);
+	ShowExampleAppDockSpace(&open);
 
 
 

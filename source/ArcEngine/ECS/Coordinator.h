@@ -8,7 +8,7 @@
 
 #include "OpenGL/IRenderer.h"
 
-class Coordinator
+class Coordinator : public std::enable_shared_from_this<Coordinator>
 {
 public:
     Coordinator()
@@ -90,9 +90,9 @@ public:
 
     // System methods
     template<typename T, const int priority, typename... Args >
-    std::weak_ptr<T> RegisterSystem(Args ..._args)
+    std::shared_ptr<ISystem> RegisterSystem(Args ..._args)
     {
-        return m_SystemManager->RegisterSystem<T, priority, Args... >(_args...);
+        return std::static_pointer_cast<ISystem>(m_SystemManager->RegisterSystem<T, priority, Args... >(shared_from_this(), _args...));
     }
 
     template<typename T>

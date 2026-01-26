@@ -1,0 +1,16 @@
+#include "MeshRenderSystem.h"
+
+#include "ECS/Coordinator.h"
+#include "ECS/Components/RenderComponent.h"
+#include "ECS/Components/TransformComponent.h"
+
+void MeshRenderSystem::OnRender(std::shared_ptr<IRenderer> _Renderer)
+{
+	for (auto const& entity : mEntities)
+	{
+		auto& renderComponent = coordinator->GetComponent<RenderComponent>(entity);
+		auto& transformComponent = coordinator->GetComponent<TransformComponent>(entity);
+
+		renderComponent.model->Draw(renderComponent.shader.get());
+	}
+}
