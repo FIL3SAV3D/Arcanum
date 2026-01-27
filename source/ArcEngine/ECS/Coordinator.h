@@ -107,6 +107,11 @@ public:
         m_SystemManager->OnCreate();
     }
 
+    void OnStart()
+    {
+        m_SystemManager->OnStart();
+    }
+
     void OnInput()
     {
         m_SystemManager->OnInput();

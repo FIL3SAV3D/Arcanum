@@ -21,6 +21,7 @@
 #include "Jolt/Math/Vec3.h"
 #include "Jolt/Math/Quat.h"
 #include <ECS/Systems/PhysicsSystem.h>
+#include <ECS/Components/RigidBodyComponet.h>
 
 Application::Application(const ApplicationSpecification& _Spec):
 	m_LayerStack{std::make_unique<LayerStack>()},
@@ -78,10 +79,23 @@ void Application::OnCreate()
 {
 	coordinator->RegisterComponent<RenderComponent>();
 	coordinator->RegisterComponent<TransformComponent>();
+	coordinator->RegisterComponent<RigidBodyComponent>();
 
 	//UI = std::static_pointer_cast<UIRenderSystem>(coordinator->RegisterSystem<UIRenderSystem, 10>(window));
-	coordinator->RegisterSystem<ECSPhysicsSystem, 20>();
+
 	coordinator->RegisterSystem<MeshRenderSystem, 10>();
+	coordinator->RegisterSystem<ECSPhysicsSystem, 20>();
+
+	Signature signature;
+	signature.set(coordinator->GetComponentType<TransformComponent>());
+	signature.set(coordinator->GetComponentType<RigidBodyComponent>());
+	coordinator->SetSystemSignature<ECSPhysicsSystem>(signature);
+
+	signature.reset();
+
+	signature.set(coordinator->GetComponentType<TransformComponent>());
+	signature.set(coordinator->GetComponentType<RenderComponent>());
+	coordinator->SetSystemSignature<MeshRenderSystem>(signature);
 
 	coordinator->m_SystemManager->RecalculateUpdateOrder();
 
@@ -111,6 +125,11 @@ void Application::OnCreate()
 				.scale = JPH::Vec3(scale, scale, scale)
 			});
 
+		coordinator->AddComponent(
+			entity,
+			RigidBodyComponent{}
+		);
+
 		RenderComponent renderComponent = {};
 		renderComponent.model = m_cubeModel;
 
@@ -119,6 +138,7 @@ void Application::OnCreate()
 			renderComponent);
 	}
 
+	coordinator->OnStart();
 }
 
 void Application::OnEnable()

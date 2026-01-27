@@ -96,6 +96,14 @@ public:
 		}
 	}
 
+	void OnStart()
+	{
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnStart();
+		}
+	}
+
 	void OnInput()
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)

@@ -211,6 +211,9 @@ class ECSPhysicsSystem : public ISystem
 {
 public:
     void OnCreate() override;
+
+	void OnStart() override;
+
     void OnUpdate(const float& _DeltaTime) override;
 
 private:

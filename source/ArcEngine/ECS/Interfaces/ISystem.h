@@ -13,6 +13,7 @@ class ISystem
 {
 public:
     virtual void OnCreate          ()                                     {};
+    virtual void OnStart() {};
     virtual void OnInput           ()                                     {};
     virtual void OnUpdate          (const float& _DeltaTime)              {};
     virtual void OnLateUpdate      (const float& _DeltaTime)              {};
@@ -20,6 +21,7 @@ public:
     virtual void OnRenderUI        (std::shared_ptr<IRenderer> _Renderer) {};
     virtual void OnApplicationPause()                                     {};
     virtual void OnCheckForDisabled()                                     {};
+    virtual void OnQuit() {};
     virtual void OnDestroy         ()                                     {};
 
 public:
