@@ -3,9 +3,11 @@
 #include <set>
 
 #include "ECS/Data/ECSTypeInfo.h"
-#include <OpenGL/IRenderer.h>
+#include <Renderer/IRenderer.h>
 
 #include <memory>
+
+#include "OpenGL/Window.h"
 
 class Coordinator;
 
@@ -14,11 +16,18 @@ class ISystem
 public:
     virtual void OnCreate          ()                                     {};
     virtual void OnStart() {};
-    virtual void OnInput           ()                                     {};
+    virtual void OnInput           (std::shared_ptr<Window> _Window)      {};
     virtual void OnUpdate          (const float& _DeltaTime)              {};
     virtual void OnLateUpdate      (const float& _DeltaTime)              {};
-    virtual void OnRender          (std::shared_ptr<IRenderer> _Renderer) {};
-    virtual void OnRenderUI        (std::shared_ptr<IRenderer> _Renderer) {};
+
+    virtual void OnBeginRender     (const RenderParams& _RenderParams) {};
+    virtual void OnRender          (const RenderParams& _RenderParams) {};
+    virtual void OnEndRender       (const RenderParams& _RenderParams) {};
+
+    virtual void OnBeginRenderUI   (const RenderParams& _RenderParams) {};
+    virtual void OnRenderUI        (const RenderParams& _RenderParams) {};
+    virtual void OnEndRenderUI   (const RenderParams& _RenderParams) {};
+
     virtual void OnApplicationPause()                                     {};
     virtual void OnCheckForDisabled()                                     {};
     virtual void OnQuit() {};

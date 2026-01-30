@@ -2,6 +2,9 @@
 #include <vector>
 #include <Modes/IMode.h>
 
+#include <map>
+#include <unordered_map>
+
 class ModeManager
 {
 public:

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <glm/ext/vector_float2.hpp>
 #include <vector>
+
+#include "glm/vec2.hpp"
 
 constexpr int OUTPUT_FBO_SIZE = 2;
 
@@ -20,10 +21,11 @@ public:
         GBUFFER_NUM_TEXTURES
     };
 
+public:
     GBuffer();
     ~GBuffer();
 
-    bool Create(const glm::vec2& _size);
+    bool Create(const glm::uvec2& _Size);
     void Destroy();
 
     void BindForWriting();
@@ -32,11 +34,12 @@ public:
     void SetReadBuffer(GBUFFER_TEXTURE_TYPE TextureType);
     void SetActiveTexture(GBUFFER_TEXTURE_TYPE TextureType);
 
-    glm::vec2 bufferSize;
+    const glm::uvec2& GetBufferSize() const { return bufferSize; }
+private:
+    glm::uvec2 bufferSize;
 
     unsigned int m_gBuffer_fbo;
     unsigned int m_gBuffer_textures[GBUFFER_NUM_TEXTURES] = {};
     unsigned int m_gBuffer_depthTexture;
-private:
 
 };

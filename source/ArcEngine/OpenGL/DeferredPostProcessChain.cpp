@@ -39,7 +39,7 @@ bool DeferredPostProcessChain::Create(std::shared_ptr<GBuffer> _GBuffer)
         for (unsigned int i = 0; i < OUTPUT_FBO_CUSTOM_TEXTURE_SIZE; i++) {
             glBindTexture(GL_TEXTURE_2D, fboObject->textures[i]);
 
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, static_cast<int>(_GBuffer->bufferSize.x), static_cast<int>(_GBuffer->bufferSize.y), 0, GL_RGB, GL_FLOAT, NULL);
+            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, static_cast<int>(_GBuffer->bufferSize.x), static_cast<int>(_GBuffer->bufferSize.y), 0, GL_RGB, GL_FLOAT, NULL);
 
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -52,7 +52,7 @@ bool DeferredPostProcessChain::Create(std::shared_ptr<GBuffer> _GBuffer)
 
         glGenTextures(1, &fboObject->depthTexture);
         glBindTexture(GL_TEXTURE_2D, fboObject->depthTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, static_cast<int>(_GBuffer->bufferSize.x), static_cast<int>(_GBuffer->bufferSize.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, static_cast<int>(_GBuffer->bufferSize.x), static_cast<int>(_GBuffer->bufferSize.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, fboObject->depthTexture, 0);
 
         GLenum DrawBuffers[OUTPUT_FBO_CUSTOM_TEXTURE_SIZE];
@@ -122,11 +122,11 @@ void DeferredPostProcessChain::FinalBlitToScreen()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_frameBufferObjects[m_currentFrameBufferObject]->textures[0]);
 
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    /*glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(
         0, 0, static_cast<int>(m_gBuffer->bufferSize.x), static_cast<int>(m_gBuffer->bufferSize.y),
         0, 0, static_cast<int>(m_gBuffer->bufferSize.x), static_cast<int>(m_gBuffer->bufferSize.y), GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
 }
 
 void DeferredPostProcessChain::PingPongFrameBufferObjects()
@@ -140,7 +140,7 @@ void DeferredPostProcessChain::PingPongFrameBufferObjects()
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_frameBufferObjects[drawFBO]->fbo);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_gBuffer->m_gBuffer_textures[GBuffer::GBUFFER_TEXTURE_TYPE_COMBINED]);
+    //glBindTexture(GL_TEXTURE_2D, m_gBuffer->m_gBuffer_textures[GBuffer::GBUFFER_TEXTURE_TYPE_COMBINED]);
 
     for (unsigned int i = 0; i < OUTPUT_FBO_CUSTOM_TEXTURE_SIZE; i++) {
         glActiveTexture(GL_TEXTURE1 + i);

@@ -16,7 +16,7 @@ GBuffer::~GBuffer()
     Destroy();
 }
 
-bool GBuffer::Create(const glm::vec2& _size)
+bool GBuffer::Create(const glm::uvec2& _Size)
 {
     // Create the FBO
     glGenFramebuffers(1, &m_gBuffer_fbo);
@@ -29,7 +29,7 @@ bool GBuffer::Create(const glm::vec2& _size)
     for (unsigned int i = 0; i < ARRAY_LENGTH(m_gBuffer_textures); i++) {
         glBindTexture(GL_TEXTURE_2D, m_gBuffer_textures[i]);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, static_cast<int>(_size.x), static_cast<int>(_size.y), 0, GL_RGB, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, static_cast<int>(_Size.x), static_cast<int>(_Size.y), 0, GL_RGB, GL_FLOAT, NULL);
 
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -42,7 +42,7 @@ bool GBuffer::Create(const glm::vec2& _size)
 
     // depth
     glBindTexture(GL_TEXTURE_2D, m_gBuffer_depthTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, static_cast<int>(_size.x), static_cast<int>(_size.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, static_cast<int>(_Size.x), static_cast<int>(_Size.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_gBuffer_depthTexture, 0);
 
     GLenum DrawBuffers[ARRAY_LENGTH(m_gBuffer_textures)];
@@ -63,7 +63,7 @@ bool GBuffer::Create(const glm::vec2& _size)
     // restore default FBO
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-    bufferSize = _size;
+    bufferSize = _Size;
 
     return true;
 }

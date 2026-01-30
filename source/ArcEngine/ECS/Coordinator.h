@@ -6,7 +6,7 @@
 #include "ECS/Managers/EntityManager.h"
 #include "ECS/Managers/ComponentManager.h"
 
-#include "OpenGL/IRenderer.h"
+#include "Renderer/IRenderer.h"
 
 class Coordinator : public std::enable_shared_from_this<Coordinator>
 {
@@ -102,20 +102,9 @@ public:
     }
 
 public:
-    void OnCreate()
-    {
-        m_SystemManager->OnCreate();
-    }
-
-    void OnStart()
-    {
-        m_SystemManager->OnStart();
-    }
-
-    void OnInput()
-    {
-        m_SystemManager->OnInput();
-    }
+    const void OnCreate() const { m_SystemManager->OnCreate(); }
+    const void OnStart() const { m_SystemManager->OnStart(); }
+    const void OnInput(std::shared_ptr<Window> _Window) const { m_SystemManager->OnInput(_Window); }
     void OnUpdate(const float& _DeltaTime)
     {
         m_SystemManager->OnUpdate(_DeltaTime);
@@ -124,13 +113,14 @@ public:
     {
         m_SystemManager->OnLateUpdate(_DeltaTime);
     }
-    void OnRender(std::shared_ptr<IRenderer> _Renderer)
+
+    const void OnBeginRender(const RenderParams& _RenderParams) const { m_SystemManager->OnRender(_RenderParams); };
+    const void OnRender     (const RenderParams& _RenderParams) const { m_SystemManager->OnRender(_RenderParams); };
+    const void OnEndRender  (const RenderParams& _RenderParams) const { m_SystemManager->OnRender(_RenderParams); };
+
+    void OnRenderUI(const RenderParams& _RenderParams)
     {
-        m_SystemManager->OnRender(_Renderer);
-    }
-    void OnRenderUI(std::shared_ptr<IRenderer> _Renderer)
-    {
-        m_SystemManager->OnRenderUI(_Renderer);
+        m_SystemManager->OnRenderUI(_RenderParams);
     }
 
     void OnApplicationPause()

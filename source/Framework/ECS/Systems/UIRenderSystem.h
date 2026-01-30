@@ -17,7 +17,7 @@ public:
 	~UIRenderSystem();
 
 	void OnCreate() override;
-	void OnRenderUI(std::shared_ptr<IRenderer> _Renderer) override;
+	void OnRenderUI(const RenderParams& _RenderParams) override;
 	void OnDestroy() override;
 
 	glm::vec4 clear_color{ 0.1f, 0.1f, 0.1f, 1.0f };

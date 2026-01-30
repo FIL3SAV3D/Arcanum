@@ -104,11 +104,11 @@ public:
 		}
 	}
 
-	void OnInput()
+	void OnInput(std::shared_ptr<Window> _Window)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnInput();
+			system->OnInput(_Window);
 		}
 	}
 
@@ -128,19 +128,19 @@ public:
 		}
 	}
 
-	void OnRender(std::shared_ptr<IRenderer> _Renderer)
+	void OnRender(const RenderParams& _RenderParams)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnRender(_Renderer);
+			system->OnRender(_RenderParams);
 		}
 	}
 
-	void OnRenderUI(std::shared_ptr<IRenderer> _Renderer)
+	void OnRenderUI(const RenderParams& _RenderParams)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnRenderUI(_Renderer);
+			system->OnRenderUI(_RenderParams);
 		}
 	}
 

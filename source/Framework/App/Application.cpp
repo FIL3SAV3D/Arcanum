@@ -23,13 +23,16 @@
 #include <ECS/Systems/PhysicsSystem.h>
 #include <ECS/Components/RigidBodyComponet.h>
 
-Application::Application(const ApplicationSpecification& _Spec):
-	m_LayerStack{std::make_unique<LayerStack>()},
-	modeManger{std::make_unique<ModeManager>()},
-	window{ std::make_shared<Window>(static_cast<int>(_Spec.windowSize.x), static_cast<int>(_Spec.windowSize.y), _Spec.name.c_str()) },
-	inputHandler{std::make_unique<InputHandler>()},
-	clock{std::make_unique<Clock>()},
-	coordinator{ std::make_shared<Coordinator>() }
+#include "Renderer/DeferredRenderer.h"
+
+Application::Application(const ApplicationSpecification& _Spec) :
+	modeManger{ std::make_unique<ModeManager>() },
+	window{ std::make_shared<Window>(glm::uvec2(_Spec.windowSize.x, _Spec.windowSize.y), _Spec.name.c_str()) },
+	inputHandler{ std::make_shared<InputHandler>() },
+	clock{ std::make_unique<Clock>() },
+	coordinator{ std::make_shared<Coordinator>() },
+	renderer{ std::make_shared<DeferredRenderer>() },
+	camera{ std::make_shared<Camera>() }
 
 {
 	glfwSetWindowUserPointer(window->GetNativeWindow(), this);
@@ -39,6 +42,9 @@ Application::Application(const ApplicationSpecification& _Spec):
 	glfwSetScrollCallback(window->GetNativeWindow(), InputHandler::ScrollCallBackImpl);
 	glfwSetKeyCallback(window->GetNativeWindow(), InputHandler::KeyCallBackImpl);
 
+	inputHandler->AddListener(camera);
+
+	renderer->Create(window);
 }
 
 Application::~Application()
@@ -55,17 +61,14 @@ void Application::Run()
 	OnUpdate(deltaTime);
 
 	OnLateUpdate(deltaTime);
-	//auto color = UI.lock()->clear_color;
 
-	//glClearColor(color.x, color.y, color.z, 1.0f);
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+
+	// Set camera bindings
 
 	OnRender();
 
 	OnRenderUI();
-
-	glfwSwapBuffers(window->GetNativeWindow());
 
 	OnApplicationPause();
 
@@ -83,7 +86,7 @@ void Application::OnCreate()
 
 	//UI = std::static_pointer_cast<UIRenderSystem>(coordinator->RegisterSystem<UIRenderSystem, 10>(window));
 
-	coordinator->RegisterSystem<MeshRenderSystem, 10>();
+	coordinator->RegisterSystem<MeshRenderSystem, 10>(inputHandler);
 	coordinator->RegisterSystem<ECSPhysicsSystem, 20>();
 
 	Signature signature;
@@ -101,7 +104,7 @@ void Application::OnCreate()
 
 	coordinator->OnCreate();
 
-	auto m_cubeModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Source\\ArcEngine\\Models\\obj_models\\cube.obj").c_str());
+	//auto m_cubeModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Source\\ArcEngine\\Models\\obj_models\\cube.obj").c_str());
 
 	std::vector<Entity> entities(100);
 
@@ -117,12 +120,15 @@ void Application::OnCreate()
 	{
 		entity = coordinator->CreateEntity();
 
+		JPH::Mat44 transform{};
+		transform.SetTranslation(JPH::Vec3(randPosition(generator), randPosition(generator), randPosition(generator)));
+		transform = transform.sRotation(JPH::Quat().sEulerAngles(JPH::Vec3(randRotation(generator), randRotation(generator), randRotation(generator))));
+		transform = transform.sScale(scale);
+
 		coordinator->AddComponent(
 			entity,
 			TransformComponent{
-				.position = JPH::Vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
-				.rotation = JPH::Quat().sEulerAngles(JPH::Vec3(randRotation(generator), randRotation(generator), randRotation(generator))),
-				.scale = JPH::Vec3(scale, scale, scale)
+				.transform = transform
 			});
 
 		coordinator->AddComponent(
@@ -130,13 +136,19 @@ void Application::OnCreate()
 			RigidBodyComponent{}
 		);
 
-		RenderComponent renderComponent = {};
-		renderComponent.model = m_cubeModel;
+		//RenderComponent renderComponent{};
+
+		/*renderComponent.model = m_cubeModel;
 
 		coordinator->AddComponent(
 			entity,
-			renderComponent);
+			renderComponent);*/
 	}
+
+	auto cameraEntity = coordinator->CreateEntity();
+	coordinator->AddComponent(cameraEntity, TransformComponent{});
+	
+	glfwSetInputMode(window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	coordinator->OnStart();
 }
@@ -159,7 +171,7 @@ void Application::OnInput()
 {
 	inputHandler->ProcessInput(window->GetNativeWindow());
 
-	coordinator->OnInput();
+	coordinator->OnInput(window);
 }
 
 void Application::OnUpdate(const float& _DeltaTime)
@@ -174,12 +186,19 @@ void Application::OnLateUpdate(const float& _DeltaTime)
 
 void Application::OnRender()
 {
+	/*coordinator->GetComponent<TransformComponent>();*/
+
+	/*RenderParams params;
+	params.cameraPosition = 
+
+	coordinator->OnBeginRender();
 	coordinator->OnRender(renderer);
+	coordinator->OnEndRender();*/
 }
 
 void Application::OnRenderUI()
 {
-	coordinator->OnRenderUI(renderer);
+	//coordinator->OnRenderUI();
 	//ImGui::Render();
 	//int display_w, display_h;
 	//glfwGetFramebufferSize(window->GetNativeWindow(), &display_w, &display_h);

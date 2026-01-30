@@ -3,13 +3,18 @@
 #include <memory>
 #include "ECS/Interfaces/ISystem.h"
 
+#include "OpenGL/Camera.h"
+#include <OpenGL/InputHandler.h>
+
 class MeshRenderSystem : public ISystem
 {
-	MeshRenderSystem(std::shared_ptr<IRenderer> _Renderer);
+public:
+	MeshRenderSystem(std::shared_ptr<InputHandler> _InputHandler);
 
 	void OnCreate();
-	void OnRender(std::shared_ptr<IRenderer> _Renderer) override;
+	void OnUpdate(const float& _DeltaTime) override;
+	void OnRender(const RenderParams& _RenderParams) override;
 
 private:
-	std::shared_ptr<IRenderer> renderer;
+	std::shared_ptr<Camera> cam;
 };

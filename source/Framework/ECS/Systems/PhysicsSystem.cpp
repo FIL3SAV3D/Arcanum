@@ -119,7 +119,7 @@ void ECSPhysicsSystem::OnStart()
         BodyInterface& body_interface = physics_system->GetBodyInterface();
         rigidBody.ID = body_interface.CreateAndAddBody(sphere_settings, EActivation::Activate);
 
-        physics_system->GetBodyInterface().SetPositionAndRotation(rigidBody.ID, transform.position, transform.rotation, JPH::EActivation::Activate);
+        //physics_system->GetBodyInterface().SetPositionAndRotation(rigidBody.ID, transform.position, transform.rotation, JPH::EActivation::Activate);
     }
 }
 
@@ -132,6 +132,6 @@ void ECSPhysicsSystem::OnUpdate(const float& _DeltaTime)
         auto& rigidBody = coordinator->GetComponent<RigidBodyComponent>(entity);
         auto& transform = coordinator->GetComponent<TransformComponent>(entity);
 
-        physics_system->GetBodyInterface().GetPositionAndRotation(rigidBody.ID, transform.position, transform.rotation);
+        //physics_system->GetBodyInterface().GetPositionAndRotation(rigidBody.ID, transform.position, transform.rotation);
     }
 }

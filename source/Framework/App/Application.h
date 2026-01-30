@@ -1,16 +1,18 @@
 #pragma once
 
+#include "Util/JobSystem/JobSystem.h"
+
 #include <memory>
 
 #include "Managers/ModeManager.h"
 
 #include "OpenGL/Window.h"
 #include "OpenGL/InputHandler.h"
-#include <Misc/Clock.h>
-#include <OpenGL/IRenderer.h>
+#include <Util/Clock.h>
 #include <ECS/Coordinator.h>
 
 #include "ECS/Systems/UIRenderSystem.h"
+#include "Renderer/IRenderer.h"
 
 struct ApplicationSpecification
 {
@@ -64,22 +66,20 @@ public:
 public:
 	std::shared_ptr<Window> GetWindow() { return window; }
 
-	//template<typename T>
-	//std::shared_ptr<IMode> PushMode() { return modeManger->PushMode<T>(); }
-
-	template<typename T, typename ...Args>
-	std::shared_ptr<ILayer> PushLayer(Args... _Args) { return m_LayerStack->PushLayer<T>(_Args...); }
-
 private:
+	std::shared_ptr<>
+
+
+	std::shared_ptr<Camera> camera;
+
 	std::shared_ptr<Coordinator> coordinator;
 
 	std::shared_ptr<IRenderer> renderer;
 
 	std::shared_ptr<Window> window;
 
-	std::unique_ptr<LayerStack> m_LayerStack;
 	std::unique_ptr<ModeManager> modeManger;
-	std::unique_ptr<InputHandler> inputHandler;
+	std::shared_ptr<InputHandler> inputHandler;
 
 	std::unique_ptr<Clock> clock;
 

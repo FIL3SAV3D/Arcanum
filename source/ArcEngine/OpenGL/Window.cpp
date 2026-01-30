@@ -7,7 +7,7 @@
 
 #include <backends/imgui_impl_glfw.h>
 
-Window::Window(const int& _screenWidth, const int& _screenHeight, const char* windowName)
+Window::Window(const glm::uvec2& _WindowSize, const char* windowName)
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -22,7 +22,7 @@ Window::Window(const int& _screenWidth, const int& _screenHeight, const char* wi
 
 	float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor());
 
-	window = glfwCreateWindow(_screenWidth * main_scale, _screenHeight * main_scale, windowName, nullptr, nullptr);
+	window = glfwCreateWindow(_WindowSize.x * main_scale, _WindowSize.y * main_scale, windowName, nullptr, nullptr);
 	
 	//glfwSetWindowMonitor(window, monitor,0, 0, _screenWidth * main_scale, _screenHeight * main_scale, 60);
 
@@ -47,8 +47,7 @@ Window::Window(const int& _screenWidth, const int& _screenHeight, const char* wi
 	//VSYNC
 	glfwSwapInterval(VSync);
 
-	screenHeight = _screenHeight;
-	screenWidth = _screenWidth;
+	windowSize = _WindowSize;
 }
 
 Window::~Window()

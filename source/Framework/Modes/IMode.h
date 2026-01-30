@@ -2,8 +2,7 @@
 
 #include <cstdint>
 #include <memory>
-
-#include "Layer/LayerStack.h"
+#include <string>
 
 class IMode
 {
@@ -23,5 +22,4 @@ public:
 
 	std::string name;
 private:
-	std::shared_ptr<LayerStack> m_LayerStack;
 };

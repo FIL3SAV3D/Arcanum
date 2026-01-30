@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "Modes/IMode.h"
-#include <Layer/LayerStack.h>
 
 #include <OpenGL/Window.h>
 
