@@ -39,16 +39,16 @@ void DeferredRenderer::BeginRender(const RenderParams& _camera) const
 
 void DeferredRenderer::RenderModel(const Model& model)
 {
-    for (const Mesh* mesh : model.GetMeshes())
+    for (const Mesh& mesh : model.meshes)
     {
-        RenderMesh(*mesh);
+        RenderMesh(mesh);
     }
 }
 
 void DeferredRenderer::RenderMesh(const Mesh& mesh)
 {
-    glBindVertexArray(mesh.GetVAO());
-    glDrawElements(GL_TRIANGLES, mesh.GetIndices().size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(mesh.VAO);
+    glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 

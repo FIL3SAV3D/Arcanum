@@ -31,11 +31,28 @@ struct ApplicationSpecification
 	}
 };
 
-class Application
+class IApplication
 {
 public:
-	Application(const ApplicationSpecification& _Spec);
-	~Application();
+	IApplication(const ApplicationSpecification& _Spec);
+	~IApplication();
+
+	virtual void Initialize() {};
+	virtual void Deinitialize() {};
+
+	template<typename T>
+	void RegisterMode(const std::string& _Name)
+	{
+		modeManger->RegisterMode<T>(_Name);
+	}
+
+	template<typename T>
+	void RegisterDefaultMode(const std::string& _Name)
+	{
+		modeManger->RegisterDefaultMode<T>(_Name);
+	}
+
+	void SetMode();
 
 	void Run();
 
@@ -67,11 +84,6 @@ public:
 	std::shared_ptr<Window> GetWindow() { return window; }
 
 private:
-	std::shared_ptr<>
-
-
-	std::shared_ptr<Camera> camera;
-
 	std::shared_ptr<Coordinator> coordinator;
 
 	std::shared_ptr<IRenderer> renderer;

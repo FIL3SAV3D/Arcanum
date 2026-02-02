@@ -1,30 +1,22 @@
 #pragma once
 
+#include "Asset/Interface/IAsset.h"
+#include "Core/VertexData.h"
+
 #include <vector>
 
-#include "Asset/Interface/IAsset.h"
-
-#include "Jolt/Jolt.h"
-#include "Jolt/Math/Float3.h"
-#include "Jolt/Math/Float2.h"
 
 struct Mesh : public IAsset
 {
 public:
-    struct VertexData
-    {
-        JPH::Float3 aPosition{};
-        JPH::Float3 aNormal{};
-        JPH::Float3 aTangent{};
-        JPH::Float3 aBiTangent{};
-        JPH::Float2 aTexCoords{};
-    };
+    Mesh() : vertices{}, indices{} {}
+    Mesh(const std::vector< VertexData >&   _Vertices, const std::vector< unsigned int >& _Indices) : vertices{_Vertices}, indices{_Indices} {}
 
 public:
-    std::vector< VertexData > m_vertices{};
-    std::vector<unsigned int> m_indices {};
 
-public:
+    std::vector< VertexData > vertices{};
+    std::vector< unsigned int > indices {};
+
     unsigned int VAO{ 0 };
     unsigned int VBO{ 0 };
     unsigned int EBO{ 0 };

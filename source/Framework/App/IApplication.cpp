@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Application.h"
+#include "IApplication.h"
 #include <format>
 #include "Modes/ModeMain.h"
 
@@ -25,15 +25,13 @@
 
 #include "Renderer/DeferredRenderer.h"
 
-Application::Application(const ApplicationSpecification& _Spec) :
+IApplication::IApplication(const ApplicationSpecification& _Spec) :
 	modeManger{ std::make_unique<ModeManager>() },
 	window{ std::make_shared<Window>(glm::uvec2(_Spec.windowSize.x, _Spec.windowSize.y), _Spec.name.c_str()) },
 	inputHandler{ std::make_shared<InputHandler>() },
 	clock{ std::make_unique<Clock>() },
 	coordinator{ std::make_shared<Coordinator>() },
-	renderer{ std::make_shared<DeferredRenderer>() },
-	camera{ std::make_shared<Camera>() }
-
+	renderer{ std::make_shared<DeferredRenderer>() }
 {
 	glfwSetWindowUserPointer(window->GetNativeWindow(), this);
 	//glfwSetFramebufferSizeCallback(window->GetNativeWindow(), FrameBufferSizeCallback);
@@ -42,16 +40,21 @@ Application::Application(const ApplicationSpecification& _Spec) :
 	glfwSetScrollCallback(window->GetNativeWindow(), InputHandler::ScrollCallBackImpl);
 	glfwSetKeyCallback(window->GetNativeWindow(), InputHandler::KeyCallBackImpl);
 
-	inputHandler->AddListener(camera);
-
 	renderer->Create(window);
+
+
+	Initialize();
 }
 
-Application::~Application()
+IApplication::~IApplication()
 {
 }
 
-void Application::Run()
+void IApplication::SetMode()
+{
+}
+
+void IApplication::Run()
 {
 	OnInput();
 
@@ -75,10 +78,10 @@ void Application::Run()
 	OnCheckForDisabled();
 }
 
-#pragma region  ApplicationStart
+#pragma region  IApplicationStart
 
 // Start
-void Application::OnCreate()
+void IApplication::OnCreate()
 {
 	coordinator->RegisterComponent<RenderComponent>();
 	coordinator->RegisterComponent<TransformComponent>();
@@ -153,38 +156,38 @@ void Application::OnCreate()
 	coordinator->OnStart();
 }
 
-void Application::OnEnable()
+void IApplication::OnEnable()
 {
 }
 
-void Application::OnStart()
+void IApplication::OnStart()
 {
 }
 // Start
 
 #pragma endregion
 
-#pragma region ApplicationRun
+#pragma region IApplicationRun
 
 // Update
-void Application::OnInput()
+void IApplication::OnInput()
 {
 	inputHandler->ProcessInput(window->GetNativeWindow());
 
 	coordinator->OnInput(window);
 }
 
-void Application::OnUpdate(const float& _DeltaTime)
+void IApplication::OnUpdate(const float& _DeltaTime)
 {
 	coordinator->OnUpdate(_DeltaTime);
 }
 
-void Application::OnLateUpdate(const float& _DeltaTime)
+void IApplication::OnLateUpdate(const float& _DeltaTime)
 {
 	coordinator->OnLateUpdate(_DeltaTime);
 }
 
-void Application::OnRender()
+void IApplication::OnRender()
 {
 	/*coordinator->GetComponent<TransformComponent>();*/
 
@@ -196,7 +199,7 @@ void Application::OnRender()
 	coordinator->OnEndRender();*/
 }
 
-void Application::OnRenderUI()
+void IApplication::OnRenderUI()
 {
 	//coordinator->OnRenderUI();
 	//ImGui::Render();
@@ -218,29 +221,29 @@ void Application::OnRenderUI()
 
 }
 
-void Application::OnApplicationPause()
+void IApplication::OnApplicationPause()
 {
 }
 
-void Application::OnCheckForDisabled()
+void IApplication::OnCheckForDisabled()
 {
 }
 // Update
 
 #pragma endregion
 
-#pragma region ApplicationEnd
+#pragma region IApplicationEnd
 
 // Quit
-void Application::OnQuit()
+void IApplication::OnQuit()
 {
 }
 
-void Application::OnDisable()
+void IApplication::OnDisable()
 {
 }
 
-void Application::OnDestroy()
+void IApplication::OnDestroy()
 {
 
 }
@@ -248,7 +251,7 @@ void Application::OnDestroy()
 
 #pragma endregion
 
-bool Application::IsQuitting()
+bool IApplication::IsQuitting()
 {
 	return glfwWindowShouldClose(window->GetNativeWindow());
 }

@@ -7,5 +7,9 @@
 
 struct Model : public IAsset
 {
-    std::vector<Mesh*> m_Meshes;
+public:
+    Model() : meshes{ } {}
+    Model(std::vector<Mesh> _Meshes) : meshes{ _Meshes } {}
+
+    std::vector<Mesh> meshes;
 };

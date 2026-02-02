@@ -1,5 +1,18 @@
 vulkan_sdk = os.getenv("VULKAN_SDK")
 
+function AssimpLink()
+	filter {"configurations:Debug"}
+		links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+
+	filter {"configurations:DebugAsan"}
+		links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+
+	filter {"configurations:Release"}
+		links { "../Arcanum/library/Assimp/lib/assimp-vc143-mt.lib"}
+		
+	filter{}
+end
+
 cppdialect "c++20"
 language "C++"
 staticruntime "off"
@@ -30,7 +43,7 @@ workspace "Arcanum"
 	project "ArcanumEditor"
 		kind "ConsoleApp"
 		targetdir "bin/%{cfg.buildcfg}"
-		dependson { "Framework", ... }
+		dependson { "Game", ... }
 
 	files {
             "source/ArcanumEditor/**.h",
@@ -38,33 +51,23 @@ workspace "Arcanum"
             "source/ArcanumEditor/**.hpp",
         }
 
-		filter {"configurations:Debug"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+		includedirs { "../Arcanum/source/ArcanumEditor" }
 
-		filter {"configurations:DebugAsan"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
-
-		filter {"configurations:Release"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mt.lib"}
-		
-		filter{}
-
-		links { "ArcEngine" }
-		includedirs { "../Arcanum/source/ArcEngine" }
+		links { "Game" }
+		includedirs { "../Arcanum/source/Game" }
 
 		links { "Framework" }
 		includedirs { "../Arcanum/source/Framework" }
 
-		links { "ArcanumEditor" }
-		includedirs { "../Arcanum/source/ArcanumEditor" }
+		links { "ArcEngine" }
+		includedirs { "../Arcanum/source/ArcEngine" }
 
 		links { "Jolt" }
 		includedirs { "../Arcanum/source/Jolt" }
 
-		includedirs { "../Arcanum/library/GLFW/include" }
+		-- ThirdParty
 		includedirs { "../Arcanum/library/GLM" }
-
-		includedirs { "../Arcanum/library/GLAD/include" }
+		includedirs { "../Arcanum/library/GLFW/include" }
 
 		-- Submodules
 		includedirs { "../Arcanum/submodules/imgui" }
@@ -72,7 +75,7 @@ workspace "Arcanum"
 	project "Standalone"
 		kind "ConsoleApp"
 		targetdir "bin/%{cfg.buildcfg}"
-		dependson { "Framework", ... }
+		dependson { "Game", ... }
 
 	files {
             "source/Standalone/**.h",
@@ -80,30 +83,23 @@ workspace "Arcanum"
             "source/Standalone/**.hpp",
         }
 
-		filter {"configurations:Debug"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
-
-		filter {"configurations:DebugAsan"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
-
-		filter {"configurations:Release"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mt.lib"}
-		
-		filter{}
-
-		links { "Standalone" }
 		includedirs { "../Arcanum/source/Standalone" }
 
-		links { "ArcEngine" }
-		links { "Framework" }
+		links { "Game" }
+		includedirs { "../Arcanum/source/Game" }
 
+		links { "Framework" }
 		includedirs { "../Arcanum/source/Framework" }
+
+		links { "ArcEngine" }
 		includedirs { "../Arcanum/source/ArcEngine" }
 
-		includedirs { "../Arcanum/library/GLFW/include" }
-		includedirs { "../Arcanum/library/GLM" }
+		links { "Jolt" }
+		includedirs { "../Arcanum/source/Jolt" }
 
-		includedirs { "../Arcanum/library/GLAD/include" }
+		-- ThirdParty
+		includedirs { "../Arcanum/library/GLM" }
+		includedirs { "../Arcanum/library/GLFW/include" }
 
 		-- Submodules
 		includedirs { "../Arcanum/submodules/imgui" }
@@ -111,7 +107,7 @@ workspace "Arcanum"
 	project "Game"
 		kind "StaticLib"
 		targetdir "bin/%{cfg.buildcfg}"
-		dependson { "ArcEngine", ... }
+		dependson { "Framework", ... }
 
 		files {
             "source/Game/**.h",
@@ -119,36 +115,20 @@ workspace "Arcanum"
             "source/Game/**.hpp",
         }
 
-		filter {"configurations:Debug"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+		includedirs { "../Arcanum/source/Game" }
 
-		filter {"configurations:DebugAsan"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+		links { "Framework" }
+		includedirs { "../Arcanum/source/Framework" }
 
-		filter {"configurations:Release"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mt.lib"}
-		
-		filter{}
-
-		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
-		
-		links { "../Arcanum/library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "ArcEngine" }
-		links { "ArcNetCommon" }
+		includedirs { "../Arcanum/source/ArcEngine" }
 
 		links { "Jolt" }
 		includedirs { "../Arcanum/source/Jolt" }
 
-		includedirs { "$(VULKAN_SDK)/include" }
-		includedirs { "../Arcanum/library/GLFW/include" }
+		-- ThirdParty
 		includedirs { "../Arcanum/library/GLM" }
-		includedirs { "../Arcanum/source/ArcEngine" }
-		includedirs { "../Arcanum/source/Framework" }
-		includedirs { "../Arcanum/source/ArcNetCommon" }
-		includedirs { "../Arcanum/library/asio-1.34.2/include" }
-		includedirs { "../Arcanum/library/GLAD/include" }
-		includedirs { "../Arcanum/library/std_image" }
-		includedirs { "../Arcanum/library/Assimp/include" }
+		includedirs { "../Arcanum/library/GLFW/include" }
 
 		-- Submodules
 		includedirs { "../Arcanum/submodules/imgui" }
@@ -179,6 +159,7 @@ workspace "Arcanum"
 		
 		links { "../Arcanum/library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "ArcEngine" }
+		includedirs { "../Arcanum/source/ArcEngine" }
 		links { "ArcNetCommon" }
 
 		links { "Jolt" }
@@ -187,7 +168,6 @@ workspace "Arcanum"
 		includedirs { "$(VULKAN_SDK)/include" }
 		includedirs { "../Arcanum/library/GLFW/include" }
 		includedirs { "../Arcanum/library/GLM" }
-		includedirs { "../Arcanum/source/ArcEngine" }
 		includedirs { "../Arcanum/source/Framework" }
 		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
@@ -235,6 +215,9 @@ workspace "Arcanum"
 		
 		filter{}
 
+		links { "Jolt" }
+		includedirs { "../Arcanum/source/Jolt" }
+
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
 		links { "../Arcanum/library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "ArcNetCommon" }
@@ -246,8 +229,7 @@ workspace "Arcanum"
 		includedirs { "../Arcanum/library/TinyGLTF" }
 		includedirs { "../Arcanum/library/TinyObj" }
 		includedirs { "../Arcanum/source/ArcEngine" }
-		links { "Jolt" }
-		includedirs { "../Arcanum/source/Jolt" }
+		
 		includedirs { "../Arcanum/source/ArcNetCommon" }
 		includedirs { "../Arcanum/library/asio-1.34.2/include" }
 		includedirs { "../Arcanum/library/GLAD/include" }

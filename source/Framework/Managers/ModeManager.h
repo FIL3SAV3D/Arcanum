@@ -1,45 +1,42 @@
 #pragma once
-#include <vector>
-#include <Modes/IMode.h>
 
-#include <map>
+#include "Modes/IMode.h"
+
+#include <vector>
 #include <unordered_map>
+#include <cassert>
 
 class ModeManager
 {
 public:
-	template<typename T, typename ...Args>
-	std::shared_ptr<T> RegisterMode(Args ..._Args)
+	template<typename T>
+	void RegisterMode(const std::string& _Name)
 	{
-		const char* typeName = typeid(T).name();
+		assert(m_ModeMap.find(_Name) == m_ModeMap.end() && "Registering mode with same name more than once.");
 
-		assert(m_ModeMap.find(typeName) == m_ModeMap.end() && "Registering mode more than once.");
-
-		std::shared_ptr<T> mode = std::make_shared<T>(_Args...);
-		m_ModeMap.insert({ typeName, mode });
-
-		return mode;
+		std::shared_ptr<T> mode = std::make_shared<T>();
+		m_ModeMap.insert({ _Name, mode });
 	}
 
-	// Application Being Created
-	void OnCreate();
-	void OnStart();
-	void OnEnable();
+	template<typename T>
+	void RegisterDefaultMode(const std::string& _Name)
+	{
+		assert(m_ModeMap.find(_Name) == m_ModeMap.end() && "Registering mode with same name more than once.");
 
-	// Update
-	void OnInput();
-	void OnUpdate(const float& _DeltaTime);
-	void OnLateUpdate(const float& _DeltaTime);
-	void OnRender();
-	void OnRenderUI();
-	void OnApplicationPause();
-	void OnCheckForDisabled();
+		std::shared_ptr<T> mode = std::make_shared<T>();
+		m_ModeMap.insert({ _Name, mode });
 
-	// End
-	void OnDisable();
-	void OnQuit();
-	void OnDestroy();
+		m_CurrentMode = mode;
+	}
+
+	void SwitchMode(const std::string& _Name)
+	{
+		assert(m_ModeMap.find(_Name) == m_ModeMap.end() && "No mode found!");
+		m_CurrentMode = m_ModeMap.at(_Name);
+	}
 
 private:
-	std::unordered_map<const char*, std::shared_ptr<IMode>> m_ModeMap{};
+	std::shared_ptr<IMode> m_CurrentMode;
+
+	std::unordered_map<std::string, std::shared_ptr<IMode>> m_ModeMap{};
 };

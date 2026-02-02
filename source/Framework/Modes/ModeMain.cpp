@@ -1,8 +1,7 @@
 #include "ModeMain.h"
 
 ModeMain::ModeMain(const char* _name, std::shared_ptr<Window> _Window):
-	window{_Window},
-	IMode{ _name }
+	window{_Window}
 {
 	OnCreate();
 }

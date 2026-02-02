@@ -42,6 +42,9 @@ namespace ArcEngine
     AssetType AssetManager::GetTypeByExtension(const std::filesystem::path& _AssetPath)
     {
         std::cout << _AssetPath.extension() << std::endl;
-        return AssetType::MESH;
+
+        if (_AssetPath.extension() == ".fbx") { return AssetType::MESH; }
+
+        return AssetType::NONE;
     }
 }
