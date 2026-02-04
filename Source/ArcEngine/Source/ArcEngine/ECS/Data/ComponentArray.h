@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ECS/Data/ECSTypeInfo.h"
+#include "ArcEngine/ECS/Data/ECSTypeInfo.h"
 
 // std
 #include <assert.h>

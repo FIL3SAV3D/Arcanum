@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include "Modes/IMode.h"
+#include "Framework/Modes/IMode.h"
 
-#include <OpenGL/Window.h>
+#include <ArcEngine/OpenGL/Window.h>
 
 class ModeMain : public IMode
 {

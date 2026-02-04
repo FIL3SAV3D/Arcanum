@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "App/EditorApplication.h"
+#include "ArcanumEditor/App/EditorApplication.h"
 
 int main(int /*NumArgs*/, char** /*ppArgs*/)
 {

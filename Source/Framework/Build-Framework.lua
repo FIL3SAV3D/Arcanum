@@ -11,6 +11,26 @@ project "Framework"
     {
         "Source",
         "../ArcEngine/Source",
+        "../Thirdparty/JoltPhysics-Arcanum",
+        "../Thirdparty/DearImGUI",
+
+        "../../Library/GLM",
+        "../../Library/Assimp/include",
+        "../../Library/asio-1.34.2/include",
+        "../../Library/GLAD/include",
+        "../../Library/GLFW/include",
+        "../../Library/std_image",
+
+        "$(VULKAN_SDK)/include",
+    }
+
+    links
+    {
+        "ArcEngine",
+        "JoltPhysics-Arcanum",
+        "DearImGUI",
+        "%{VULKAN_SDK}/Lib/vulkan-1.lib",
+        "../../Library/GLFW/lib-vc2022/glfw3.lib"
     }
 
     targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
@@ -25,14 +45,20 @@ project "Framework"
        runtime "Debug"
        symbols "On"
 
+       links { "../../Library/Assimp/dll/assimp-vc143-mtd.dll" }
+
     filter "configurations:Release"
        defines { "RELEASE" }
        runtime "Release"
        optimize "On"
        symbols "On"
 
+       links { "../../Library/Assimp/dll/assimp-vc143-mt.dll" }
+
     filter "configurations:Dist"
        defines { "DIST" }
        runtime "Release"
        optimize "On"
        symbols "Off"
+
+       links { "../../Library/Assimp/dll/assimp-vc143-mt.dll" }

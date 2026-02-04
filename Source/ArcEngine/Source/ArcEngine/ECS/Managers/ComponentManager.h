@@ -4,8 +4,8 @@
 #include <unordered_map>
 #include <memory>
 
-#include "ECS/Data/ECSTypeInfo.h"
-#include "ECS/Data/ComponentArray.h"
+#include "ArcEngine/ECS/Data/ECSTypeInfo.h"
+#include "ArcEngine/ECS/Data/ComponentArray.h"
 
 class ComponentManager
 {

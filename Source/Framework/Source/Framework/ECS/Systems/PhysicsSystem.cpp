@@ -1,9 +1,9 @@
 #include "PhysicsSystem.h"
 
-#include <ECS/Components/TransformComponent.h>
-#include <ECS/Components/RigidBodyComponet.h>
+#include <Framework/ECS/Components/TransformComponent.h>
+#include <Framework/ECS/Components/RigidBodyComponet.h>
 
-#include <ECS/Coordinator.h>
+#include <ArcEngine/ECS/Coordinator.h>
 
 
 

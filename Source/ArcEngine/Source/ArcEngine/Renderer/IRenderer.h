@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Asset/Types/Model.h"
-#include "Asset/Types/Mesh.h"
+#include "ArcEngine/Asset/Types/Model.h"
+#include "ArcEngine/Asset/Types/Mesh.h"
 
 #include "Jolt/Jolt.h"
 #include "Jolt/Math/Float2.h"
-#include <OpenGL/Camera.h>
+#include <ArcEngine/OpenGL/Camera.h>
 
 class Window;
 

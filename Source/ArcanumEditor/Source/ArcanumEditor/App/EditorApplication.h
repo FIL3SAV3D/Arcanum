@@ -1,6 +1,6 @@
 #pragma once
 
-#include "App/Application.h"
+#include "Game/App/Application.h"
 
 class EditorApplication : public Application
 {

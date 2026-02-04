@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include "ECS/Interfaces/ISystem.h"
+#include "ArcEngine/ECS/Interfaces/ISystem.h"
 
-#include "Core/ImGUIHandler.h"
+#include "ArcEngine/Core/ImGUIHandler.h"
 
 #include "glm/vec4.hpp"
 

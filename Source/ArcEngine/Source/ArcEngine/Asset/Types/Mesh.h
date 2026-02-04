@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Asset/Interface/IAsset.h"
-#include "Core/VertexData.h"
+#include "ArcEngine/Asset/Interface/IAsset.h"
+#include "ArcEngine/Core/VertexData.h"
 
 #include <vector>
 

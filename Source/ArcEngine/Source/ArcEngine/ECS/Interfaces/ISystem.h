@@ -2,12 +2,12 @@
 
 #include <set>
 
-#include "ECS/Data/ECSTypeInfo.h"
-#include <Renderer/IRenderer.h>
+#include "ArcEngine/ECS/Data/ECSTypeInfo.h"
+#include <ArcEngine/Renderer/IRenderer.h>
 
 #include <memory>
 
-#include "OpenGL/Window.h"
+#include "ArcEngine/OpenGL/Window.h"
 
 class Coordinator;
 

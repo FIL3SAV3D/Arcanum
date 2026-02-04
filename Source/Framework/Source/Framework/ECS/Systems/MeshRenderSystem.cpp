@@ -1,8 +1,8 @@
 #include "MeshRenderSystem.h"
 
-#include "ECS/Coordinator.h"
-#include "ECS/Components/RenderComponent.h"
-#include "ECS/Components/TransformComponent.h"
+#include "ArcEngine/ECS/Coordinator.h"
+#include "Framework/ECS/Components/RenderComponent.h"
+#include "Framework/ECS/Components/TransformComponent.h"
 
 
 MeshRenderSystem::MeshRenderSystem(std::shared_ptr<InputHandler> _InputHandler)

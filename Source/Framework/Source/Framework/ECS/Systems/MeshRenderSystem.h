@@ -1,10 +1,10 @@
 #pragma once
 
 #include <memory>
-#include "ECS/Interfaces/ISystem.h"
+#include "ArcEngine/ECS/Interfaces/ISystem.h"
 
-#include "OpenGL/Camera.h"
-#include <OpenGL/InputHandler.h>
+#include "ArcEngine/OpenGL/Camera.h"
+#include <ArcEngine/OpenGL/InputHandler.h>
 
 class MeshRenderSystem : public ISystem
 {

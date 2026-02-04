@@ -1,7 +1,7 @@
 #include "AssetManager.h"
 #include <iostream>
 
-#include "Asset/Types/Mesh.h"
+#include "ArcEngine/Asset/Types/Mesh.h"
 
 namespace ArcEngine
 {

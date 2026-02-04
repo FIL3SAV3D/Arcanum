@@ -1,6 +1,6 @@
 #pragma once
 
-#include "App/IApplication.h"
+#include "Framework/App/IApplication.h"
 
 class Application : public IApplication
 {

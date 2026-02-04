@@ -1,9 +1,9 @@
 #include "CameraSystem.h"
 
-#include "ECS/Coordinator.h"
-#include "ECS/Components/TransformComponent.h"
-#include "ECS/Components/CameraComponent.h"
-#include <ECS/Components/InputComponent.h>
+#include "ArcEngine/ECS/Coordinator.h"
+#include "Framework/ECS/Components/TransformComponent.h"
+#include "Framework/ECS/Components/CameraComponent.h"
+#include <Framework/ECS/Components/InputComponent.h>
 
 void CameraSystem::OnInput(std::shared_ptr<Window> _Window)
 {

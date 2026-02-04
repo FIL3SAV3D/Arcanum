@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Modes/IMode.h"
+#include "Framework/Modes/IMode.h"
 
 #include <vector>
 #include <unordered_map>

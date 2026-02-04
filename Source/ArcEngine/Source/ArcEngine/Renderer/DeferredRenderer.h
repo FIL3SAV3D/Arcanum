@@ -1,11 +1,11 @@
 #pragma once
 
 #include "IRenderer.h"
-#include "OpenGL/GBuffer.h"
 
 #include <memory.h>
 
-#include "OpenGL/Shader.h"
+#include "ArcEngine/OpenGL/GBuffer.h"
+#include "ArcEngine/OpenGL/Shader.h"
 
 class DeferredRenderer : public IRenderer
 {

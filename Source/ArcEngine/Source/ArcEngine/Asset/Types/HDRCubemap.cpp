@@ -5,7 +5,7 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
-#include "OpenGL/Shader.h"
+#include "ArcEngine/OpenGL/Shader.h"
 #include "Model.h"
 
 HDRCubemap::HDRCubemap(const char* _cubemapPath, const unsigned int& _sizex, const unsigned int& _sizey)
@@ -213,8 +213,8 @@ void HDRCubemap::PrefilterHDRMap(const unsigned int& _format)
     for (unsigned int mip = 0; mip < maxMipLevels; ++mip)
     {
         // reisze framebuffer according to mip-level size.
-        unsigned int mipWidth = 128 * std::pow(0.5, mip);
-        unsigned int mipHeight = 128 * std::pow(0.5, mip);
+        unsigned int mipWidth = static_cast<unsigned int>(128 * std::pow(0.5f, mip));
+        unsigned int mipHeight = static_cast<unsigned int>(128 * std::pow(0.5f, mip));
         glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
         glViewport(0, 0, mipWidth, mipHeight);

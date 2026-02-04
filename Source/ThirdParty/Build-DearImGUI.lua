@@ -5,11 +5,33 @@ project "DearImGUI"
 	targetdir "Binaries/%{cfg.buildcfg}"
 	staticruntime "off"
 
-    files { "DearImGUI/**.h", "DearImGUI/**.cpp" }
+    files 
+    {
+        "DearImGUI/*.h", 
+        "DearImGUI/*.cpp",
+
+		"DearImGUI/backends/imgui_impl_opengl3.h",
+		"DearImGUI/backends/imgui_impl_opengl3.cpp",
+
+		"DearImGUI/backends/imgui_impl_vulkan.h",
+		"DearImGUI/backends/imgui_impl_vulkan.cpp",
+
+		"DearImGUI/backends/imgui_impl_glfw.h",
+		"DearImGUI/backends/imgui_impl_glfw.cpp",
+    }
 
     includedirs
     {
-        "DearImGUI"
+        "DearImGUI",
+
+        "../../Library/GLM",
+        "../../Library/Assimp/include",
+        "../../Library/asio-1.34.2/include",
+        "../../Library/GLAD/include",
+        "../../Library/GLFW/include",
+        "../../Library/std_image",
+
+        "$(VULKAN_SDK)/include",
     }
 
     targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")

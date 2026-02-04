@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Asset/Interface/IAsset.h"
+#include "ArcEngine/Asset/Interface/IAsset.h"
 #include "Mesh.h"
 
 #include <vector>

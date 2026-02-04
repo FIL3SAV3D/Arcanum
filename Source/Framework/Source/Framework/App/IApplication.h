@@ -1,18 +1,16 @@
 #pragma once
 
-#include "Util/JobSystem/JobSystem.h"
+#include "ArcEngine/Util/JobSystem/JobSystem.h"
+#include "ArcEngine/OpenGL/Window.h"
+#include "ArcEngine/OpenGL/InputHandler.h"
+#include <ArcEngine/Util/Clock.h>
+#include <ArcEngine/ECS/Coordinator.h>
+#include "ArcEngine/Renderer/IRenderer.h"
+
+#include "Framework/Managers/ModeManager.h"
+#include "Framework/ECS/Systems/UIRenderSystem.h"
 
 #include <memory>
-
-#include "Managers/ModeManager.h"
-
-#include "OpenGL/Window.h"
-#include "OpenGL/InputHandler.h"
-#include <Util/Clock.h>
-#include <ECS/Coordinator.h>
-
-#include "ECS/Systems/UIRenderSystem.h"
-#include "Renderer/IRenderer.h"
 
 struct ApplicationSpecification
 {

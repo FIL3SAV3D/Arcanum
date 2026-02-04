@@ -1,3 +1,5 @@
+VULKAN_SDK = os.getenv("VULKAN_SDK")
+
 workspace "Arcanum"
    architecture "x64"
    configurations { "Debug", "Release", "Dist" }

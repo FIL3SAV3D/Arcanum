@@ -6,8 +6,8 @@
 #include <map>
 #include <cassert>
 
-#include "ECS/Data/ECSTypeInfo.h"
-#include "ECS/Interfaces/ISystem.h"
+#include "ArcEngine/ECS/Data/ECSTypeInfo.h"
+#include "ArcEngine/ECS/Interfaces/ISystem.h"
 
 #include <GLFW/glfw3.h>
 

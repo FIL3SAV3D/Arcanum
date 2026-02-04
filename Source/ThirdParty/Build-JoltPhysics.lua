@@ -5,11 +5,20 @@ project "JoltPhysics-Arcanum"
 	targetdir "Binaries/%{cfg.buildcfg}"
 	staticruntime "off"
 
-    files { "JoltPhysics-Arcanum/**.h", "JoltPhysics-Arcanum/**.cpp" }
+    files { "JoltPhysics-Arcanum/Jolt/**.h", "JoltPhysics-Arcanum/Jolt/**.cpp" }
 
     includedirs
     {
-        "JoltPhysics-Arcanum"
+        "JoltPhysics-Arcanum",
+
+        "../../Library/GLM",
+        "../../Library/Assimp/include",
+        "../../Library/asio-1.34.2/include",
+        "../../Library/GLAD/include",
+        "../../Library/GLFW/include",
+        "../../Library/std_image",
+
+        "$(VULKAN_SDK)/include",
     }
 
     targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")

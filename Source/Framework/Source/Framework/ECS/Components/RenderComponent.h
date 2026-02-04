@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Asset/Types/Model.h"
-#include "OpenGL/Shader.h"
+#include "ArcEngine/Asset/Types/Model.h"
+#include "ArcEngine/OpenGL/Shader.h"
 
 struct RenderComponent
 {

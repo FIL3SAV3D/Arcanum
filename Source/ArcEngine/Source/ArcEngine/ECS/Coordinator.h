@@ -1,12 +1,12 @@
 #pragma once
 
-#include "ECS/Data/ECSTypeInfo.h"
+#include "ArcEngine/ECS/Data/ECSTypeInfo.h"
 
-#include "ECS/Managers/SystemManager.h"
-#include "ECS/Managers/EntityManager.h"
-#include "ECS/Managers/ComponentManager.h"
+#include "ArcEngine/ECS/Managers/SystemManager.h"
+#include "ArcEngine/ECS/Managers/EntityManager.h"
+#include "ArcEngine/ECS/Managers/ComponentManager.h"
 
-#include "Renderer/IRenderer.h"
+#include "ArcEngine/Renderer/IRenderer.h"
 
 class Coordinator : public std::enable_shared_from_this<Coordinator>
 {

@@ -3,27 +3,27 @@
 
 #include "IApplication.h"
 #include <format>
-#include "Modes/ModeMain.h"
+#include "Framework/Modes/ModeMain.h"
 
 //#include "Layers/ImGUILayer.h"
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 
-#include "ECS/Systems/UIRenderSystem.h"
-#include <ECS/Systems/MeshRenderSystem.h>
-#include <ECS/Components/RenderComponent.h>
-#include <ECS/Components/TransformComponent.h>
+#include "Framework/ECS/Systems/UIRenderSystem.h"
+#include <Framework/ECS/Systems/MeshRenderSystem.h>
+#include <Framework/ECS/Components/RenderComponent.h>
+#include <Framework/ECS/Components/TransformComponent.h>
 
 #include <random>
-#include <OpenGL/Model.h>
+#include <ArcEngine/OpenGL/Model.h>
 
 #include "Jolt/Jolt.h"
 #include "Jolt/Math/Vec3.h"
 #include "Jolt/Math/Quat.h"
-#include <ECS/Systems/PhysicsSystem.h>
-#include <ECS/Components/RigidBodyComponet.h>
+#include <Framework/ECS/Systems/PhysicsSystem.h>
+#include <Framework/ECS/Components/RigidBodyComponet.h>
 
-#include "Renderer/DeferredRenderer.h"
+#include "ArcEngine/Renderer/DeferredRenderer.h"
 
 IApplication::IApplication(const ApplicationSpecification& _Spec) :
 	modeManger{ std::make_unique<ModeManager>() },

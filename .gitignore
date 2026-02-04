@@ -8,6 +8,8 @@ x64/
 bin/
 obj/
 
+Binaries/
+
 # Prerequisites
 *.d
 

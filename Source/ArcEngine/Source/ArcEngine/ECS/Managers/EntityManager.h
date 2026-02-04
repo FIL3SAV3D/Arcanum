@@ -4,7 +4,7 @@
 #include <array>
 #include <assert.h>
 
-#include "ECS/Data/ECSTypeInfo.h"
+#include "ArcEngine/ECS/Data/ECSTypeInfo.h"
 
 class EntityManager
 {
