@@ -1,3 +1,6 @@
 [submodule "submodules/imgui"]
 	path = submodules/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "Source/ThirdParty/JoltPhysics-Arcanum"]
+	path = Source/ThirdParty/JoltPhysics-Arcanum
+	url = https://github.com/FIL3SAV3D/JoltPhysics-Arcanum.git
