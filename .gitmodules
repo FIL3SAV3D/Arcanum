@@ -1,5 +1,5 @@
 [submodule "submodules/imgui"]
-	path = submodules/imgui
+	path = Source/ThirdParty/DearImGUI
 	url = https://github.com/ocornut/imgui.git
 [submodule "Source/ThirdParty/JoltPhysics-Arcanum"]
 	path = Source/ThirdParty/JoltPhysics-Arcanum
