@@ -1,16 +1,15 @@
-project "ArcanumEditor"
-    kind "WindowedApp"
+project "JoltPhysics-Arcanum"
+    kind "StaticLib"
     language "C++"
     cppdialect "C++20"
 	targetdir "Binaries/%{cfg.buildcfg}"
 	staticruntime "off"
 
-    files { "Source/**.h", "Source/**.cpp" }
+    files { "JoltPhysics-Arcanum/**.h", "JoltPhysics-Arcanum/**.cpp" }
 
     includedirs
     {
-        "Source",
-        "../Game/Source",
+        "JoltPhysics-Arcanum"
     }
 
     targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")

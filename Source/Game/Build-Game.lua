@@ -1,5 +1,5 @@
-project "ArcanumEditor"
-    kind "WindowedApp"
+project "Game"
+    kind "StaticLib"
     language "C++"
     cppdialect "C++20"
 	targetdir "Binaries/%{cfg.buildcfg}"
@@ -10,7 +10,7 @@ project "ArcanumEditor"
     includedirs
     {
         "Source",
-        "../Game/Source",
+        "../Framework/Source",
     }
 
     targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")

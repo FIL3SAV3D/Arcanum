@@ -1,4 +1,4 @@
-project "ArcanumEditor"
+project "Standalone"
     kind "WindowedApp"
     language "C++"
     cppdialect "C++20"
