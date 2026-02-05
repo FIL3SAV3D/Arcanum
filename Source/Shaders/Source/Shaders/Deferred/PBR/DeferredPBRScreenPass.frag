@@ -9,9 +9,9 @@ uniform sampler2D gAlbedo;
 uniform sampler2D gORM;
 uniform sampler2D gDepth;
 
-uniform sampler2D shadowMap;
-
-uniform samplerCube irradianceMap;
+//uniform sampler2D shadowMap;
+//
+//uniform samplerCube irradianceMap;
 
 uniform mat4 lightSpaceMatrix;
 uniform vec3 lightDir;
@@ -23,7 +23,7 @@ struct Light {
     float Linear;
     float Quadratic;
 };
-const int NR_LIGHTS = 32;
+const int NR_LIGHTS = 128;
 uniform Light lights[NR_LIGHTS];
 uniform vec3 viewPos;
 
@@ -83,23 +83,23 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
-{
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  
-
-    // perform perspective divide
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    // transform to [0,1] range
-    projCoords = projCoords * 0.5 + 0.5;
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
-    // get depth of current fragment from light's perspective
-    float currentDepth = projCoords.z;
-    // check whether current frag pos is in shadow
-    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
-
-    return shadow;
-}
+//float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
+//{
+//    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  
+//
+//    // perform perspective divide
+//    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+//    // transform to [0,1] range
+//    projCoords = projCoords * 0.5 + 0.5;
+//    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+//    float closestDepth = texture(shadowMap, projCoords.xy).r;
+//    // get depth of current fragment from light's perspective
+//    float currentDepth = projCoords.z;
+//    // check whether current frag pos is in shadow
+//    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+//
+//    return shadow;
+//}
 
 void main()
 { 
@@ -163,20 +163,22 @@ void main()
     vec3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;	  
-    vec3 irradiance = texture(irradianceMap, N).rgb;
-    vec3 diffuse      = irradiance * albedo;
+//    vec3 irradiance = texture(irradianceMap, N).rgb;
+    //vec3 diffuse      = irradiance * albedo;
+    vec3 diffuse      = albedo;
     vec3 ambient = (kD * diffuse) * ao;
     // vec3 ambient = vec3(0.002);
 
     vec4 FragPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0);
-    float shadow = ShadowCalculation(FragPosLightSpace, N);    
+    //float shadow = ShadowCalculation(FragPosLightSpace, N);    
     
-    vec3 color = ambient * (1.0 - shadow) + Lo;
+    //vec3 color = ambient * (1.0 - shadow) + Lo;
+    vec3 color = ambient  + Lo;
 
-    // // HDR tonemapping
-    // color = color / (color + vec3(1.0));
+     // HDR tonemapping
+//     color = color / (color + vec3(1.0));
     // // gamma correct
     // color = pow(color, vec3(1.0/2.2)); 
-
+     
     FragColor = vec4(color , 1.0);
 }
