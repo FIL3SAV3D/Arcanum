@@ -36,6 +36,7 @@ protected:
 	int CreateVertexShader	(const char* _vertexShaderPath);
 	int CreateFragmentShader(const char* _fragmentShaderPath);
 	int CreateGeometryShader(const char* _geometryShaderPath);
+	int CreateComputeShader(const char* _computeShaderPath);
 
 private:
 	std::string ReadFile(const char* _filePath);

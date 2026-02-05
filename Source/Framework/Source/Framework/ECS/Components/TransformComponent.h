@@ -1,11 +1,8 @@
 #pragma once
 
-#include "Jolt/Jolt.h"
-#include "Jolt/Math/Vec3.h"
-#include "Jolt/Math/Quat.h"
-#include "Jolt/Math/Mat44.h"
+#include "glm/mat4x4.hpp"
 
 struct TransformComponent
 {
-    JPH::Mat44 transform;
+    glm::mat4 transform;
 };

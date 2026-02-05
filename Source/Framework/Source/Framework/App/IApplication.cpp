@@ -25,23 +25,25 @@
 
 #include "ArcEngine/Renderer/DeferredRenderer.h"
 
+#include "glm/gtc/quaternion.hpp"
+
 IApplication::IApplication(const ApplicationSpecification& _Spec) :
 	modeManger{ std::make_unique<ModeManager>() },
 	window{ std::make_shared<Window>(glm::uvec2(_Spec.windowSize.x, _Spec.windowSize.y), _Spec.name.c_str()) },
 	inputHandler{ std::make_shared<InputHandler>() },
 	clock{ std::make_unique<Clock>() },
 	coordinator{ std::make_shared<Coordinator>() },
-	renderer{ std::make_shared<DeferredRenderer>() }
+	assetManager{ std::make_shared<ArcEngine::AssetManager>() }
 {
 	glfwSetWindowUserPointer(window->GetNativeWindow(), this);
-	//glfwSetFramebufferSizeCallback(window->GetNativeWindow(), FrameBufferSizeCallback);
+	glfwSetFramebufferSizeCallback(window->GetNativeWindow(), FrameBufferSizeCallback);
 
 	glfwSetCursorPosCallback(window->GetNativeWindow(), InputHandler::CursorCallBackImpl);
 	glfwSetScrollCallback(window->GetNativeWindow(), InputHandler::ScrollCallBackImpl);
 	glfwSetKeyCallback(window->GetNativeWindow(), InputHandler::KeyCallBackImpl);
 
-	renderer->Create(window);
 
+	glfwSetWindowUserPointer(window->GetNativeWindow(), this);
 
 	Initialize();
 }
@@ -65,13 +67,11 @@ void IApplication::Run()
 
 	OnLateUpdate(deltaTime);
 
-	
-
 	// Set camera bindings
 
 	OnRender();
 
-	OnRenderUI();
+	//OnRenderUI();
 
 	OnApplicationPause();
 
@@ -89,13 +89,13 @@ void IApplication::OnCreate()
 
 	//UI = std::static_pointer_cast<UIRenderSystem>(coordinator->RegisterSystem<UIRenderSystem, 10>(window));
 
-	coordinator->RegisterSystem<MeshRenderSystem, 10>(inputHandler);
-	coordinator->RegisterSystem<ECSPhysicsSystem, 20>();
+	coordinator->RegisterSystem<MeshRenderSystem, 10>(inputHandler, window);
+	//coordinator->RegisterSystem<ECSPhysicsSystem, 20>();
 
 	Signature signature;
-	signature.set(coordinator->GetComponentType<TransformComponent>());
-	signature.set(coordinator->GetComponentType<RigidBodyComponent>());
-	coordinator->SetSystemSignature<ECSPhysicsSystem>(signature);
+	//signature.set(coordinator->GetComponentType<TransformComponent>());
+	//signature.set(coordinator->GetComponentType<RigidBodyComponent>());
+	//coordinator->SetSystemSignature<ECSPhysicsSystem>(signature);
 
 	signature.reset();
 
@@ -107,7 +107,7 @@ void IApplication::OnCreate()
 
 	coordinator->OnCreate();
 
-	//auto m_cubeModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Source\\ArcEngine\\Models\\obj_models\\cube.obj").c_str());
+	auto m_cubeModel = assetManager->LoadAsset(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
 
 	std::vector<Entity> entities(100);
 
@@ -123,10 +123,11 @@ void IApplication::OnCreate()
 	{
 		entity = coordinator->CreateEntity();
 
-		JPH::Mat44 transform{};
-		transform.SetTranslation(JPH::Vec3(randPosition(generator), randPosition(generator), randPosition(generator)));
-		transform = transform.sRotation(JPH::Quat().sEulerAngles(JPH::Vec3(randRotation(generator), randRotation(generator), randRotation(generator))));
-		transform = transform.sScale(scale);
+		glm::mat4 transform = glm::mat4{ 1.0f };
+		transform = glm::translate(transform, glm::vec3(randPosition(generator), randPosition(generator), randPosition(generator)));
+		auto rotQuat = glm::quat(glm::vec3(randRotation(generator), randRotation(generator), randRotation(generator)));
+		transform = transform * glm::mat4_cast(rotQuat);
+		transform = glm::scale(transform, glm::vec3(scale));
 
 		coordinator->AddComponent(
 			entity,
@@ -139,13 +140,13 @@ void IApplication::OnCreate()
 			RigidBodyComponent{}
 		);
 
-		//RenderComponent renderComponent{};
+		RenderComponent renderComponent{};
 
-		/*renderComponent.model = m_cubeModel;
+		renderComponent.model = *std::static_pointer_cast<Model>(m_cubeModel);
 
 		coordinator->AddComponent(
 			entity,
-			renderComponent);*/
+			renderComponent);
 	}
 
 	auto cameraEntity = coordinator->CreateEntity();
@@ -189,14 +190,7 @@ void IApplication::OnLateUpdate(const float& _DeltaTime)
 
 void IApplication::OnRender()
 {
-	/*coordinator->GetComponent<TransformComponent>();*/
-
-	/*RenderParams params;
-	params.cameraPosition = 
-
-	coordinator->OnBeginRender();
-	coordinator->OnRender(renderer);
-	coordinator->OnEndRender();*/
+	coordinator->OnRender();
 }
 
 void IApplication::OnRenderUI()
@@ -254,4 +248,13 @@ void IApplication::OnDestroy()
 bool IApplication::IsQuitting()
 {
 	return glfwWindowShouldClose(window->GetNativeWindow());
+}
+
+void IApplication::FrameBufferSizeCallback(GLFWwindow* _window, int _width, int _height)
+{
+	IApplication* ptr = static_cast<IApplication*>(glfwGetWindowUserPointer(_window));
+	glm::uvec2 newSize{_width, _height};
+
+	ptr->window->SetScreenSize(newSize);
+	ptr->coordinator->OnResize(newSize);
 }

@@ -21,7 +21,7 @@ public:
     virtual void OnLateUpdate      (const float& _DeltaTime)              {};
 
     virtual void OnBeginRender     (const RenderParams& _RenderParams) {};
-    virtual void OnRender          (const RenderParams& _RenderParams) {};
+    virtual void OnRender          () {};
     virtual void OnEndRender       (const RenderParams& _RenderParams) {};
 
     virtual void OnBeginRenderUI   (const RenderParams& _RenderParams) {};
@@ -32,6 +32,8 @@ public:
     virtual void OnCheckForDisabled()                                     {};
     virtual void OnQuit() {};
     virtual void OnDestroy         ()                                     {};
+
+    virtual void OnResize(const glm::uvec2& _Size) {};
 
 public:
     std::set<Entity> mEntities{};

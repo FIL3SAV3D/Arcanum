@@ -13,6 +13,7 @@ public:
 	GLFWwindow* GetNativeWindow() const { return window; }
 
 	const glm::uvec2& GetScreenSize() const { return windowSize; }
+	void SetScreenSize(const glm::uvec2& _Size) { windowSize = _Size; }
 
 private:
 	GLFWwindow* window = nullptr;

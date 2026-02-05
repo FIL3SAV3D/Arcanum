@@ -19,7 +19,7 @@ namespace ArcEngine
         AssetManager();
         ~AssetManager();
 
-        bool LoadAsset(const std::filesystem::path& _AssetPath);
+        std::shared_ptr<IAsset> LoadAsset(const std::filesystem::path& _AssetPath);
 
     private:
         AssetType GetTypeByExtension(const std::filesystem::path& _AssetPath);

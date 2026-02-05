@@ -114,9 +114,9 @@ public:
         m_SystemManager->OnLateUpdate(_DeltaTime);
     }
 
-    const void OnBeginRender(const RenderParams& _RenderParams) const { m_SystemManager->OnRender(_RenderParams); };
-    const void OnRender     (const RenderParams& _RenderParams) const { m_SystemManager->OnRender(_RenderParams); };
-    const void OnEndRender  (const RenderParams& _RenderParams) const { m_SystemManager->OnRender(_RenderParams); };
+    const void OnBeginRender(const RenderParams& _RenderParams) const {  };
+    const void OnRender     () const { m_SystemManager->OnRender(); };
+    const void OnEndRender  (const RenderParams& _RenderParams) const {  };
 
     void OnRenderUI(const RenderParams& _RenderParams)
     {
@@ -130,6 +130,11 @@ public:
     void OnCheckForDisabled()
     {
         m_SystemManager->OnApplicationPause();
+    }
+
+    void OnResize(const glm::uvec2& _Size)
+    {
+        m_SystemManager->OnResize(_Size);
     }
 
 public:

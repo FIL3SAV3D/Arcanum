@@ -12,6 +12,8 @@
 
 #include <memory>
 
+#include <ArcEngine/Asset/AssetManager.h>
+
 struct ApplicationSpecification
 {
 	std::string name;
@@ -28,6 +30,8 @@ struct ApplicationSpecification
 		fullscreen = _Fullscreen;
 	}
 };
+
+struct GLFWwindow;
 
 class IApplication
 {
@@ -56,6 +60,8 @@ public:
 
 	bool IsQuitting();
 
+	static void FrameBufferSizeCallback(GLFWwindow* _window, int _width, int _height);
+
 public:
 	// Application Being Created
 	void OnCreate();
@@ -82,9 +88,9 @@ public:
 	std::shared_ptr<Window> GetWindow() { return window; }
 
 private:
-	std::shared_ptr<Coordinator> coordinator;
+	std::shared_ptr<ArcEngine::AssetManager> assetManager;
 
-	std::shared_ptr<IRenderer> renderer;
+	std::shared_ptr<Coordinator> coordinator;
 
 	std::shared_ptr<Window> window;
 

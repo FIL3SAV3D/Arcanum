@@ -1,0 +1,1 @@
+I spent today to clean up my project repository and properly set up the premake files for each build. This has drastically made the project look and feel more professional so i feel really good about it.

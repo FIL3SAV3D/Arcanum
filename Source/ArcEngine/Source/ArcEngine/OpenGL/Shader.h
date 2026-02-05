@@ -9,6 +9,7 @@ class Shader : public ShaderTemplate
 {
 public:
 	Shader(const char* _name);
+	Shader(const char* _name, bool compute);
 	Shader(const char* _vertexPath, const char* _fragmentPath);
 	Shader(const char* _vertexPath, const char* _fragmentPath, const char* _geometryPath);
 	~Shader();

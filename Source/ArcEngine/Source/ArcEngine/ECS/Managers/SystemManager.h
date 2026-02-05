@@ -128,11 +128,11 @@ public:
 		}
 	}
 
-	void OnRender(const RenderParams& _RenderParams)
+	void OnRender()
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnRender(_RenderParams);
+			system->OnRender();
 		}
 	}
 
@@ -165,6 +165,14 @@ public:
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
 			system->OnDestroy();
+		}
+	}
+
+	void OnResize(const glm::uvec2& _Size)
+	{
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnResize(_Size);
 		}
 	}
 

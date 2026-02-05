@@ -35,6 +35,7 @@ public:
     void SetActiveTexture(GBUFFER_TEXTURE_TYPE TextureType);
 
     const glm::uvec2& GetBufferSize() const { return bufferSize; }
+    const unsigned int& GetFBO() const { return m_gBuffer_fbo; }
 private:
     glm::uvec2 bufferSize;
 

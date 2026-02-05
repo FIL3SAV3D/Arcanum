@@ -9,12 +9,17 @@
 class MeshRenderSystem : public ISystem
 {
 public:
-	MeshRenderSystem(std::shared_ptr<InputHandler> _InputHandler);
+	MeshRenderSystem(std::shared_ptr<InputHandler> _InputHandler, std::shared_ptr<Window> _Window);
 
-	void OnCreate();
+	void OnCreate() override;
 	void OnUpdate(const float& _DeltaTime) override;
-	void OnRender(const RenderParams& _RenderParams) override;
+	void OnRender() override;
+
+	void OnResize(const glm::uvec2& _Size) override;
 
 private:
+	std::shared_ptr<IRenderer> m_Renderer;
 	std::shared_ptr<Camera> cam;
+
+	std::shared_ptr<Window> window;
 };

@@ -15,7 +15,7 @@ namespace ArcEngine
         m_ModelFactory.reset();
     }
 
-    bool AssetManager::LoadAsset(const std::filesystem::path& _AssetPath)
+    std::shared_ptr<IAsset> AssetManager::LoadAsset(const std::filesystem::path& _AssetPath)
     {
         std::shared_ptr<IAsset> asset;
         switch (GetTypeByExtension(_AssetPath))
@@ -36,14 +36,16 @@ namespace ArcEngine
             break;
         }
 
-        return false;
+        return asset;
     }
 
     AssetType AssetManager::GetTypeByExtension(const std::filesystem::path& _AssetPath)
     {
         std::cout << _AssetPath.extension() << std::endl;
 
-        if (_AssetPath.extension() == ".fbx") { return AssetType::MESH; }
+        if (_AssetPath.extension() == ".fbx") { return AssetType::MODEL; }
+        if (_AssetPath.extension() == ".obj") { return AssetType::MODEL; }
+        if (_AssetPath.extension() == ".glb") { return AssetType::MODEL; }
 
         return AssetType::NONE;
     }

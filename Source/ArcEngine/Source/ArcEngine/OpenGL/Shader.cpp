@@ -9,6 +9,11 @@ Shader::Shader(const char* _name)
 	CreateShader(vertName.c_str() , fragName.c_str());
 }
 
+Shader::Shader(const char* _name, bool compute)
+{
+	CreateComputeShader(_name);
+}
+
 Shader::Shader(const char* _vertexPath, const char* _fragmentPath)
 {
 	CreateShader(_vertexPath, _fragmentPath);

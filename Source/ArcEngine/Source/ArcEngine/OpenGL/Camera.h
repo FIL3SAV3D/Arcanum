@@ -27,7 +27,6 @@ public:
 	glm::mat4x4 GetViewMatrix() const;
 	glm::mat4x4 GetProjectionMatrix() const;
 
-
 	void SetPosition(const glm::vec3& _position);
 	void SetRotation(const glm::vec3& _rotation);
 
@@ -45,7 +44,7 @@ private:
 	float yaw = 0;
 	float pitch = 0;
 
-	const float speed = 5.0f;
+	const float speed = 10.0f;
 
 	glm::mat4 transform{};
 

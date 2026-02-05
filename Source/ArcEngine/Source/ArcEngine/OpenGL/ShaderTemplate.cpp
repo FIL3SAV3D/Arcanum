@@ -75,7 +75,8 @@ void ShaderTemplate::CreateShader(const char* _vertexShaderPath, const char* _fr
 	std::string shaderSearchPath;
 	shaderSearchPath.append("D:\\PersonalProjects");
 	shaderSearchPath.append("\\Arcanum");
-	shaderSearchPath.append("\\source\\ArcEngine\\OpenGL\\Shaders\\");
+	shaderSearchPath.append("\\Source\\Shaders");
+	shaderSearchPath.append("\\Source\\Shaders\\");
 
 	ID = glCreateProgram();
 
@@ -151,6 +152,37 @@ int ShaderTemplate::CreateGeometryShader(const char* _geometryShaderPath)
 	glAttachShader(ID, geometry);
 
 	return geometry;
+}
+
+int ShaderTemplate::CreateComputeShader(const char* _computeShaderPath)
+{
+	std::string shaderSearchPath;
+	shaderSearchPath.append("D:\\PersonalProjects");
+	shaderSearchPath.append("\\Arcanum");
+	shaderSearchPath.append("\\Source\\Shaders");
+	shaderSearchPath.append("\\Source\\Shaders\\");
+	shaderSearchPath.append(_computeShaderPath);
+
+	std::string data{ ReadFile(shaderSearchPath.c_str()) };
+	const char* code = data.c_str();
+
+	ID = glCreateProgram();
+
+	unsigned int compute = glCreateShader(GL_COMPUTE_SHADER);
+
+	glShaderSource(compute, 1, &code, nullptr);
+	glCompileShader(compute);
+
+
+	CheckCompileErrors(compute, "COMPUTE");
+
+	glAttachShader(ID, compute);
+	glLinkProgram(ID);
+	CheckCompileErrors(ID, "PROGRAM");
+
+	glDeleteShader(compute);
+
+	return ID;
 }
 
 std::string ShaderTemplate::ReadFile(const char* _filePath)
