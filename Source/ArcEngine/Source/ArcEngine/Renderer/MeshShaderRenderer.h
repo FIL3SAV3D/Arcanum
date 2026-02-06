@@ -4,6 +4,7 @@
 
 #include <memory>
 #include "ArcEngine/Asset/Types/ComputeShader.h"
+#include "ArcEngine/Asset/Types/MeshShader.h"
 
 class MeshShaderRenderer : public IRenderer
 {
@@ -15,9 +16,14 @@ class MeshShaderRenderer : public IRenderer
     void RenderMeshInstanced(const RenderParams& _RParams, const Mesh& _Mesh, const int& _SubMeshIndex, std::vector<glm::mat4> _InstanceData, const int& _InstanceCount) override;
     void EndRender(const RenderParams& _RParams) const override;
     void Blit() const override;
-    void Resize(std::shared_ptr<Window> _Window) const override;
+    void Resize(std::shared_ptr<Window> _Window) override;
 
 private:
+    float deltaTime = 0.0f; // time between current frame and last frame
+    float lastFrame = 0.0f; // time of last frame
+    int fCounter = 0;
+
+
     unsigned int quadVAO;
     unsigned int quadVBO;
 
@@ -25,7 +31,8 @@ private:
 
     std::shared_ptr<Window> window;
 
-    const unsigned int TEXTURE_WIDTH = 512, TEXTURE_HEIGHT = 512;
     std::unique_ptr<Shader> screenQuad;
     std::unique_ptr<ComputeShader> computeShader;
+    std::unique_ptr<MeshShader> debugmeshShader;
+    std::unique_ptr<MeshShader> meshShader;
 };

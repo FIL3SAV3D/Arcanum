@@ -1,6 +1,6 @@
 #include "ModelFactory.h"
 
-
+#include "ArcEngine/Thirdparty/MeshOptimizer/meshoptimizer.h"
 
 #include <glad/glad.h>
 
@@ -90,12 +90,15 @@ Mesh ModelFactory::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 		vertices.push_back(vertex);
 	}
 
+	unsigned int itr = 0;
 	// process indices
 	for (unsigned int i = 0; i < _mesh->mNumFaces; i++)
 	{
 		aiFace face = _mesh->mFaces[i];
 		for (unsigned int j = 0; j < face.mNumIndices; j++)
+		{
 			indices.push_back(face.mIndices[j]);
+		}
 	}
 
 
@@ -121,7 +124,88 @@ Mesh ModelFactory::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 	//	textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	/*}*/
 
-	auto mesh = Mesh(vertices, indices);
+	std::vector<meshopt_Meshlet> meshlets;
+	std::vector<uint32_t>        meshletVertices;
+	std::vector<uint8_t>         meshletTriangles;
+
+	const float  kConeWeight = 0.0f;
+
+	const size_t maxMeshlets = meshopt_buildMeshletsBound(indices.size(), kMaxVertices, kMaxTriangles);
+
+	meshlets.resize(maxMeshlets);
+	meshletVertices.resize(maxMeshlets * kMaxVertices);
+	meshletTriangles.resize(maxMeshlets * kMaxTriangles * 3);
+
+	size_t meshletCount = meshopt_buildMeshlets(
+		meshlets.data(),
+		meshletVertices.data(),
+		meshletTriangles.data(),
+		reinterpret_cast<const uint32_t*>(indices.data()),
+		indices.size(),
+		reinterpret_cast<const float*>(vertices.data()),
+		vertices.size(),
+		sizeof(glm::vec3),
+		kMaxVertices,
+		kMaxTriangles,
+		kConeWeight);
+
+	auto& last = meshlets[meshletCount - 1];
+	meshletVertices.resize(last.vertex_offset + last.vertex_count);
+	meshletTriangles.resize(last.triangle_offset + ((last.triangle_count * 3 + 3) & ~3));
+	meshlets.resize(meshletCount);
+
+	std::vector<uint32_t> meshletTrianglesU32;
+	for (auto& m : meshlets)
+	{
+		// Save triangle offset for current meshlet
+		uint32_t triangleOffset = static_cast<uint32_t>(meshletTrianglesU32.size());
+
+		// Repack to uint32_t
+		for (uint32_t i = 0; i < m.triangle_count; ++i)
+		{
+			uint32_t i0 = 3 * i + 0 + m.triangle_offset;
+			uint32_t i1 = 3 * i + 1 + m.triangle_offset;
+			uint32_t i2 = 3 * i + 2 + m.triangle_offset;
+
+			uint8_t  vIdx0 = meshletTriangles[i0];
+			uint8_t  vIdx1 = meshletTriangles[i1];
+			uint8_t  vIdx2 = meshletTriangles[i2];
+			uint32_t packed = ((static_cast<uint32_t>(vIdx0) & 0xFF) << 0) |
+				((static_cast<uint32_t>(vIdx1) & 0xFF) << 8) |
+				((static_cast<uint32_t>(vIdx2) & 0xFF) << 16);
+			meshletTrianglesU32.push_back(packed);
+		}
+
+		// Update triangle offset for current meshlet
+		m.triangle_offset = triangleOffset;
+	}
+
+	Mesh mesh;
+	mesh.vertices = vertices;
+	mesh.indices = indices;
+
+	mesh.MSMeshletBuffer = meshlets.size();
+
+	glGenBuffers(1, &mesh.MSPositionBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.MSPositionBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(VertexData), &vertices[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenBuffers(1, &mesh.MSMeshletBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.MSMeshletBuffer);
+	glBufferData(GL_ARRAY_BUFFER, meshlets.size() * sizeof(meshopt_Meshlet), &meshlets[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenBuffers(1, &mesh.MSMeshletVerticiesBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.MSMeshletVerticiesBuffer);
+	glBufferData(GL_ARRAY_BUFFER, meshletVertices.size() * sizeof(uint32_t), &meshletVertices[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenBuffers(1, &mesh.MSMeshletTrianglesBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.MSMeshletTrianglesBuffer);
+	glBufferData(GL_ARRAY_BUFFER, meshletTrianglesU32.size() * sizeof(uint8_t), &meshletTrianglesU32[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	SetUpMesh(mesh);
 
 	return mesh;

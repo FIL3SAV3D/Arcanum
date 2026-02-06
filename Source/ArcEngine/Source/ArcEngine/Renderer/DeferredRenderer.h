@@ -18,7 +18,7 @@ public:
 
     void EndRender(const RenderParams& _RParams) const override;
     void Blit() const override;
-    void Resize(std::shared_ptr<Window> _Window) const override;
+    void Resize(std::shared_ptr<Window> _Window) override;
 
 private:
     std::shared_ptr<Window> window;

@@ -192,7 +192,7 @@ void DeferredRenderer::Blit() const
 {
 }
 
-void DeferredRenderer::Resize(std::shared_ptr<Window> _Window) const
+void DeferredRenderer::Resize(std::shared_ptr<Window> _Window)
 {
     m_GBuffer->Destroy();
     m_GBuffer->Create(_Window->GetScreenSize());
