@@ -29,9 +29,11 @@ public:
     unsigned int VBO{ 0 };
     unsigned int EBO{ 0 };
 
-    unsigned int MSMeshletBufferSize;
+    unsigned int MSMeshletAmount;
 
-    unsigned int MSPositionBuffer;
+    unsigned int MSVerticesBuffer;
+    unsigned int MSIndicesBuffer;
+
     unsigned int MSMeshletBuffer;
     unsigned int MSMeshletVerticiesBuffer;
     unsigned int MSMeshletTrianglesBuffer;

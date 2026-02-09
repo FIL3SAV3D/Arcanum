@@ -18,11 +18,19 @@ class MeshShaderRenderer : public IRenderer
     void Blit() const override;
     void Resize(std::shared_ptr<Window> _Window) override;
 
+    struct uniforms
+    {
+        glm::mat4 projection;
+        glm::mat4 view;
+        glm::mat4 model;
+    };
+
 private:
     float deltaTime = 0.0f; // time between current frame and last frame
     float lastFrame = 0.0f; // time of last frame
     int fCounter = 0;
 
+    unsigned int ssbo;
 
     unsigned int quadVAO;
     unsigned int quadVBO;

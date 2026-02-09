@@ -4,6 +4,7 @@
 #include "GLFW/glfw3.h"
 
 #include "ArcEngine/OpenGL/Shader.h"
+#include <glm/gtc/type_ptr.hpp>
 
 
 void MeshShaderRenderer::Create(std::shared_ptr<Window> _Window)
@@ -72,19 +73,52 @@ void MeshShaderRenderer::Create(std::shared_ptr<Window> _Window)
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
     }
     
+    auto version = glGetString(GL_VERSION);
+
+    std::printf("Version: %s\n", version);
+
     int x;
+    glGetIntegerv(GL_NUM_EXTENSIONS, &x);
+    std::printf("NUM OF EXTENSIONS: %i\n", x);
+
     glGetIntegerv(GL_MAX_MESH_OUTPUT_VERTICES_NV, &x);
     std::printf("MAX MESH OUT VERTS: %i\n", x);
     glGetIntegerv(GL_MAX_MESH_OUTPUT_PRIMITIVES_NV, &x);
     std::printf("MAX MESH OUT PRIM: %i\n", x);
 
-    glGetIntegerv(GL_MAX_MESH_WORK_GROUP_SIZE_NV, &x);
-    std::printf("MAX WORK SIZE: %i\n", x);
+    
 
+    glm::ivec3 data;
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0, &data.x);
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1, &data.y);
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2, &data.z);
+    std::printf("GL_MAX_COMPUTE_WORK_GROUP_SIZE: %i * %i * %i\n", data.x, data.y, data.z);
+
+    glGetIntegeri_v(GL_MAX_MESH_WORK_GROUP_SIZE_NV, 0, &data.x);
+    glGetIntegeri_v(GL_MAX_MESH_WORK_GROUP_SIZE_NV, 1, &data.y);
+    glGetIntegeri_v(GL_MAX_MESH_WORK_GROUP_SIZE_NV, 2, &data.z);
+    std::printf("GL_MAX_MESH_WORK_GROUP_SIZE_NV: %i * %i * %i\n", data.x, data.y, data.z);
+
+    glGetIntegerv(GL_MESH_VERTICES_OUT_NV, &x);
+    std::printf("MAX Vert SIZE: %i\n", x);
+
+    glGetIntegerv(GL_MESH_PRIMITIVES_OUT_NV, &x);
+    std::printf("MAX PRIM SIZE: %i\n", x);
+
+    uniforms init{};
+
+    glGenBuffers(1, &ssbo);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, ssbo);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(uniforms), nullptr, GL_STATIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    glBindBufferRange(GL_UNIFORM_BUFFER, 0, ssbo, 0, sizeof(uniforms));
 }
 
 void MeshShaderRenderer::Destroy()
 {
+    glDeleteBuffers(sizeof(uniforms), &ssbo);
 }
 
 void MeshShaderRenderer::BeginRender(const RenderParams& _Params) const
@@ -114,18 +148,41 @@ void MeshShaderRenderer::RenderMesh(const RenderParams& _RParams, const Mesh& _M
     glDrawArrays(GL_TRIANGLES, 0, 6);*/
 
     
-    //// DEbug
+    // DEbug
     //debugmeshShader->use();
     //uint32_t num_workgroups = 3;
     //glDrawMeshTasksNV(0, num_workgroups);
 
+    meshShader->use();
 
-    glBindBuffer(GL_ARRAY_BUFFER, _Mesh.MSPositionBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, _Mesh.MSMeshletBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, _Mesh.MSMeshletVerticiesBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, _Mesh.MSMeshletTrianglesBuffer);
+    uniforms uni;
+    uni.projection = _RParams.camera->GetProjectionMatrix();
+    uni.view = _RParams.camera->GetViewMatrix();
+    uni.view = objectToWorld;
 
-    glDrawMeshTasksNV(0, _Mesh.MSMeshletBufferSize);
+    glBindBuffer(GL_UNIFORM_BUFFER, ssbo);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0                    , sizeof(glm::mat4), glm::value_ptr(uni.projection));
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)    , sizeof(glm::mat4), glm::value_ptr(uni.view));
+    glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(objectToWorld));
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSVerticesBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _Mesh.MSVerticesBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSIndicesBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _Mesh.MSIndicesBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSMeshletTrianglesBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _Mesh.MSMeshletTrianglesBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSMeshletBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, _Mesh.MSMeshletBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glDrawMeshTasksNV(0, _Mesh.MSMeshletAmount);
 }
 
 void MeshShaderRenderer::RenderMeshInstanced(const RenderParams& _RParams, const Mesh& _Mesh, const int& _SubMeshIndex, std::vector<glm::mat4> _InstanceData, const int& _InstanceCount)

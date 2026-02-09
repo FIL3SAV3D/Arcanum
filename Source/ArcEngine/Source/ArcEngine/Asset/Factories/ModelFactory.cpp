@@ -50,6 +50,9 @@ Mesh ModelFactory::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 {
 	std::vector<VertexData> vertices;
 	std::vector<unsigned int> indices;
+
+	std::vector<glm::vec3> vertPositions;
+
 	//std::vector<Texture> textures;
 
 	for (unsigned int i = 0; i < _mesh->mNumVertices; i++)
@@ -61,6 +64,9 @@ Mesh ModelFactory::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 		vector.y = _mesh->mVertices[i].y;
 		vector.z = _mesh->mVertices[i].z;
 		vertex.aPosition = vector;
+
+		vertPositions.push_back(vector);
+
 
 		vector.x = _mesh->mNormals[i].x;
 		vector.y = _mesh->mNormals[i].y;
@@ -88,6 +94,7 @@ Mesh ModelFactory::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 			vertex.aTexCoords = glm::vec2(0.0f, 0.0f);
 
 		vertices.push_back(vertex);
+
 	}
 
 	unsigned int itr = 0;
@@ -125,8 +132,8 @@ Mesh ModelFactory::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 	/*}*/
 
 	std::vector<meshopt_Meshlet> meshlets;
-	std::vector<uint32_t>        meshletVertices;
-	std::vector<uint8_t>         meshletTriangles;
+	std::vector<unsigned int>    meshletVertices;
+	std::vector<unsigned char>   meshletTriangles;
 
 	const float  kConeWeight = 0.0f;
 
@@ -136,14 +143,13 @@ Mesh ModelFactory::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 	meshletVertices.resize(maxMeshlets * kMaxVertices);
 	meshletTriangles.resize(maxMeshlets * kMaxTriangles * 3);
 
-	size_t meshletCount = meshopt_buildMeshlets(
-		meshlets.data(),
-		meshletVertices.data(),
-		meshletTriangles.data(),
-		reinterpret_cast<const uint32_t*>(indices.data()),
+	size_t meshletCount = meshopt_buildMeshlets(&meshlets[0],
+		&meshletVertices[0],
+		&meshletTriangles[0],
+		&indices[0],
 		indices.size(),
-		reinterpret_cast<const float*>(vertices.data()),
-		vertices.size(),
+		&vertPositions[0].x,
+		vertPositions.size(),
 		sizeof(glm::vec3),
 		kMaxVertices,
 		kMaxTriangles,
@@ -154,57 +160,57 @@ Mesh ModelFactory::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
 	meshletTriangles.resize(last.triangle_offset + ((last.triangle_count * 3 + 3) & ~3));
 	meshlets.resize(meshletCount);
 
-	std::vector<uint32_t> meshletTrianglesU32;
-	for (auto& m : meshlets)
-	{
-		// Save triangle offset for current meshlet
-		uint32_t triangleOffset = static_cast<uint32_t>(meshletTrianglesU32.size());
+	//std::vector<uint32_t> meshletTrianglesU32;
+	//for (auto& m : meshlets)
+	//{
+	//	// Save triangle offset for current meshlet
+	//	uint32_t triangleOffset = static_cast<uint32_t>(meshletTrianglesU32.size());
 
-		// Repack to uint32_t
-		for (uint32_t i = 0; i < m.triangle_count; ++i)
-		{
-			uint32_t i0 = 3 * i + 0 + m.triangle_offset;
-			uint32_t i1 = 3 * i + 1 + m.triangle_offset;
-			uint32_t i2 = 3 * i + 2 + m.triangle_offset;
+	//	// Repack to uint32_t
+	//	for (uint32_t i = 0; i < m.triangle_count; ++i)
+	//	{
+	//		uint32_t i0 = 3 * i + 0 + m.triangle_offset;
+	//		uint32_t i1 = 3 * i + 1 + m.triangle_offset;
+	//		uint32_t i2 = 3 * i + 2 + m.triangle_offset;
 
-			uint8_t  vIdx0 = meshletTriangles[i0];
-			uint8_t  vIdx1 = meshletTriangles[i1];
-			uint8_t  vIdx2 = meshletTriangles[i2];
-			uint32_t packed = ((static_cast<uint32_t>(vIdx0) & 0xFF) << 0) |
-				((static_cast<uint32_t>(vIdx1) & 0xFF) << 8) |
-				((static_cast<uint32_t>(vIdx2) & 0xFF) << 16);
-			meshletTrianglesU32.push_back(packed);
-		}
+	//		uint8_t  vIdx0 = meshletTriangles[i0];
+	//		uint8_t  vIdx1 = meshletTriangles[i1];
+	//		uint8_t  vIdx2 = meshletTriangles[i2];
+	//		uint32_t packed = ((static_cast<uint32_t>(vIdx0) & 0xFF) << 0) |
+	//			((static_cast<uint32_t>(vIdx1) & 0xFF) << 8) |
+	//			((static_cast<uint32_t>(vIdx2) & 0xFF) << 16);
+	//		meshletTrianglesU32.push_back(packed);
+	//	}
 
-		// Update triangle offset for current meshlet
-		m.triangle_offset = triangleOffset;
-	}
+	//	// Update triangle offset for current meshlet
+	//	m.triangle_offset = triangleOffset;
+	//}
 
 	Mesh mesh;
 	mesh.vertices = vertices;
 	mesh.indices = indices;
 
-	mesh.MSMeshletBuffer = meshlets.size();
+	mesh.MSMeshletAmount = meshlets.size();
 
-	glGenBuffers(1, &mesh.MSPositionBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh.MSPositionBuffer);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(VertexData), &vertices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glGenBuffers(1, &mesh.MSVerticesBuffer);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, mesh.MSVerticesBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, vertPositions.size() * sizeof(glm::vec3), &vertPositions[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	glGenBuffers(1, &mesh.MSIndicesBuffer);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, mesh.MSIndicesBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glGenBuffers(1, &mesh.MSMeshletBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh.MSMeshletBuffer);
-	glBufferData(GL_ARRAY_BUFFER, meshlets.size() * sizeof(meshopt_Meshlet), &meshlets[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glGenBuffers(1, &mesh.MSMeshletVerticiesBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh.MSMeshletVerticiesBuffer);
-	glBufferData(GL_ARRAY_BUFFER, meshletVertices.size() * sizeof(uint32_t), &meshletVertices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, mesh.MSMeshletBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, meshlets.size() * sizeof(meshopt_Meshlet), &meshlets[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glGenBuffers(1, &mesh.MSMeshletTrianglesBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh.MSMeshletTrianglesBuffer);
-	glBufferData(GL_ARRAY_BUFFER, meshletTrianglesU32.size() * sizeof(uint8_t), &meshletTrianglesU32[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, mesh.MSMeshletTrianglesBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, meshletTriangles.size() * sizeof(uint8_t), &meshletTriangles[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	SetUpMesh(mesh);
 
