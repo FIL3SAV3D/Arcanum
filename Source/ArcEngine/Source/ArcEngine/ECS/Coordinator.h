@@ -104,7 +104,7 @@ public:
 public:
     const void OnCreate() const { m_SystemManager->OnCreate(); }
     const void OnStart() const { m_SystemManager->OnStart(); }
-    const void OnInput(std::shared_ptr<Window> _Window) const { m_SystemManager->OnInput(_Window); }
+    const void OnInput(std::shared_ptr<ArcEngine::Window> _Window) const { m_SystemManager->OnInput(_Window); }
     void OnUpdate(const float& _DeltaTime)
     {
         m_SystemManager->OnUpdate(_DeltaTime);

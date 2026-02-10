@@ -3,7 +3,7 @@
 #include "ArcEngine/ECS/Coordinator.h"
 #include "Framework/ECS/Components/InputComponent.h"
 
-void InputSystem::OnInput(std::shared_ptr<Window> _Window)
+void InputSystem::OnInput(std::shared_ptr<ArcEngine::Window> _Window)
 {
 	glfwPollEvents();
 

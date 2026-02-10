@@ -8,7 +8,7 @@
 #include "Framework/ECS/Components/TransformComponent.h"
 
 
-MeshRenderSystem::MeshRenderSystem(std::shared_ptr<InputHandler> _InputHandler, std::shared_ptr<Window> _Window)
+MeshRenderSystem::MeshRenderSystem(std::shared_ptr<InputHandler> _InputHandler, std::shared_ptr<ArcEngine::Window> _Window)
 {
 	cam = std::make_shared<Camera>();
 	_InputHandler->AddListener(cam);

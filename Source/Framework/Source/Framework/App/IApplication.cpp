@@ -15,7 +15,7 @@
 #include <Framework/ECS/Components/TransformComponent.h>
 
 #include <random>
-#include <ArcEngine/OpenGL/Model.h>
+#include <ArcEngine/Rendering/OpenGL-4.6/Model.h>
 
 #include "Jolt/Jolt.h"
 #include "Jolt/Math/Vec3.h"
@@ -27,29 +27,40 @@
 
 #include "glm/gtc/quaternion.hpp"
 
-IApplication::IApplication(const ApplicationSpecification& _Spec) :
-	modeManger{ std::make_unique<ModeManager>() },
-	window{ std::make_shared<Window>(glm::uvec2(_Spec.windowSize.x, _Spec.windowSize.y), _Spec.name.c_str()) },
-	inputHandler{ std::make_shared<InputHandler>() },
-	clock{ std::make_unique<Clock>() },
-	coordinator{ std::make_shared<Coordinator>() },
-	assetManager{ std::make_shared<ArcEngine::AssetManager>() }
+IApplication::IApplication(const ApplicationSpecification& _Spec) 
+	//modeManger{ std::make_unique<ModeManager>() },
+	//inputHandler{ std::make_shared<InputHandler>() },
+	//clock{ std::make_unique<Clock>() },
+	//coordinator{ std::make_shared<Coordinator>() },
+	//assetManager{ std::make_shared<ArcEngine::AssetManager>() }
 {
-	glfwSetWindowUserPointer(window->GetNativeWindow(), this);
-	glfwSetFramebufferSizeCallback(window->GetNativeWindow(), FrameBufferSizeCallback);
+	//window = std::make_shared<ArcEngine::Window>();
 
-	glfwSetCursorPosCallback(window->GetNativeWindow(), InputHandler::CursorCallBackImpl);
-	glfwSetScrollCallback(window->GetNativeWindow(), InputHandler::ScrollCallBackImpl);
-	glfwSetKeyCallback(window->GetNativeWindow(), InputHandler::KeyCallBackImpl);
+	//ArcEngine::WindowSpecification windowSpecification;
+	//windowSpecification.graphicsAPI = ArcEngine::EngineGraphicsAPI::OPENGL;
+	//windowSpecification.windowName = _Spec.name;
+	//windowSpecification.windowSize = _Spec.windowSize;
+
+	//window->Create(windowSpecification);
+
+	//glfwSetWindowUserPointer(window->GetNativeWindow(), this);
+	//glfwSetFramebufferSizeCallback(window->GetNativeWindow(), FrameBufferSizeCallback);
+
+	//glfwSetCursorPosCallback(window->GetNativeWindow(), InputHandler::CursorCallBackImpl);
+	//glfwSetScrollCallback(window->GetNativeWindow(), InputHandler::ScrollCallBackImpl);
+	//glfwSetKeyCallback(window->GetNativeWindow(), InputHandler::KeyCallBackImpl);
 
 
-	glfwSetWindowUserPointer(window->GetNativeWindow(), this);
+	//glfwSetWindowUserPointer(window->GetNativeWindow(), this);
 
-	Initialize();
+	//Initialize();
+
+	vkEngine.Initialize();
 }
 
 IApplication::~IApplication()
 {
+	window->Destroy();
 }
 
 void IApplication::SetMode()
@@ -58,24 +69,24 @@ void IApplication::SetMode()
 
 void IApplication::Run()
 {
-	OnInput();
+	//OnInput();
 
-	clock->Update();
-	const float deltaTime = clock->GetDeltaTime();
+	//clock->Update();
+	//const float deltaTime = clock->GetDeltaTime();
 
-	OnUpdate(deltaTime);
+	//OnUpdate(deltaTime);
 
-	OnLateUpdate(deltaTime);
+	//OnLateUpdate(deltaTime);
 
-	// Set camera bindings
+	//// Set camera bindings
 
-	OnRender();
+	//OnRender();
 
-	//OnRenderUI();
+	////OnRenderUI();
 
-	OnApplicationPause();
+	//OnApplicationPause();
 
-	OnCheckForDisabled();
+	//OnCheckForDisabled();
 }
 
 #pragma region  IApplicationStart
@@ -83,78 +94,78 @@ void IApplication::Run()
 // Start
 void IApplication::OnCreate()
 {
-	coordinator->RegisterComponent<RenderComponent>();
-	coordinator->RegisterComponent<TransformComponent>();
-	coordinator->RegisterComponent<RigidBodyComponent>();
+	//coordinator->RegisterComponent<RenderComponent>();
+	//coordinator->RegisterComponent<TransformComponent>();
+	//coordinator->RegisterComponent<RigidBodyComponent>();
 
-	//UI = std::static_pointer_cast<UIRenderSystem>(coordinator->RegisterSystem<UIRenderSystem, 10>(window));
+	////UI = std::static_pointer_cast<UIRenderSystem>(coordinator->RegisterSystem<UIRenderSystem, 10>(window));
 
-	coordinator->RegisterSystem<MeshRenderSystem, 10>(inputHandler, window);
-	//coordinator->RegisterSystem<ECSPhysicsSystem, 20>();
+	//coordinator->RegisterSystem<MeshRenderSystem, 10>(inputHandler, window);
+	////coordinator->RegisterSystem<ECSPhysicsSystem, 20>();
 
-	Signature signature;
+	//Signature signature;
+	////signature.set(coordinator->GetComponentType<TransformComponent>());
+	////signature.set(coordinator->GetComponentType<RigidBodyComponent>());
+	////coordinator->SetSystemSignature<ECSPhysicsSystem>(signature);
+
+	//signature.reset();
+
 	//signature.set(coordinator->GetComponentType<TransformComponent>());
-	//signature.set(coordinator->GetComponentType<RigidBodyComponent>());
-	//coordinator->SetSystemSignature<ECSPhysicsSystem>(signature);
+	//signature.set(coordinator->GetComponentType<RenderComponent>());
+	//coordinator->SetSystemSignature<MeshRenderSystem>(signature);
 
-	signature.reset();
+	//coordinator->m_SystemManager->RecalculateUpdateOrder();
 
-	signature.set(coordinator->GetComponentType<TransformComponent>());
-	signature.set(coordinator->GetComponentType<RenderComponent>());
-	coordinator->SetSystemSignature<MeshRenderSystem>(signature);
+	//coordinator->OnCreate();
 
-	coordinator->m_SystemManager->RecalculateUpdateOrder();
+	//auto m_cubeModel = assetManager->LoadAsset(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
 
-	coordinator->OnCreate();
+	//std::vector<Entity> entities(100);
 
-	auto m_cubeModel = assetManager->LoadAsset(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
+	//std::default_random_engine generator;
+	//std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
+	//std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
+	//std::uniform_real_distribution<float> randScale(3.0f, 5.0f);
+	//std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
 
-	std::vector<Entity> entities(100);
+	//float scale = randScale(generator);
 
-	std::default_random_engine generator;
-	std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
-	std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
-	std::uniform_real_distribution<float> randScale(3.0f, 5.0f);
-	std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
+	//for (auto& entity : entities)
+	//{
+	//	entity = coordinator->CreateEntity();
 
-	float scale = randScale(generator);
+	//	glm::mat4 transform = glm::mat4{ 1.0f };
+	//	transform = glm::translate(transform, glm::vec3(randPosition(generator), randPosition(generator), randPosition(generator)));
+	//	auto rotQuat = glm::quat(glm::vec3(randRotation(generator), randRotation(generator), randRotation(generator)));
+	//	transform = transform * glm::mat4_cast(rotQuat);
+	//	transform = glm::scale(transform, glm::vec3(scale));
 
-	for (auto& entity : entities)
-	{
-		entity = coordinator->CreateEntity();
+	//	coordinator->AddComponent(
+	//		entity,
+	//		TransformComponent{
+	//			.transform = transform
+	//		});
 
-		glm::mat4 transform = glm::mat4{ 1.0f };
-		transform = glm::translate(transform, glm::vec3(randPosition(generator), randPosition(generator), randPosition(generator)));
-		auto rotQuat = glm::quat(glm::vec3(randRotation(generator), randRotation(generator), randRotation(generator)));
-		transform = transform * glm::mat4_cast(rotQuat);
-		transform = glm::scale(transform, glm::vec3(scale));
+	//	coordinator->AddComponent(
+	//		entity,
+	//		RigidBodyComponent{}
+	//	);
 
-		coordinator->AddComponent(
-			entity,
-			TransformComponent{
-				.transform = transform
-			});
+	//	RenderComponent renderComponent{};
 
-		coordinator->AddComponent(
-			entity,
-			RigidBodyComponent{}
-		);
+	//	renderComponent.model = *std::static_pointer_cast<Model>(m_cubeModel);
 
-		RenderComponent renderComponent{};
+	//	coordinator->AddComponent(
+	//		entity,
+	//		renderComponent);
+	//}
 
-		renderComponent.model = *std::static_pointer_cast<Model>(m_cubeModel);
+	//auto cameraEntity = coordinator->CreateEntity();
+	//coordinator->AddComponent(cameraEntity, TransformComponent{});
+	//
+	//glfwSetInputMode(window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-		coordinator->AddComponent(
-			entity,
-			renderComponent);
-	}
-
-	auto cameraEntity = coordinator->CreateEntity();
-	coordinator->AddComponent(cameraEntity, TransformComponent{});
-	
-	glfwSetInputMode(window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-	coordinator->OnStart();
+	//coordinator->OnStart();
 }
 
 void IApplication::OnEnable()
@@ -173,45 +184,28 @@ void IApplication::OnStart()
 // Update
 void IApplication::OnInput()
 {
-	inputHandler->ProcessInput(window->GetNativeWindow());
+	/*inputHandler->ProcessInput(window->GetNativeWindow());
 
-	coordinator->OnInput(window);
+	coordinator->OnInput(window);*/
 }
 
 void IApplication::OnUpdate(const float& _DeltaTime)
 {
-	coordinator->OnUpdate(_DeltaTime);
+	/*coordinator->OnUpdate(_DeltaTime);*/
 }
 
 void IApplication::OnLateUpdate(const float& _DeltaTime)
 {
-	coordinator->OnLateUpdate(_DeltaTime);
+	/*coordinator->OnLateUpdate(_DeltaTime);*/
 }
 
 void IApplication::OnRender()
 {
-	coordinator->OnRender();
+	/*coordinator->OnRender();*/
 }
 
 void IApplication::OnRenderUI()
 {
-	//coordinator->OnRenderUI();
-	//ImGui::Render();
-	//int display_w, display_h;
-	//glfwGetFramebufferSize(window->GetNativeWindow(), &display_w, &display_h);
-	//glViewport(0, 0, display_w, display_h);
-	////glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-	//glClear(GL_COLOR_BUFFER_BIT);
-	//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	//// Imgui end render
-
-	//if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	//{
-	//	GLFWwindow* backup_current_context = glfwGetCurrentContext();
-	//	ImGui::UpdatePlatformWindows();
-	//	ImGui::RenderPlatformWindowsDefault();
-	//	glfwMakeContextCurrent(backup_current_context);
-	//}
 
 }
 
@@ -247,14 +241,15 @@ void IApplication::OnDestroy()
 
 bool IApplication::IsQuitting()
 {
-	return glfwWindowShouldClose(window->GetNativeWindow());
+	return true;
+	/*return glfwWindowShouldClose(window->GetNativeWindow());*/
 }
 
 void IApplication::FrameBufferSizeCallback(GLFWwindow* _window, int _width, int _height)
 {
-	IApplication* ptr = static_cast<IApplication*>(glfwGetWindowUserPointer(_window));
+	/*IApplication* ptr = static_cast<IApplication*>(glfwGetWindowUserPointer(_window));
 	glm::uvec2 newSize{_width, _height};
 
 	ptr->window->SetScreenSize(newSize);
-	ptr->coordinator->OnResize(newSize);
+	ptr->coordinator->OnResize(newSize);*/
 }

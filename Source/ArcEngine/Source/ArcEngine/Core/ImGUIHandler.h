@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <ArcEngine/OpenGL/Window.h>
+#include <ArcEngine/Platform/Window.h>
 
 #include "glm/vec4.hpp"
 
@@ -13,7 +13,7 @@ public:
 	ImGUIHandler();
 	~ImGUIHandler();
 
-	bool Initialize(std::shared_ptr<Window> _Window);
+	bool Initialize(std::shared_ptr<ArcEngine::Window> _Window);
 	bool DeInitialize();
 
 	void Update();
@@ -29,5 +29,5 @@ private:
 
 	ImGuiIO* io;
 
-	std::shared_ptr<Window> window;
+	std::shared_ptr<ArcEngine::Window> window;
 };

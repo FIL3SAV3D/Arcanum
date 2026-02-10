@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include "ArcEngine/OpenGL/Window.h"
+#include "ArcEngine/Platform/Window.h"
 
 class Coordinator;
 
@@ -16,7 +16,7 @@ class ISystem
 public:
     virtual void OnCreate          ()                                     {};
     virtual void OnStart() {};
-    virtual void OnInput           (std::shared_ptr<Window> _Window)      {};
+    virtual void OnInput           (std::shared_ptr<ArcEngine::Window> _Window)      {};
     virtual void OnUpdate          (const float& _DeltaTime)              {};
     virtual void OnLateUpdate      (const float& _DeltaTime)              {};
 

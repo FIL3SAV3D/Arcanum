@@ -3,10 +3,10 @@
 
 #include "DeferredRenderer.h"
 
-#include "ArcEngine/OpenGL/Window.h"
+#include "ArcEngine/Platform/Window.h"
 #include <random>
 
-void DeferredRenderer::Create(std::shared_ptr<Window> _Window)
+void DeferredRenderer::Create(std::shared_ptr<ArcEngine::Window> _Window)
 {
     window = _Window;
 
@@ -192,7 +192,7 @@ void DeferredRenderer::Blit() const
 {
 }
 
-void DeferredRenderer::Resize(std::shared_ptr<Window> _Window)
+void DeferredRenderer::Resize(std::shared_ptr<ArcEngine::Window> _Window)
 {
     m_GBuffer->Destroy();
     m_GBuffer->Create(_Window->GetScreenSize());

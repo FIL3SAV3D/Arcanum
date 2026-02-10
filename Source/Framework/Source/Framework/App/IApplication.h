@@ -1,8 +1,10 @@
 #pragma once
 
 #include "ArcEngine/Util/JobSystem/JobSystem.h"
-#include "ArcEngine/OpenGL/Window.h"
-#include "ArcEngine/OpenGL/InputHandler.h"
+
+#include "ArcEngine/Platform/Window.h"
+
+#include "ArcEngine/Platform/InputHandler.h"
 #include <ArcEngine/Util/Clock.h>
 #include <ArcEngine/ECS/Coordinator.h>
 #include "ArcEngine/Renderer/IRenderer.h"
@@ -13,6 +15,8 @@
 #include <memory>
 
 #include <ArcEngine/Asset/AssetManager.h>
+
+#include <ArcEngine/Rendering/Vulkan-1.4/VulkanEngine.h>
 
 struct ApplicationSpecification
 {
@@ -85,14 +89,16 @@ public:
 	void OnDestroy();
 
 public:
-	std::shared_ptr<Window> GetWindow() { return window; }
+	std::shared_ptr<ArcEngine::Window> GetWindow() { return window; }
 
 private:
+	VulkanEngine vkEngine;
+
 	std::shared_ptr<ArcEngine::AssetManager> assetManager;
 
 	std::shared_ptr<Coordinator> coordinator;
 
-	std::shared_ptr<Window> window;
+	std::shared_ptr<ArcEngine::Window> window;
 
 	std::unique_ptr<ModeManager> modeManger;
 	std::shared_ptr<InputHandler> inputHandler;

@@ -1,11 +1,11 @@
 #include "UIRenderSystem.h"
 
-#include "ArcEngine/OpenGL/Window.h"
+#include "ArcEngine/Platform/Window.h"
 
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 
-UIRenderSystem::UIRenderSystem(std::shared_ptr<Window> _window)
+UIRenderSystem::UIRenderSystem(std::shared_ptr<ArcEngine::Window> _window)
 {
     window = _window;
 }

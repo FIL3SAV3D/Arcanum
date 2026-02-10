@@ -104,7 +104,7 @@ public:
 		}
 	}
 
-	void OnInput(std::shared_ptr<Window> _Window)
+	void OnInput(std::shared_ptr<ArcEngine::Window> _Window)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{

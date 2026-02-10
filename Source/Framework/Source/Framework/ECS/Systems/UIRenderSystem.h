@@ -8,12 +8,15 @@
 
 #include "glm/vec4.hpp"
 
-class Window;
+namespace ArcEngine
+{
+	class Window;
+}
 
 class UIRenderSystem : public ISystem
 {
 public:
-	UIRenderSystem(std::shared_ptr<Window> _window);
+	UIRenderSystem(std::shared_ptr<ArcEngine::Window> _window);
 	~UIRenderSystem();
 
 	void OnCreate() override;
@@ -24,5 +27,5 @@ public:
 private:
 	std::unique_ptr<ImGUIHandler> m_ImGUIHandler;
 
-	std::shared_ptr<Window> window;
+	std::shared_ptr<ArcEngine::Window> window;
 };

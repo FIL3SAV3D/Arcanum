@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ArcEngine/Asset/Types/Model.h"
-#include "ArcEngine/OpenGL/Shader.h"
+#include "ArcEngine/Rendering/OpenGL-4.6/Shader.h"
 
 #include <memory>
 

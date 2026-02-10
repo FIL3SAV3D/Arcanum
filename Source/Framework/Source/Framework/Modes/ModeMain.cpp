@@ -1,6 +1,6 @@
 #include "ModeMain.h"
 
-ModeMain::ModeMain(const char* _name, std::shared_ptr<Window> _Window):
+ModeMain::ModeMain(const char* _name, std::shared_ptr<ArcEngine::Window> _Window):
 	window{_Window}
 {
 	OnCreate();

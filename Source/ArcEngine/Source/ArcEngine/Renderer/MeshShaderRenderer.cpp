@@ -3,11 +3,11 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-#include "ArcEngine/OpenGL/Shader.h"
+#include "ArcEngine/Rendering/OpenGL-4.6/Shader.h"
 #include <glm/gtc/type_ptr.hpp>
 
 
-void MeshShaderRenderer::Create(std::shared_ptr<Window> _Window)
+void MeshShaderRenderer::Create(std::shared_ptr<ArcEngine::Window> _Window)
 {
     screenQuad = std::make_unique<Shader>("Debug\\ScreenQuad.vert", "Debug\\ScreenQuad.frag");
 
@@ -29,7 +29,7 @@ void MeshShaderRenderer::Create(std::shared_ptr<Window> _Window)
     screenQuad->Use();
     screenQuad->setInt("tex", 0);
 
-    auto& size = window->GetScreenSize();
+    auto size = window->GetScreenSize();
 
     // Create texture for opengl operation
     // -----------------------------------
@@ -148,41 +148,41 @@ void MeshShaderRenderer::RenderMesh(const RenderParams& _RParams, const Mesh& _M
     glDrawArrays(GL_TRIANGLES, 0, 6);*/
 
     
-    // DEbug
-    //debugmeshShader->use();
-    //uint32_t num_workgroups = 3;
-    //glDrawMeshTasksNV(0, num_workgroups);
+    // Debug
+    debugmeshShader->use();
+    uint32_t num_workgroups = 3;
+    glDrawMeshTasksNV(0, num_workgroups);
 
-    meshShader->use();
+    //meshShader->use();
 
-    uniforms uni;
-    uni.projection = _RParams.camera->GetProjectionMatrix();
-    uni.view = _RParams.camera->GetViewMatrix();
-    uni.view = objectToWorld;
+    //uniforms uni;
+    //uni.projection = _RParams.camera->GetProjectionMatrix();
+    //uni.view = _RParams.camera->GetViewMatrix();
+    //uni.view = objectToWorld;
 
-    glBindBuffer(GL_UNIFORM_BUFFER, ssbo);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0                    , sizeof(glm::mat4), glm::value_ptr(uni.projection));
-    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)    , sizeof(glm::mat4), glm::value_ptr(uni.view));
-    glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(objectToWorld));
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    //glBindBuffer(GL_UNIFORM_BUFFER, ssbo);
+    //glBufferSubData(GL_UNIFORM_BUFFER, 0                    , sizeof(glm::mat4), glm::value_ptr(uni.projection));
+    //glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)    , sizeof(glm::mat4), glm::value_ptr(uni.view));
+    //glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(objectToWorld));
+    //glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSVerticesBuffer);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _Mesh.MSVerticesBuffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSVerticesBuffer);
+    //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _Mesh.MSVerticesBuffer);
+    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSIndicesBuffer);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _Mesh.MSIndicesBuffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSIndicesBuffer);
+    //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _Mesh.MSIndicesBuffer);
+    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSMeshletTrianglesBuffer);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _Mesh.MSMeshletTrianglesBuffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSMeshletTrianglesBuffer);
+    //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _Mesh.MSMeshletTrianglesBuffer);
+    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSMeshletBuffer);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, _Mesh.MSMeshletBuffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSMeshletBuffer);
+    //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, _Mesh.MSMeshletBuffer);
+    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-    glDrawMeshTasksNV(0, _Mesh.MSMeshletAmount);
+    //glDrawMeshTasksNV(0, _Mesh.MSMeshletAmount);
 }
 
 void MeshShaderRenderer::RenderMeshInstanced(const RenderParams& _RParams, const Mesh& _Mesh, const int& _SubMeshIndex, std::vector<glm::mat4> _InstanceData, const int& _InstanceCount)
@@ -198,9 +198,9 @@ void MeshShaderRenderer::Blit() const
 {
 }
 
-void MeshShaderRenderer::Resize(std::shared_ptr<Window> _Window)
+void MeshShaderRenderer::Resize(std::shared_ptr<ArcEngine::Window> _Window)
 {
-    auto& size = window->GetScreenSize();
+    auto size = window->GetScreenSize();
     
     glViewport(0, 0, size.x, size.y);
 

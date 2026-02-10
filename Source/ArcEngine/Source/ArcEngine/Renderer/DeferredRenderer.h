@@ -2,14 +2,14 @@
 
 #include "IRenderer.h"
 
-#include "ArcEngine/OpenGL/GBuffer.h"
-#include "ArcEngine/OpenGL/Shader.h"
+#include "ArcEngine/Rendering/OpenGL-4.6/GBuffer.h"
+#include "ArcEngine/Rendering/OpenGL-4.6/Shader.h"
 
 class DeferredRenderer : public IRenderer
 {
 public:
     // Inherited via IRenderer
-    void Create(std::shared_ptr<Window> _Window) override;
+    void Create(std::shared_ptr<ArcEngine::Window> _Window) override;
     void Destroy() override;
     void BeginRender(const RenderParams& _Params) const override;
 
@@ -18,10 +18,10 @@ public:
 
     void EndRender(const RenderParams& _RParams) const override;
     void Blit() const override;
-    void Resize(std::shared_ptr<Window> _Window) override;
+    void Resize(std::shared_ptr<ArcEngine::Window> _Window) override;
 
 private:
-    std::shared_ptr<Window> window;
+    std::shared_ptr<ArcEngine::Window> window;
 
     unsigned int quadVAO;
     unsigned int quadVBO;

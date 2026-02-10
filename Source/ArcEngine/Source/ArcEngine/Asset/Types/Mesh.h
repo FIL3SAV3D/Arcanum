@@ -8,17 +8,6 @@
 #define kMaxTriangles 124
 #define kMaxVertices  64
 
-struct MeshletTriangle {
-    uint8_t vertexIndex0; // indexes meshlet's output vertex positions
-    uint8_t vertexIndex1; // indexes meshlet's output vertex positions
-    uint8_t vertexIndex2; // indexes meshlet's output vertex positions
-};
-
-struct Meshlet {
-    int             localVertices[kMaxVertices]; // indexes into Mesh::vertexPositions
-    MeshletTriangle triangles[kMaxTriangles];
-};
-
 struct Mesh : public IAsset
 {
 public:

@@ -4,3 +4,6 @@
 [submodule "Source/ThirdParty/JoltPhysics-Arcanum"]
 	path = Source/ThirdParty/JoltPhysics-Arcanum
 	url = https://github.com/FIL3SAV3D/JoltPhysics-Arcanum.git
+[submodule "Source/ThirdParty/SDL"]
+	path = Source/ThirdParty/SDL
+	url = https://github.com/libsdl-org/SDL.git

@@ -5,7 +5,7 @@
 #include "Framework/ECS/Components/CameraComponent.h"
 #include <Framework/ECS/Components/InputComponent.h>
 
-void CameraSystem::OnInput(std::shared_ptr<Window> _Window)
+void CameraSystem::OnInput(std::shared_ptr<ArcEngine::Window> _Window)
 {
 }
 

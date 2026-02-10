@@ -4,7 +4,7 @@
 
 class CameraSystem : ISystem
 {
-    void OnInput(std::shared_ptr<Window> _Window) override;
+    void OnInput(std::shared_ptr<ArcEngine::Window> _Window) override;
     void OnUpdate(const float& _DeltaTime) override;
     void OnLateUpdate(const float& _DeltaTime) override;
 

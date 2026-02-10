@@ -10,15 +10,6 @@ project "JoltPhysics-Arcanum"
     includedirs
     {
         "JoltPhysics-Arcanum",
-
-        "../../Library/GLM",
-        "../../Library/Assimp/include",
-        "../../Library/asio-1.34.2/include",
-        "../../Library/GLAD/include",
-        "../../Library/GLFW/include",
-        "../../Library/std_image",
-
-        "$(VULKAN_SDK)/include",
     }
 
     targetdir ("../../Binaries/" .. OutputDir .. "/%{prj.name}")

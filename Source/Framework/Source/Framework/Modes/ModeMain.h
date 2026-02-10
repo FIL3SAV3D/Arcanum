@@ -4,12 +4,12 @@
 
 #include "Framework/Modes/IMode.h"
 
-#include <ArcEngine/OpenGL/Window.h>
+#include <ArcEngine/Platform/Window.h>
 
 class ModeMain : public IMode
 {
 public:
-	ModeMain(const char* _name, std::shared_ptr<Window> _Window);
+	ModeMain(const char* _name, std::shared_ptr<ArcEngine::Window> _Window);
 	~ModeMain();
 
 	void OnResize(const uint32_t _width, const uint32_t _height) override;
@@ -23,5 +23,5 @@ public:
 	void Update(const float& _delta_time) override;
 
 private:
-	std::shared_ptr<Window> window;
+	std::shared_ptr<ArcEngine::Window> window;
 };

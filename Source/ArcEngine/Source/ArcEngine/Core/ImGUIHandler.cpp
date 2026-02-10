@@ -16,7 +16,7 @@ ImGUIHandler::~ImGUIHandler()
 
 }
 
-bool ImGUIHandler::Initialize(std::shared_ptr<Window> _Window)
+bool ImGUIHandler::Initialize(std::shared_ptr<ArcEngine::Window> _Window)
 {
 	window = _Window;
 
