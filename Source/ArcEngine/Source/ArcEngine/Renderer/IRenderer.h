@@ -2,8 +2,8 @@
 
 #include "ArcEngine/Asset/Types/Model.h"
 #include "ArcEngine/Asset/Types/Mesh.h"
-#include "ArcEngine/Rendering/OpenGL-4.6/Camera.h"
-#include "ArcEngine/Rendering/OpenGL-4.6/Shader.h"
+#include "ArcEngine/Graphics/OpenGL-4.6/Camera.h"
+#include "ArcEngine/Graphics/OpenGL-4.6/Shader.h"
 
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>

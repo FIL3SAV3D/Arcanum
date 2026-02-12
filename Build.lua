@@ -31,7 +31,6 @@ group ""
 group "ThirdParty"
 	include "Source/ThirdParty/Build-JoltPhysics.lua"
 	include "Source/ThirdParty/Build-DearImGUI.lua"
-	include "Source/ThirdParty/Build-SDL.lua"
 group ""
 
 group "Shaders"

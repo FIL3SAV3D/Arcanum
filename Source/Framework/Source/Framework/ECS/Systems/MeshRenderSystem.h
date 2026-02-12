@@ -3,7 +3,7 @@
 #include <memory>
 #include "ArcEngine/ECS/Interfaces/ISystem.h"
 
-#include "ArcEngine/Rendering/OpenGL-4.6/Camera.h"
+#include "ArcEngine/Graphics/OpenGL-4.6/Camera.h"
 #include <ArcEngine/Platform/InputHandler.h>
 
 class MeshRenderSystem : public ISystem

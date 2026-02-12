@@ -24,6 +24,11 @@ project "ArcEngine"
         "../../Library/GLAD/include",
         "../../Library/GLFW/include",
         "../../Library/std_image",
+        "../../Library/SDL/include",
+
+        "../../Library/fmt/include",
+        "../../Library/vma",
+        "../../Library/volk",
 
         "$(VULKAN_SDK)/include",
     }
@@ -34,7 +39,8 @@ project "ArcEngine"
         "DearImGUI",
         "%{VULKAN_SDK}/Lib/vulkan-1.lib",
 
-        "../../Library/GLFW/lib-vc2022/glfw3.lib"
+        "../../Library/GLFW/lib-vc2022/glfw3.lib",
+        "../../Library/SDL/lib/SDL3.lib"
     }
 
     targetdir ("../../Binaries/" .. OutputDir .. "/%{prj.name}")
@@ -49,7 +55,10 @@ project "ArcEngine"
        runtime "Debug"
        symbols "On"
 
-       links { "../../Library/Assimp/lib/assimp-vc143-mtd.lib" }
+       links 
+       { 
+        "../../Library/Assimp/dll/assimp-vc143-mtd.dll",
+       }
 
     filter "configurations:Release"
        defines { "RELEASE" }
@@ -57,7 +66,10 @@ project "ArcEngine"
        optimize "On"
        symbols "On"
 
-       links { "../../Library/Assimp/lib/assimp-vc143-mtd.lib" }
+       links 
+       { 
+        "../../Library/Assimp/dll/assimp-vc143-mtd.dll",
+       }
 
     filter "configurations:Dist"
        defines { "DIST" }

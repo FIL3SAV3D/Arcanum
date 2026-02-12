@@ -21,6 +21,11 @@ project "Game"
         "../../Library/GLAD/include",
         "../../Library/GLFW/include",
         "../../Library/std_image",
+        "../../Library/SDL/include",
+
+        "../../Library/fmt/include",
+        "../../Library/vma",
+        "../../Library/volk",
 
         "$(VULKAN_SDK)/include",
     }
@@ -32,7 +37,8 @@ project "Game"
         "JoltPhysics-Arcanum",
         "DearImGUI",
         "%{VULKAN_SDK}/Lib/vulkan-1.lib",
-        "../../Library/GLFW/lib-vc2022/glfw3.lib"
+        "../../Library/GLFW/lib-vc2022/glfw3.lib",
+        "../../Library/SDL/lib/SDL3.lib"
     }
 
     targetdir ("../../Binaries/" .. OutputDir .. "/%{prj.name}")
@@ -47,7 +53,10 @@ project "Game"
        runtime "Debug"
        symbols "On"
 
-       links { "../../Library/Assimp/dll/assimp-vc143-mtd.dll" }
+       links 
+       { 
+        "../../Library/Assimp/dll/assimp-vc143-mtd.dll",
+       }
 
     filter "configurations:Release"
        defines { "RELEASE" }
@@ -55,7 +64,10 @@ project "Game"
        optimize "On"
        symbols "On"
 
-       links { "../../Library/Assimp/dll/assimp-vc143-mt.dll" }
+       links 
+       { 
+        "../../Library/Assimp/dll/assimp-vc143-mtd.dll",
+       }
 
     filter "configurations:Dist"
        defines { "DIST" }

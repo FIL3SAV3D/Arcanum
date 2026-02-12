@@ -2,8 +2,8 @@
 
 #include "IRenderer.h"
 
-#include "ArcEngine/Rendering/OpenGL-4.6/GBuffer.h"
-#include "ArcEngine/Rendering/OpenGL-4.6/Shader.h"
+#include "ArcEngine/Graphics/OpenGL-4.6/GBuffer.h"
+#include "ArcEngine/Graphics/OpenGL-4.6/Shader.h"
 
 class DeferredRenderer : public IRenderer
 {

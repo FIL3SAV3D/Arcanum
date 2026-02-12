@@ -3,6 +3,8 @@
 #include "iInputListener.h"
 
 #include <GLFW/glfw3.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_oldnames.h>
 
 InputHandler::InputHandler()
 {
@@ -20,7 +22,9 @@ InputHandler::~InputHandler()
 
 void InputHandler::ProcessInput(GLFWwindow* window)
 {
-	glfwPollEvents();
+	SDL_Event e;
+
+	
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{

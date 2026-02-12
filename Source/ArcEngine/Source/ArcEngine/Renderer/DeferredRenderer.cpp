@@ -185,7 +185,7 @@ void DeferredRenderer::EndRender(const RenderParams& _RParams) const
     //GL_COLOR_BUFFER_BIT, GL_NEAREST);
     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glfwSwapBuffers(window->GetNativeWindow());
+    //glfwSwapBuffers(window->GetNativeWindow());
 }
 
 void DeferredRenderer::Blit() const

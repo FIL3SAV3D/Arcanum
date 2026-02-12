@@ -9,7 +9,7 @@ int main(int /*NumArgs*/, char** /*ppArgs*/)
         EditorApplication* application = new EditorApplication();
         application->OnCreate();
 
-        while (!application->IsQuitting())
+        while (!application->bQuit)
         {
             application->Run();
         }

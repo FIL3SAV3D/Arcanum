@@ -22,6 +22,11 @@ project "Standalone"
         "../../Library/GLAD/include",
         "../../Library/GLFW/include",
         "../../Library/std_image",
+        "../../Library/SDL/include",
+
+        "../../Library/fmt/include",
+        "../../Library/vma",
+        "../../Library/volk",
 
         "$(VULKAN_SDK)/include",
     }
@@ -35,7 +40,8 @@ project "Standalone"
         "DearImGUI",
 
         "%{VULKAN_SDK}/lib/vulkan-1.lib",
-        "../../Library/GLFW/lib-vc2022/glfw3.lib"
+        "../../Library/GLFW/lib-vc2022/glfw3.lib",
+        "../../Library/SDL/lib/SDL3.lib"
     }
 
     targetdir ("../../Binaries/" .. OutputDir .. "/%{prj.name}")
@@ -50,7 +56,11 @@ project "Standalone"
        runtime "Debug"
        symbols "On"
 
-       links { "../../Library/Assimp/dll/assimp-vc143-mtd.dll" }
+       links 
+       { 
+        "../../Library/Assimp/dll/assimp-vc143-mtd.dll",
+        
+       }
 
     filter "configurations:Release"
        defines { "RELEASE" }
@@ -58,7 +68,10 @@ project "Standalone"
        optimize "On"
        symbols "On"
 
-       links { "../../Library/Assimp/dll/assimp-vc143-mt.dll" }
+       links 
+       { 
+        "../../Library/Assimp/dll/assimp-vc143-mtd.dll",
+       }
 
     filter "configurations:Dist"
        defines { "DIST" }

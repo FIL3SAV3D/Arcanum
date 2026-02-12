@@ -16,7 +16,7 @@
 
 #include <ArcEngine/Asset/AssetManager.h>
 
-#include <ArcEngine/Rendering/Vulkan-1.4/VulkanEngine.h>
+#include <ArcEngine/Graphics/Graphics.h>
 
 struct ApplicationSpecification
 {
@@ -89,16 +89,18 @@ public:
 	void OnDestroy();
 
 public:
-	std::shared_ptr<ArcEngine::Window> GetWindow() { return window; }
+	//std::shared_ptr<ArcEngine::Window> GetWindow() { return window; }
 
+	bool bQuit = false;
+	bool stop_rendering = false;
 private:
-	VulkanEngine vkEngine;
+
+	ArcEngine::Window window;
+	ArcEngine::Graphics graphics;
 
 	std::shared_ptr<ArcEngine::AssetManager> assetManager;
 
 	std::shared_ptr<Coordinator> coordinator;
-
-	std::shared_ptr<ArcEngine::Window> window;
 
 	std::unique_ptr<ModeManager> modeManger;
 	std::shared_ptr<InputHandler> inputHandler;

@@ -15,7 +15,7 @@
 #include <Framework/ECS/Components/TransformComponent.h>
 
 #include <random>
-#include <ArcEngine/Rendering/OpenGL-4.6/Model.h>
+#include <ArcEngine/Graphics/OpenGL-4.6/Model.h>
 
 #include "Jolt/Jolt.h"
 #include "Jolt/Math/Vec3.h"
@@ -27,19 +27,18 @@
 
 #include "glm/gtc/quaternion.hpp"
 
+#include "SDL3/SDL.h"
+
 IApplication::IApplication(const ApplicationSpecification& _Spec) 
 	//modeManger{ std::make_unique<ModeManager>() },
-	//inputHandler{ std::make_shared<InputHandler>() },
+	/*inputHandler{ std::make_shared<InputHandler>() },*/
 	//clock{ std::make_unique<Clock>() },
 	//coordinator{ std::make_shared<Coordinator>() },
 	//assetManager{ std::make_shared<ArcEngine::AssetManager>() }
 {
 	//window = std::make_shared<ArcEngine::Window>();
 
-	//ArcEngine::WindowSpecification windowSpecification;
-	//windowSpecification.graphicsAPI = ArcEngine::EngineGraphicsAPI::OPENGL;
-	//windowSpecification.windowName = _Spec.name;
-	//windowSpecification.windowSize = _Spec.windowSize;
+	
 
 	//window->Create(windowSpecification);
 
@@ -55,12 +54,19 @@ IApplication::IApplication(const ApplicationSpecification& _Spec)
 
 	//Initialize();
 
-	vkEngine.Initialize();
+	ArcEngine::WindowSpecification windowSpecification;
+	windowSpecification.graphicsAPI = ArcEngine::EngineGraphicsAPI::OPENGL;
+	windowSpecification.windowName = _Spec.name;
+	windowSpecification.windowSize = _Spec.windowSize;
+
+	window.Create(windowSpecification);
+	graphics.Create(ArcEngine::Graphics::VULKAN);
 }
 
 IApplication::~IApplication()
 {
-	window->Destroy();
+	graphics.Destroy();
+	window.Destroy();
 }
 
 void IApplication::SetMode()
@@ -69,6 +75,21 @@ void IApplication::SetMode()
 
 void IApplication::Run()
 {
+	SDL_Event e;
+
+	while (SDL_PollEvent(&e) != 0) {
+		// close the window when user alt-f4s or clicks the X button
+		if (e.type == SDL_EVENT_QUIT)
+			bQuit = true;
+
+
+		if (e.window.type == SDL_EVENT_WINDOW_MINIMIZED) {
+			stop_rendering = true;
+		}
+		if (e.window.type == SDL_EVENT_WINDOW_RESTORED) {
+			stop_rendering = false;
+		}
+	}
 	//OnInput();
 
 	//clock->Update();

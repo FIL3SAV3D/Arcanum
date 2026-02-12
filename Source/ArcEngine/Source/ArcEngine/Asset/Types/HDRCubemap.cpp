@@ -5,7 +5,7 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
-#include "ArcEngine/Rendering/OpenGL-4.6/Shader.h"
+#include "ArcEngine/Graphics/OpenGL-4.6/Shader.h"
 #include "Model.h"
 
 HDRCubemap::HDRCubemap(const char* _cubemapPath, const unsigned int& _sizex, const unsigned int& _sizey)

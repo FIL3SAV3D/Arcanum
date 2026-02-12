@@ -3,7 +3,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-#include "ArcEngine/Rendering/OpenGL-4.6/Shader.h"
+#include "ArcEngine/Graphics/OpenGL-4.6/Shader.h"
 #include <glm/gtc/type_ptr.hpp>
 
 
@@ -191,7 +191,7 @@ void MeshShaderRenderer::RenderMeshInstanced(const RenderParams& _RParams, const
 
 void MeshShaderRenderer::EndRender(const RenderParams& _RParams) const
 {
-    glfwSwapBuffers(window->GetNativeWindow());
+    //glfwSwapBuffers(window->GetNativeWindow());
 }
 
 void MeshShaderRenderer::Blit() const
