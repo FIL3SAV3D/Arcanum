@@ -1,25 +1,26 @@
 #include "VulkanGraphics.h"
 
-void VulkanGraphics::Create()
+void ArcEngine::VulkanGraphics::Create()
+{
+    swapchain.Create();
+}
+
+void ArcEngine::VulkanGraphics::Destroy()
 {
 }
 
-void VulkanGraphics::Destroy()
+void ArcEngine::VulkanGraphics::Blit()
 {
 }
 
-void VulkanGraphics::Blit()
+void ArcEngine::VulkanGraphics::RenderMesh()
 {
 }
 
-void VulkanGraphics::RenderMesh()
+void ArcEngine::VulkanGraphics::RenderMeshInstanced()
 {
 }
 
-void VulkanGraphics::RenderMeshInstanced()
-{
-}
-
-void VulkanGraphics::RenderMeshIndirect()
+void ArcEngine::VulkanGraphics::RenderMeshIndirect()
 {
 }

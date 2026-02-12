@@ -1,11 +1,12 @@
 #pragma once
 
-#include "IGraphics.h"
 
 #include <memory>
 
 namespace ArcEngine
 {
+    class IGraphics;
+
     class Graphics
     {
     public:

@@ -1,14 +1,22 @@
 #pragma once
 
-#include "ArcEngine/Graphics/IGraphics.h"
+#include "ArcEngine/Graphics/Interface/IGraphics.h"
 
-class VulkanGraphics : public IGraphics
+#include "ArcEngine/Graphics/Vulkan-1.4/VulkanSwapchain.h"
+
+namespace ArcEngine
 {
-public:
-    void Create() override;
-    void Destroy() override;
-    void Blit() override;
-    void RenderMesh() override;
-    void RenderMeshInstanced() override;
-    void RenderMeshIndirect() override;
-};
+    class VulkanGraphics : public IGraphics
+    {
+    public:
+        void Create() override;
+        void Destroy() override;
+        void Blit() override;
+        void RenderMesh() override;
+        void RenderMeshInstanced() override;
+        void RenderMeshIndirect() override;
+
+    private:
+        VulkanSwapchain swapchain;
+    };
+}

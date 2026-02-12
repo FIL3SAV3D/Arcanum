@@ -3,6 +3,8 @@
 #include "ArcEngine/Graphics/Vulkan-1.4/VulkanGraphics.h"
 #include "ArcEngine/Graphics/OpenGL-4.6/OpenGLGraphics.h"
 
+#include "ArcEngine/Graphics/Interface/IGraphics.h"
+
 #include <cassert>
 
 void ArcEngine::Graphics::Create(const GraphicsAPI& _graphicsAPI)

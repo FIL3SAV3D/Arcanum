@@ -82,6 +82,12 @@ void IApplication::Run()
 		if (e.type == SDL_EVENT_QUIT)
 			bQuit = true;
 
+		const bool* key_states = SDL_GetKeyboardState(nullptr);
+
+		if (key_states[SDL_SCANCODE_ESCAPE])
+		{
+			bQuit = true;
+		}
 
 		if (e.window.type == SDL_EVENT_WINDOW_MINIMIZED) {
 			stop_rendering = true;
