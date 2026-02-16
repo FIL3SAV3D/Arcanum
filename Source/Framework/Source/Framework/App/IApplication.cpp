@@ -28,6 +28,8 @@
 #include "glm/gtc/quaternion.hpp"
 
 #include "SDL3/SDL.h"
+#include <backends/imgui_impl_vulkan.h>
+#include <backends/imgui_impl_sdl3.h>
 
 IApplication::IApplication(const ApplicationSpecification& _Spec) 
 	//modeManger{ std::make_unique<ModeManager>() },
@@ -59,14 +61,18 @@ IApplication::IApplication(const ApplicationSpecification& _Spec)
 	windowSpecification.windowName = _Spec.name;
 	windowSpecification.windowSize = _Spec.windowSize;
 
-	window.Create(windowSpecification);
-	graphics.Create(ArcEngine::Graphics::VULKAN);
+	window = std::make_shared<ArcEngine::Window>();
+	window->Create(windowSpecification);
+
+	graphics.Create(ArcEngine::Graphics::VULKAN, window);
 }
 
 IApplication::~IApplication()
 {
 	graphics.Destroy();
-	window.Destroy();
+
+	window->Destroy();
+	window.reset();
 }
 
 void IApplication::SetMode()
@@ -95,6 +101,8 @@ void IApplication::Run()
 		if (e.window.type == SDL_EVENT_WINDOW_RESTORED) {
 			stop_rendering = false;
 		}
+
+		ImGui_ImplSDL3_ProcessEvent(&e);
 	}
 	//OnInput();
 
@@ -114,6 +122,19 @@ void IApplication::Run()
 	//OnApplicationPause();
 
 	//OnCheckForDisabled();
+
+	// imgui new frame
+	ImGui_ImplVulkan_NewFrame();
+	ImGui_ImplSDL3_NewFrame();
+	ImGui::NewFrame();
+
+	//some imgui UI to test
+	ImGui::ShowDemoWindow();
+
+	//make imgui calculate internal draw structures
+	ImGui::Render();
+
+	graphics.RenderMesh();
 }
 
 #pragma region  IApplicationStart

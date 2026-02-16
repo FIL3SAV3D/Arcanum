@@ -27,6 +27,8 @@ project "Game"
         "../../Library/vma",
         "../../Library/volk",
 
+        "../../Library/SLANG-2026.2.2/include",
+
         "$(VULKAN_SDK)/include",
     }
 
@@ -38,7 +40,8 @@ project "Game"
         "DearImGUI",
         "%{VULKAN_SDK}/Lib/vulkan-1.lib",
         "../../Library/GLFW/lib-vc2022/glfw3.lib",
-        "../../Library/SDL/lib/SDL3.lib"
+        "../../Library/SDL/lib/SDL3.lib",
+        "../../Library/SLANG-2026.2.2/lib/slang.lib",
     }
 
     targetdir ("../../Binaries/" .. OutputDir .. "/%{prj.name}")

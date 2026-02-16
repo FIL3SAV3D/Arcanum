@@ -4,11 +4,20 @@
 
 #include <ArcEngine/Graphics/Vulkan-1.4/vk_types.h>
 
-class VulkanSwapchain : public ISwapchain
+class VulkanSwapchain
 {
 public:
-    void Create(const glm::uvec2& _Size) override;
-    void Destroy() override;
+	struct SwapchainParameters
+	{
+		glm::uvec2 size;
+		VkPhysicalDevice chosenGPU;
+		VkDevice device;
+		VkSurfaceKHR surface;
+	};
+
+public:
+    void Create (const SwapchainParameters& _parameters);
+    void Destroy(const VkDevice& _device);
 
 	VkSwapchainKHR _swapchain;
 	VkFormat _swapchainImageFormat;

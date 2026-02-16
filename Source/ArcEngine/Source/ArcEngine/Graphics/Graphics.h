@@ -1,12 +1,15 @@
 #pragma once
 
+#include "ArcEngine/Platform/Window.h"
 
 #include <memory>
 
+#include "ArcEngine/Graphics/Interface/IGraphics.h"
+
+struct SDL_Window;
+
 namespace ArcEngine
 {
-    class IGraphics;
-
     class Graphics
     {
     public:
@@ -17,7 +20,7 @@ namespace ArcEngine
         };
 
     public:
-        void Create(const GraphicsAPI& _graphicsAPI);
+        void Create(const GraphicsAPI& _graphicsAPI, std::shared_ptr<Window> _window);
         void Destroy();
 
         void Blit();

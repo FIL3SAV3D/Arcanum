@@ -7,7 +7,7 @@
 
 #include <cassert>
 
-void ArcEngine::Graphics::Create(const GraphicsAPI& _graphicsAPI)
+void ArcEngine::Graphics::Create(const GraphicsAPI& _graphicsAPI, std::shared_ptr<Window> _window)
 {
     switch (_graphicsAPI)
     {
@@ -28,7 +28,7 @@ void ArcEngine::Graphics::Create(const GraphicsAPI& _graphicsAPI)
     }
     }
 
-    graphics->Create();
+    graphics->Create(_window);
 }
 
 void ArcEngine::Graphics::Destroy()

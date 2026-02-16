@@ -41,6 +41,9 @@ void VulkanEngine::init()
 
     InitSwapchain();
 
+    
+
+
     InitCommands();
 
     InitSyncStructures();

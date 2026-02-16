@@ -95,7 +95,7 @@ public:
 	bool stop_rendering = false;
 private:
 
-	ArcEngine::Window window;
+	std::shared_ptr<ArcEngine::Window> window;
 	ArcEngine::Graphics graphics;
 
 	std::shared_ptr<ArcEngine::AssetManager> assetManager;

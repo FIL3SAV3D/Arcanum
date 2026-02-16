@@ -1,10 +1,10 @@
-project "Shaders"
-    kind "None"
+project "ShadersOpenGL"
+    kind "Utility"
 	targetdir "Binaries/%{cfg.buildcfg}"
 
     files 
     { 
-        "Source/**.frag", 
+        "Source/**.frag",
         "Source/**.vert",
         "Source/**.comp"
     }

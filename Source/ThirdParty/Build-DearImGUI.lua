@@ -18,6 +18,10 @@ project "DearImGUI"
 
 		"DearImGUI/backends/imgui_impl_glfw.h",
 		"DearImGUI/backends/imgui_impl_glfw.cpp",
+
+        "DearImGUI/backends/imgui_impl_sdl3.h",
+		"DearImGUI/backends/imgui_impl_sdl3.cpp",
+
     }
 
     includedirs
@@ -30,6 +34,9 @@ project "DearImGUI"
         "../../Library/GLAD/include",
         "../../Library/GLFW/include",
         "../../Library/std_image",
+
+        "../../Library/SDL/include",
+
 
         "$(VULKAN_SDK)/include",
     }

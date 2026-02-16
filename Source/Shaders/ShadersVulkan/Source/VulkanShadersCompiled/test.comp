@@ -1,0 +1,83 @@
+#version 460
+#extension GL_EXT_samplerless_texture_functions : require
+layout(row_major) uniform;
+layout(row_major) buffer;
+
+#line 3 0
+layout(rgba32f)
+layout(binding = 0)
+uniform image2D image_0;
+
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+void main()
+{
+
+#line 9
+    uvec2 texelCoord_0 = gl_GlobalInvocationID.xy;
+    vec2 size_0 = vec2(0.0, 0.0);
+    ((size_0[0]) = imageSize((image_0)).x), ((size_0[1]) = imageSize((image_0)).y);
+
+    float _S1 = float(texelCoord_0.x);
+
+#line 13
+    bool _S2;
+
+#line 13
+    if(_S1 < (size_0.x))
+    {
+
+#line 13
+        _S2 = float(texelCoord_0.y) < (size_0.y);
+
+#line 13
+    }
+    else
+    {
+
+#line 13
+        _S2 = false;
+
+#line 13
+    }
+
+#line 13
+    if(_S2)
+    {
+        vec4 color_0 = vec4(0.0, 0.0, 0.0, 1.0);
+
+        if((gl_GlobalInvocationID.x) != 0U)
+        {
+
+#line 17
+            _S2 = (gl_GlobalInvocationID.y) != 0U;
+
+#line 17
+        }
+        else
+        {
+
+#line 17
+            _S2 = false;
+
+#line 17
+        }
+
+#line 17
+        if(_S2)
+        {
+            color_0[0] = _S1 / size_0.x;
+            color_0[1] = float(texelCoord_0.y) / size_0.y;
+
+#line 17
+        }
+
+#line 23
+        imageStore((image_0), (ivec2(texelCoord_0)), color_0);
+
+#line 13
+    }
+
+#line 25
+    return;
+}
+

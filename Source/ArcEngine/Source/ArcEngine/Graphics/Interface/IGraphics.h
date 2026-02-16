@@ -1,11 +1,15 @@
 #pragma once
 
+#include <ArcEngine/Platform/Window.h>
+
+#include <memory>
+
 namespace ArcEngine
 {
     class IGraphics
     {
     public:
-        virtual void Create() = 0;
+        virtual void Create(std::shared_ptr<Window> _window) = 0;
         virtual void Destroy() = 0;
 
         virtual void Blit() = 0;

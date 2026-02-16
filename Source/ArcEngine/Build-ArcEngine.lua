@@ -24,11 +24,12 @@ project "ArcEngine"
         "../../Library/GLAD/include",
         "../../Library/GLFW/include",
         "../../Library/std_image",
-        "../../Library/SDL/include",
-
+        
         "../../Library/fmt/include",
         "../../Library/vma",
         "../../Library/volk",
+        "../../Library/SDL/include",
+        "../../Library/SLANG-2026.2.2/include",
 
         "$(VULKAN_SDK)/include",
     }
@@ -40,7 +41,9 @@ project "ArcEngine"
         "%{VULKAN_SDK}/Lib/vulkan-1.lib",
 
         "../../Library/GLFW/lib-vc2022/glfw3.lib",
-        "../../Library/SDL/lib/SDL3.lib"
+
+        "../../Library/SDL/lib/SDL3.lib",
+        "../../Library/SLANG-2026.2.2/lib/slang.lib",
     }
 
     targetdir ("../../Binaries/" .. OutputDir .. "/%{prj.name}")

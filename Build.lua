@@ -34,5 +34,6 @@ group "ThirdParty"
 group ""
 
 group "Shaders"
-	include "Source/Shaders/Build-Shaders.lua"
+	include "Source/Shaders/ShadersOpenGL/Build-ShadersOpenGL.lua"
+	include "Source/Shaders/ShadersVulkan/Build-ShadersVulkan.lua"
 group ""
