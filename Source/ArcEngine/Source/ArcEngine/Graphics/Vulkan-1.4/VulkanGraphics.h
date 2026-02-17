@@ -6,6 +6,7 @@
 #include <ArcEngine/Platform/Window.h>
 
 #include "vk_descriptors.h"
+#include <ArcEngine/Graphics/ShaderReflection.h>
 
 namespace ArcEngine
 {
@@ -115,5 +116,8 @@ namespace ArcEngine
 
 		VkPipeline _gradientPipeline;
 		VkPipelineLayout _gradientPipelineLayout;
+
+	private:
+		ShaderReflection shaderReflectionManager;
     };
 }

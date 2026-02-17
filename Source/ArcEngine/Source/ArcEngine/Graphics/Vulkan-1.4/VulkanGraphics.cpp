@@ -168,6 +168,9 @@ void ArcEngine::VulkanGraphics::Create(std::shared_ptr<Window> _window)
     init_pipelines();
 
     init_imgui(_window);
+
+    shaderReflectionManager.CreateSession();
+    shaderReflectionManager.CreateShader();
 }
 
 void ArcEngine::VulkanGraphics::Destroy()

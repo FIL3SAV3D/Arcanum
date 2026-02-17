@@ -35,18 +35,18 @@ project "ShadersVulkan"
             buildmessage 'Build Output: %{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp.spv'
             buildoutputs { "%{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.vert.spv" }
 
-    filter 'files:**.comp'
-            buildmessage 'Compiling %{file.relpath}'
+    -- filter 'files:**.comp'
+    --         buildmessage 'Compiling %{file.relpath}'
 
-            buildcommands{ "%{VULKAN_SDK}/Bin/glslc.exe %{file.abspath} -o %{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp.spv" }
+    --         buildcommands{ "%{VULKAN_SDK}/Bin/glslc.exe %{file.abspath} -o %{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp.spv" }
 
-            buildmessage 'Build Output: %{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp.spv'
-            buildoutputs { "%{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp.spv" }
+    --         buildmessage 'Build Output: %{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp.spv'
+    --         buildoutputs { "%{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp.spv" }
 
     filter 'files:**.slang'
             buildmessage 'Compiling %{file.relpath}'
 
-            buildcommands{ '%{VULKAN_SDK}/Bin/slangc.exe %{file.abspath} -profile glsl_460 -target spirv -o %{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp.spv -entry main' }
+            buildcommands{ '%{VULKAN_SDK}/Bin/slangc.exe %{file.abspath} -profile glsl_460 -target glsl -o %{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp -entry main' }
 
-            buildmessage 'Build Output: %{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp.spv'
-            buildoutputs { "%{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp.spv" }
+            buildmessage 'Build Output: %{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp'
+            buildoutputs { "%{wks.location}\\Source\\Shaders\\ShadersVulkan\\Source\\VulkanShadersCompiled\\%{file.basename}.comp" }

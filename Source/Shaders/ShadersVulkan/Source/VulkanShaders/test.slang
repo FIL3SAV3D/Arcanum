@@ -1,5 +1,30 @@
 // hello-world.slang
 
+struct Material
+{
+    Texture2D albedoMap;
+    SamplerState sampler;
+    float2 uvScale;
+    float2 uvBias;
+}
+
+struct FrameParams
+{
+    ConstantBuffer<Material> material;
+
+    float3 cameraPos;
+    float3 cameraDir;
+
+    TextureCube envMap;
+    float3 sunLightDir;
+    float3 sunLightIntensity;
+
+    Texture2D shadowMap;
+    SamplerComparisonState shadowMapSampler;
+}
+
+ParameterBlock<FrameParams> FrameParameters;
+
 RWTexture2D image;
 
 [shader("compute")]

@@ -57,6 +57,7 @@ project "Framework"
        links 
        { 
         "../../Library/Assimp/dll/assimp-vc143-mtd.dll",
+        "../../Library/fmt/lib/fmtd.lib",
        }
 
     filter "configurations:Release"
@@ -68,6 +69,7 @@ project "Framework"
        links 
        { 
         "../../Library/Assimp/dll/assimp-vc143-mtd.dll",
+        "../../Library/fmt/lib/fmt.lib",
        }
 
     filter "configurations:Dist"
