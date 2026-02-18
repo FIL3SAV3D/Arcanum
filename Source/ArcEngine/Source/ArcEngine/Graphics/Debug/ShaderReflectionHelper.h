@@ -21,7 +21,7 @@ struct AccessPath
 
 struct CumulativeOffset
 {
-    int value; // the actual offset
+    int offset; // the actual offset
     int space; // the associated space
 };
 

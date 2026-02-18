@@ -300,20 +300,36 @@ void ShaderReflectionHelper::PrintTypeLayout(slang::TypeLayoutReflection* typeLa
     case slang::TypeReflection::Kind::TextureBuffer:
     case slang::TypeReflection::Kind::ShaderStorageBuffer:
     {
+       
+
         printWithDepth("Container: ");
         EndLine();
         printWithDepth("Offset: ");
         EndLine();
         PrintRelativeOffsets(typeLayout->getContainerVarLayout());
 
+        AccumulatedOffsets innerAccessPath = accessPath;
+        innerAccessPath.deepestConstantBuffer = innerAccessPath.leaf;
+
+        if (typeLayout->getContainerVarLayout()->getTypeLayout()->getSize(
+            slang::ParameterCategory::SubElementRegisterSpace) != 0)
+        {
+            innerAccessPath.deepestParameterBlock = innerAccessPath.leaf;
+        }
+
         auto elementVarLayout = typeLayout->getElementVarLayout();
         printWithDepth("Element: ");
         EndLine();
         PrintRelativeOffsets(elementVarLayout);
 
+        ExtendedAccessPath elementAccessPath(innerAccessPath, elementVarLayout);
+
         printWithDepth("Type Layout: ");
         EndLine();
-        PrintTypeLayout(elementVarLayout->getTypeLayout());
+        PrintTypeLayout(elementVarLayout->getTypeLayout(), elementAccessPath);
+
+        
+
     break;
     }
     default:
@@ -509,7 +525,8 @@ void ShaderReflectionHelper::PrintScope(
     slang::VariableLayoutReflection* scopeVarLayout, 
     AccessPath accessPath)
 {
-    ExtendedAccessPath scopeAccessPath(accessPath, scopeVarLayout);
+    AccessPathNode scopeAccessPath = {};  (accessPath, scopeVarLayout);
+    scopeAccessPath.outer = 
 
     auto scopeTypeLayout = scopeVarLayout->getTypeLayout();
     switch (scopeTypeLayout->getKind())
@@ -572,9 +589,9 @@ void ShaderReflectionHelper::PrintEntryPointLayout(slang::EntryPointReflection* 
         entryPointLayout->getComputeThreadGroupSize(3, sizes);
 
         print("thread group size: ");
-        print("x: "); print(sizes[0]);
-        print("y: "); print(sizes[1]);
-        print("z: "); print(sizes[2]);
+        print("x: "); print("{}", sizes[0]);
+        print("y: "); print("{}", sizes[1]);
+        print("z: "); print("{}", sizes[2]);
     }
     break;
 
@@ -586,15 +603,45 @@ void ShaderReflectionHelper::PrintEntryPointLayout(slang::EntryPointReflection* 
 
 CumulativeOffset ShaderReflectionHelper::CalculateCumulativeOffset(slang::ParameterCategory layoutUnit, AccessPath accessPath)
 {
-    CumulativeOffset result;
-    // ...
-    for (auto node = accessPath.leafNode; node != nullptr; node = node->outer)
+    CumulativeOffset result = {};
+
+    switch (layoutUnit)
     {
-        result.value += node->varLayout->getOffset(layoutUnit);
-        result.space += node->varLayout->getBindingSpace(layoutUnit);
+    default:
+        for (auto node = accessPath.leaf; node != nullptr; node = node->outer)
+        {
+            result.offset += node->varLayout->getOffset(layoutUnit);
+        }
+        break;
+    case slang::ParameterCategory::Uniform:
+        for (auto node = accessPath.leaf; node != accessPath.deepestConstantBuffer; node = node->outer)
+        {
+            result.offset += node->varLayout->getOffset(layoutUnit);
+        }
+        break;
+    case slang::ParameterCategory::ConstantBuffer:
+    case slang::ParameterCategory::ShaderResource:
+    case slang::ParameterCategory::UnorderedAccess:
+    case slang::ParameterCategory::SamplerState:
+    case slang::ParameterCategory::DescriptorTableSlot:
+        for (auto node = accessPath.leaf; node != accessPath.deepestParameterBlock; node = node->outer)
+        {
+            result.offset += node->varLayout->getOffset(layoutUnit);
+            result.space += node->varLayout->getBindingSpace(layoutUnit);
+        }
+        for (auto node = accessPath.deepestParameterBlock; node != nullptr; node = node->outer)
+        {
+            result.space += node->varLayout->getOffset(slang::ParameterCategory::SubElementRegisterSpace);
+        }
+
+
+        break;
+
+
     }
-    // ...
+
     return result;
+
 }
 
 void ShaderReflectionHelper::PrintCumulativeOffset(
@@ -604,8 +651,8 @@ void ShaderReflectionHelper::PrintCumulativeOffset(
 {
     CumulativeOffset cumulativeOffset = CalculateCumulativeOffset(layoutUnit, accessPath);
 
-    cumulativeOffset.value += varLayout->getOffset(layoutUnit);
+    cumulativeOffset.offset += varLayout->getOffset(layoutUnit);
     cumulativeOffset.space += varLayout->getBindingSpace(layoutUnit);
 
-    printOffset(layoutUnit, cumulativeOffset.offset, cumulativeOffset.space);
+    PrintOffset(layoutUnit, cumulativeOffset.offset, cumulativeOffset.space);
 }
