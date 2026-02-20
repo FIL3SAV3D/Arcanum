@@ -6,19 +6,25 @@
 #include <string>
 #include "Debug/ShaderReflectionHelper.h"
 
+#include <ArcEngine/Graphics/Vulkan-1.4/vulkan-api.h>
+
 class ShaderReflection
 {
 public:
     void CreateSession();
-    void CreateShader();
+    void CreateShader(VulkanAPI& api, const char* _ShaderName);
 
-    void DeconstructParameterPrint(slang::VariableLayoutReflection* _layout);
+    void AddAutomaticallyIntroducedUniformBuffer(DescriptorSetLayoutBuilder& descriptorSetLayoutBuilder);
 
-    void printVariable(slang::VariableReflection* variable);
-    void printType(slang::TypeReflection* type);
-
+    //void DeconstructParameterPrint(slang::VariableLayoutReflection* _layout);
+    
+    void CheckDiagnostics(Slang::ComPtr<slang::IBlob> _Diagnostics);
 
 private:
+    VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
+    VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
+    VkPipeline pipeline = VK_NULL_HANDLE;
+
     ShaderReflectionHelper helper;
     Slang::ComPtr<slang::IGlobalSession> globalSession;
 };

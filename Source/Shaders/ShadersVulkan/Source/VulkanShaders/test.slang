@@ -1,35 +1,11 @@
-// hello-world.slang
-
-struct Material
-{
-    Texture2D albedoMap;
-    SamplerState sampler;
-    float2 uvScale;
-    float2 uvBias;
-}
-
-struct FrameParams
-{
-    ConstantBuffer<Material> material;
-
-    float3 cameraPos;
-    float3 cameraDir;
-
-    TextureCube envMap;
-    float3 sunLightDir;
-    float3 sunLightIntensity;
-
-    Texture2D shadowMap;
-    SamplerComparisonState shadowMapSampler;
-}
-
-ParameterBlock<FrameParams> FrameParameters;
+static const uint THREADGROUP_SIZE_X = 16;
+static const uint THREADGROUP_SIZE_Y = THREADGROUP_SIZE_X;
 
 RWTexture2D image;
 
 [shader("compute")]
-[numthreads(16,16,1)]
-void main(uint3 threadId : SV_DispatchThreadID)
+[numthreads(THREADGROUP_SIZE_X, THREADGROUP_SIZE_Y)]
+void computeMain(uint3 threadId : SV_DispatchThreadID)
 {
     uint2 texelCoord = threadId.xy;
     float2 size = float2(0.0, 0.0);

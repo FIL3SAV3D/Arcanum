@@ -55,6 +55,9 @@ namespace ArcEngine
     class VulkanGraphics : public IGraphics
     {
     public:
+		void Testing();
+		void TestingRender();
+
         void Create(std::shared_ptr<Window> _window) override;
         void Destroy() override;
         void Blit() override;
@@ -75,6 +78,11 @@ namespace ArcEngine
 		void draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView);
 
     private:
+		// Testing Vars
+		VulkanAPI vkApi;
+		ShaderReflection shaderReflectionManager;
+
+	private:
 		int _frameNumber{ 0 };
 		bool stop_rendering{ false };
 
@@ -118,6 +126,5 @@ namespace ArcEngine
 		VkPipelineLayout _gradientPipelineLayout;
 
 	private:
-		ShaderReflection shaderReflectionManager;
     };
 }

@@ -15,162 +15,178 @@
 #include "slang.h"
 
 constexpr bool bUseValidationLayers = true;
+void ArcEngine::VulkanGraphics::Testing()
+{
+    initializeVulkanDevice(vkApi);
+    shaderReflectionManager.CreateShader(vkApi, "mesh-shader.slang");
+    /*
+    shaderReflectionManager.CreateShader(vkApi, "test.slang");
+    shaderReflectionManager.CreateShader(vkApi, "raster-simple.slang");
+    */
+}
+void ArcEngine::VulkanGraphics::TestingRender()
+{
+    
+}
+
 void ArcEngine::VulkanGraphics::Create(std::shared_ptr<Window> _window)
 {
-    vkb::InstanceBuilder builder;
+    Testing();
 
-    auto inst_ret = builder.set_app_name("Example Vulkan Application")
-        .request_validation_layers(bUseValidationLayers)
-        .use_default_debug_messenger()
-        .require_api_version(1, 3, 0)
-        .build();
+    //vkb::InstanceBuilder builder;
 
-    vkb::Instance vkb_inst = inst_ret.value();
+    //auto inst_ret = builder.set_app_name("Example Vulkan Application")
+    //    .request_validation_layers(bUseValidationLayers)
+    //    .use_default_debug_messenger()
+    //    .require_api_version(1, 3, 0)
+    //    .build();
 
-    _instance = vkb_inst.instance;
-    _debug_messenger = vkb_inst.debug_messenger;
+    //vkb::Instance vkb_inst = inst_ret.value();
 
-    SDL_Vulkan_CreateSurface(_window->GetNativeWindow(), _instance, nullptr, &_surface);
+    //_instance = vkb_inst.instance;
+    //_debug_messenger = vkb_inst.debug_messenger;
 
-    // Vulkan 1.3 features
-    VkPhysicalDeviceVulkan13Features features13{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES };
-    features13.dynamicRendering = true;
-    features13.synchronization2 = true;
+    //SDL_Vulkan_CreateSurface(_window->GetNativeWindow(), _instance, nullptr, &_surface);
 
-    //vulkan 1.2 features
-    VkPhysicalDeviceVulkan12Features features12{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
-    features12.bufferDeviceAddress = true;
-    features12.descriptorIndexing = true;
+    //// Vulkan 1.3 features
+    //VkPhysicalDeviceVulkan13Features features13{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES };
+    //features13.dynamicRendering = true;
+    //features13.synchronization2 = true;
 
-    //Use vkbootstrap to select a gpu.
-    //We want a gpu that can write to the SDL surface and supports vulkan 1.3 with the correct features
-    vkb::PhysicalDeviceSelector selector{ vkb_inst };
-    vkb::PhysicalDevice physicalDevice = selector
-        .set_minimum_version(1, 3)
-        .set_required_features_13(features13)
-        .set_required_features_12(features12)
-        .set_surface(_surface)
-        .select()
-        .value();
+    ////vulkan 1.2 features
+    //VkPhysicalDeviceVulkan12Features features12{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
+    //features12.bufferDeviceAddress = true;
+    //features12.descriptorIndexing = true;
 
-    // Create final vulkan device
-    vkb::DeviceBuilder deviceBuilder{ physicalDevice };
+    ////Use vkbootstrap to select a gpu.
+    ////We want a gpu that can write to the SDL surface and supports vulkan 1.3 with the correct features
+    //vkb::PhysicalDeviceSelector selector{ vkb_inst };
+    //vkb::PhysicalDevice physicalDevice = selector
+    //    .set_minimum_version(1, 3)
+    //    .set_required_features_13(features13)
+    //    .set_required_features_12(features12)
+    //    .set_surface(_surface)
+    //    .select()
+    //    .value();
 
-    vkb::Device vkbDevice = deviceBuilder.build().value();
+    //// Create final vulkan device
+    //vkb::DeviceBuilder deviceBuilder{ physicalDevice };
 
-    //Get tje VKdevice handle used in the rest of a vulkan application
-    _device = vkbDevice.device;
-    _chosenGPU = physicalDevice.physical_device;
+    //vkb::Device vkbDevice = deviceBuilder.build().value();
 
-    // use vkbootstrap to get a Graphics queue
-    _graphicsQueue = vkbDevice.get_queue(vkb::QueueType::graphics).value();
-    _graphicsQueueFamily = vkbDevice.get_queue_index(vkb::QueueType::graphics).value();
+    ////Get tje VKdevice handle used in the rest of a vulkan application
+    //_device = vkbDevice.device;
+    //_chosenGPU = physicalDevice.physical_device;
 
-    // initialize the memory allocator
-    VmaAllocatorCreateInfo allocatorInfo = {};
-    allocatorInfo.physicalDevice = _chosenGPU;
-    allocatorInfo.device = _device;
-    allocatorInfo.instance = _instance;
-    allocatorInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
-    vmaCreateAllocator(&allocatorInfo, &_allocator);
+    //// use vkbootstrap to get a Graphics queue
+    //_graphicsQueue = vkbDevice.get_queue(vkb::QueueType::graphics).value();
+    //_graphicsQueueFamily = vkbDevice.get_queue_index(vkb::QueueType::graphics).value();
 
-    _mainDeletionQueue.push_function([&]() {
-        vmaDestroyAllocator(_allocator);
-        });
+    //// initialize the memory allocator
+    //VmaAllocatorCreateInfo allocatorInfo = {};
+    //allocatorInfo.physicalDevice = _chosenGPU;
+    //allocatorInfo.device = _device;
+    //allocatorInfo.instance = _instance;
+    //allocatorInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
+    //vmaCreateAllocator(&allocatorInfo, &_allocator);
 
-    VulkanSwapchain::SwapchainParameters swapchainParameters;
-    swapchainParameters.chosenGPU = _chosenGPU;
-    swapchainParameters.device = _device;
-    swapchainParameters.surface = _surface;
-    swapchainParameters.size = _window->GetScreenSize();
+    //_mainDeletionQueue.push_function([&]() {
+    //    vmaDestroyAllocator(_allocator);
+    //    });
 
-    swapchain.Create(swapchainParameters);
+    //VulkanSwapchain::SwapchainParameters swapchainParameters;
+    //swapchainParameters.chosenGPU = _chosenGPU;
+    //swapchainParameters.device = _device;
+    //swapchainParameters.surface = _surface;
+    //swapchainParameters.size = _window->GetScreenSize();
 
-    //draw image size will match the window
-    VkExtent3D drawImageExtent = {
-        _window->GetScreenSize().x,
-        _window->GetScreenSize().y,
-        1
-    };
+    //swapchain.Create(swapchainParameters);
 
-    VkExtent2D extent;
-    extent.width = _window->GetScreenSize().x;
-    extent.height = _window->GetScreenSize().y;
+    ////draw image size will match the window
+    //VkExtent3D drawImageExtent = {
+    //    _window->GetScreenSize().x,
+    //    _window->GetScreenSize().y,
+    //    1
+    //};
 
-    _drawExtent = extent;
+    //VkExtent2D extent;
+    //extent.width = _window->GetScreenSize().x;
+    //extent.height = _window->GetScreenSize().y;
 
-    //hardcoding the draw format to 32 bit float
-    _drawImage.imageFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
-    _drawImage.imageExtent = drawImageExtent;
+    //_drawExtent = extent;
 
-    VkImageUsageFlags drawImageUsages{};
-    drawImageUsages |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-    drawImageUsages |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-    drawImageUsages |= VK_IMAGE_USAGE_STORAGE_BIT;
-    drawImageUsages |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    ////hardcoding the draw format to 32 bit float
+    //_drawImage.imageFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
+    //_drawImage.imageExtent = drawImageExtent;
 
-    VkImageCreateInfo rimg_info = vkinit::image_create_info(_drawImage.imageFormat, drawImageUsages, drawImageExtent);
+    //VkImageUsageFlags drawImageUsages{};
+    //drawImageUsages |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    //drawImageUsages |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+    //drawImageUsages |= VK_IMAGE_USAGE_STORAGE_BIT;
+    //drawImageUsages |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    //for the draw image, we want to allocate it from gpu local memory
-    VmaAllocationCreateInfo rimg_allocinfo = {};
-    rimg_allocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-    rimg_allocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    //VkImageCreateInfo rimg_info = vkinit::image_create_info(_drawImage.imageFormat, drawImageUsages, drawImageExtent);
 
-    //allocate and create the image
-    vmaCreateImage(_allocator, &rimg_info, &rimg_allocinfo, &_drawImage.image, &_drawImage.allocation, nullptr);
+    ////for the draw image, we want to allocate it from gpu local memory
+    //VmaAllocationCreateInfo rimg_allocinfo = {};
+    //rimg_allocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+    //rimg_allocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    //build a image-view for the draw image to use for rendering
-    VkImageViewCreateInfo rview_info = vkinit::imageview_create_info(_drawImage.imageFormat, _drawImage.image, VK_IMAGE_ASPECT_COLOR_BIT);
+    ////allocate and create the image
+    //vmaCreateImage(_allocator, &rimg_info, &rimg_allocinfo, &_drawImage.image, &_drawImage.allocation, nullptr);
 
-    VK_CHECK(vkCreateImageView(_device, &rview_info, nullptr, &_drawImage.imageView));
+    ////build a image-view for the draw image to use for rendering
+    //VkImageViewCreateInfo rview_info = vkinit::imageview_create_info(_drawImage.imageFormat, _drawImage.image, VK_IMAGE_ASPECT_COLOR_BIT);
 
-    //add to deletion queues
-    _mainDeletionQueue.push_function([=]() {
-        vkDestroyImageView(_device, _drawImage.imageView, nullptr);
-        vmaDestroyImage(_allocator, _drawImage.image, _drawImage.allocation);
-        });
+    //VK_CHECK(vkCreateImageView(_device, &rview_info, nullptr, &_drawImage.imageView));
 
-    VkCommandPoolCreateInfo commandPoolInfo = vkinit::command_pool_create_info(_graphicsQueueFamily, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+    ////add to deletion queues
+    //_mainDeletionQueue.push_function([=]() {
+    //    vkDestroyImageView(_device, _drawImage.imageView, nullptr);
+    //    vmaDestroyImage(_allocator, _drawImage.image, _drawImage.allocation);
+    //    });
 
-    VkFenceCreateInfo fenceCreateInfo = vkinit::fence_create_info(VK_FENCE_CREATE_SIGNALED_BIT);
-    VkSemaphoreCreateInfo semaphoreCreateInfo = vkinit::semaphore_create_info();
+    //VkCommandPoolCreateInfo commandPoolInfo = vkinit::command_pool_create_info(_graphicsQueueFamily, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 
-    for (int i = 0; i < FRAME_OVERLAP; i++)
-    {
-        VK_CHECK(vkCreateFence(_device, &fenceCreateInfo, nullptr, &_frames[i]._renderFence));
+    //VkFenceCreateInfo fenceCreateInfo = vkinit::fence_create_info(VK_FENCE_CREATE_SIGNALED_BIT);
+    //VkSemaphoreCreateInfo semaphoreCreateInfo = vkinit::semaphore_create_info();
 
-        VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, nullptr, &_frames[i]._swapchainSemaphore));
-        VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, nullptr, &_frames[i]._renderSemaphore));
+    //for (int i = 0; i < FRAME_OVERLAP; i++)
+    //{
+    //    VK_CHECK(vkCreateFence(_device, &fenceCreateInfo, nullptr, &_frames[i]._renderFence));
 
-        VK_CHECK(vkCreateCommandPool(_device, &commandPoolInfo, nullptr, &_frames[i]._commandPool));
+    //    VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, nullptr, &_frames[i]._swapchainSemaphore));
+    //    VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, nullptr, &_frames[i]._renderSemaphore));
 
-        VkCommandBufferAllocateInfo cmdAllocInfo = vkinit::command_buffer_allocate_info(_frames[i]._commandPool, 1);
+    //    VK_CHECK(vkCreateCommandPool(_device, &commandPoolInfo, nullptr, &_frames[i]._commandPool));
 
-        VK_CHECK(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_frames[i]._mainCommandBuffer));
-    }
+    //    VkCommandBufferAllocateInfo cmdAllocInfo = vkinit::command_buffer_allocate_info(_frames[i]._commandPool, 1);
 
-    VK_CHECK(vkCreateCommandPool(_device, &commandPoolInfo, nullptr, &_immCommandPool));
+    //    VK_CHECK(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_frames[i]._mainCommandBuffer));
+    //}
 
-    // allocate the command buffer for immediate submits
-    VkCommandBufferAllocateInfo cmdAllocInfo = vkinit::command_buffer_allocate_info(_immCommandPool, 1);
+    //VK_CHECK(vkCreateCommandPool(_device, &commandPoolInfo, nullptr, &_immCommandPool));
 
-    VK_CHECK(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_immCommandBuffer));
+    //// allocate the command buffer for immediate submits
+    //VkCommandBufferAllocateInfo cmdAllocInfo = vkinit::command_buffer_allocate_info(_immCommandPool, 1);
 
-    VK_CHECK(vkCreateFence(_device, &fenceCreateInfo, nullptr, &_immFence));
-    _mainDeletionQueue.push_function([=]() { vkDestroyFence(_device, _immFence, nullptr); });
+    //VK_CHECK(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_immCommandBuffer));
 
-    _mainDeletionQueue.push_function([=]() {
-        vkDestroyCommandPool(_device, _immCommandPool, nullptr);
-        });
+    //VK_CHECK(vkCreateFence(_device, &fenceCreateInfo, nullptr, &_immFence));
+    //_mainDeletionQueue.push_function([=]() { vkDestroyFence(_device, _immFence, nullptr); });
 
-    init_descriptors();
+    //_mainDeletionQueue.push_function([=]() {
+    //    vkDestroyCommandPool(_device, _immCommandPool, nullptr);
+    //    });
 
-    init_pipelines();
+    //init_descriptors();
 
-    init_imgui(_window);
+    //init_pipelines();
 
-    shaderReflectionManager.CreateSession();
-    shaderReflectionManager.CreateShader();
+    //init_imgui(_window);
+
+    //shaderReflectionManager.CreateSession();
+    //shaderReflectionManager.CreateShader();
 }
 
 void ArcEngine::VulkanGraphics::Destroy()
@@ -339,6 +355,10 @@ void ArcEngine::VulkanGraphics::RenderMesh()
     vkutil::transition_image(cmd, _drawImage.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
 
     draw_background(cmd);
+
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, mesh_pipeline);
+    uint32_t num_workgroups = 1;
+    vkCmdDrawMeshTasksNV(cmd, num_workgroups, 0);
 
     //transition the draw image and the swapchain image into their correct transfer layouts
     vkutil::transition_image(cmd, _drawImage.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
