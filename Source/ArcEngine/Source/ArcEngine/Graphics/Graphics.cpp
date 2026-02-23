@@ -57,3 +57,13 @@ void ArcEngine::Graphics::RenderMeshIndirect()
 {
     graphics->RenderMeshInstanced();
 }
+
+void ArcEngine::Graphics::CreateShader()
+{
+
+}
+
+void ArcEngine::Graphics::DestroyShader()
+{
+
+}

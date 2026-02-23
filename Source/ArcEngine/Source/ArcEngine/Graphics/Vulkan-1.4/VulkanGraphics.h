@@ -126,5 +126,6 @@ namespace ArcEngine
 		VkPipelineLayout _gradientPipelineLayout;
 
 	private:
+		std::vector<VkPipeline> pipelines;
     };
 }

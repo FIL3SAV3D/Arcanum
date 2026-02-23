@@ -17,6 +17,9 @@ void ShaderReflection::CreateSession()
 
 void ShaderReflection::CreateShader(VulkanAPI& api, const char* _ShaderName)
 {
+    Slang::ComPtr<slang::IBlob> diagnostics;
+    Result result = SLANG_OK;
+
     // First we need to create slang global session with work with the Slang API.
     Slang::ComPtr<slang::IGlobalSession> slangGlobalSession;
     assert(SLANG_SUCCEEDED(slang::createGlobalSession(slangGlobalSession.writeRef())) && "Failed to Create Global Session");
@@ -55,7 +58,6 @@ void ShaderReflection::CreateShader(VulkanAPI& api, const char* _ShaderName)
     // `hello-world.slang`, then compile and load that file. If a matching module had
     // already been loaded previously, that would be used directly.
 
-    Slang::ComPtr<slang::IBlob> diagnostics;
     Slang::ComPtr<slang::IModule> module;
     module = session->loadModule(_ShaderName, diagnostics.writeRef());
     diagnoseIfNeeded(diagnostics);
@@ -134,106 +136,30 @@ void ShaderReflection::CreateShader(VulkanAPI& api, const char* _ShaderName)
         helper.SetProgramLayout(programLayoutitr);
         helper.PrintProgramLayout(programLayoutitr, SLANG_SPIRV);
     }
+    helper.NewLine();
 
-    // Now we can call `composedProgram->getEntryPointCode()` to retrieve the
-    // compiled SPIRV code that we will use to create a vulkan compute pipeline.
-    // This will trigger the final Slang compilation and spirv code generation.
-    Slang::ComPtr<slang::IBlob> spirvCode;
+    // Once the program has been compiled succcessfully, we can
+        // go ahead and grab reflection data from the program.
+        //
+    int targetIndex = 0;
+    slang::ProgramLayout* programLayout =
+        program->getLayout(targetIndex, diagnostics.writeRef());
+    diagnoseIfNeeded(diagnostics);
+    if (!programLayout)
     {
-        Slang::ComPtr<slang::IBlob> diagnosticsBlob;
-        SlangResult result = program->getEntryPointCode(
-            0,
-            0,
-            spirvCode.writeRef(),
-            diagnosticsBlob.writeRef());
-        CheckDiagnostics(diagnosticsBlob);
-        assert(SLANG_SUCCEEDED(result) && "Failed to Compile Program");
-
-        //if (isTestMode())
-        //{
-        //    printEntrypointHashes(1, 1, composedProgram);
-        //}
+        return;
     }
 
-    // First we need to create a descriptor set layout and a pipeline layout.
-    // In this example, the pipeline layout is simple: we have a single descriptor
-    // set with three buffer descriptors for our input/output storage buffers.
-    // General applications typically has much more complicated pipeline layouts,
-    // and should consider using Slang's reflection API to learn about the shader
-    // parameter layout of a shader program. However, Slang's reflection API is
-    // out of scope of this example.
-    //VkDescriptorSetLayoutCreateInfo descSetLayoutCreateInfo = {
-    //    VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
-    //descSetLayoutCreateInfo.bindingCount = 3;
-    //VkDescriptorSetLayoutBinding bindings[3];
+    // The compiled program can also have binary code (either
+    // for individual entry points, or the entire program)
+    // generated for it.
+    //
+    Slang::ComPtr<slang::IBlob> programBinary;
+    program->getEntryPointCode(0, 0, programBinary.writeRef(), diagnostics.writeRef());
+    diagnoseIfNeeded(diagnostics);
 
-    //for (int i = 0; i < 3; i++)
-    //{
-    //    auto& binding = bindings[i];
-    //    binding.binding = i;
-    //    binding.descriptorCount = 1;
-    //    binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    //    binding.stageFlags = VK_SHADER_STAGE_ALL;
-    //    binding.pImmutableSamplers = nullptr;
-    //}
-
-    //descSetLayoutCreateInfo.pBindings = bindings;
-
-    //api.vkCreateDescriptorSetLayout(
-    //    api.device,
-    //    &descSetLayoutCreateInfo,
-    //    nullptr,
-    //    &descriptorSetLayout);
-
-    //VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
-    //    VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO };
-    //pipelineLayoutCreateInfo.setLayoutCount = 1;
-    //pipelineLayoutCreateInfo.pSetLayouts = &descriptorSetLayout;
-
-    //api.vkCreatePipelineLayout(
-    //    api.device,
-    //    &pipelineLayoutCreateInfo,
-    //    nullptr,
-    //    &pipelineLayout);
-
-
-    //// Next we create a shader module from the compiled SPIRV code.
-    //VkShaderModuleCreateInfo shaderCreateInfo = { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
-    //shaderCreateInfo.codeSize = spirvCode->getBufferSize();
-    //shaderCreateInfo.pCode = static_cast<const uint32_t*>(spirvCode->getBufferPointer());
-    //VkShaderModule vkShaderModule;
-    //api.vkCreateShaderModule(api.device, &shaderCreateInfo, nullptr, &vkShaderModule);
-
-    //// Now we have all we need to create a compute pipeline.
-    //VkComputePipelineCreateInfo pipelineCreateInfo = {
-    //    VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO };
-    //pipelineCreateInfo.stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    //pipelineCreateInfo.stage.module = vkShaderModule;
-    //pipelineCreateInfo.stage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-    //pipelineCreateInfo.stage.pName = "main";
-    //pipelineCreateInfo.layout = pipelineLayout;
-    //api.vkCreateComputePipelines(
-    //    api.device,
-    //    VK_NULL_HANDLE,
-    //    1,
-    //    &pipelineCreateInfo,
-    //    nullptr,
-    //    &pipeline);
-
-    //// We can destroy shader module now since it will no longer be used.
-    //api.vkDestroyShaderModule(api.device, vkShaderModule, nullptr);
-}
-
-void ShaderReflection::AddAutomaticallyIntroducedUniformBuffer(
-    DescriptorSetLayoutBuilder& descriptorSetLayoutBuilder)
-{
-    auto vulkanBindingIndex = descriptorSetLayoutBuilder.descriptorRanges.size();
-
-    VkDescriptorSetLayoutBinding binding = {};
-    binding.stageFlags = VK_SHADER_STAGE_ALL;
-    binding.binding = vulkanBindingIndex;
-    binding.descriptorCount = 1;
-    binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-
-    descriptorSetLayoutBuilder.descriptorRanges.push_back(binding);
+    // Building Shader
+    builder._slangProgramLayout = programLayout;
+    builder._slangCompiledProgramBlob = programBinary;
+    builder.CreateAndValidatePipelineLayout(api);
 }

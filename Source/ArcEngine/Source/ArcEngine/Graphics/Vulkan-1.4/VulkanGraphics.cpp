@@ -18,10 +18,10 @@ constexpr bool bUseValidationLayers = true;
 void ArcEngine::VulkanGraphics::Testing()
 {
     initializeVulkanDevice(vkApi);
-    shaderReflectionManager.CreateShader(vkApi, "mesh-shader.slang");
-    /*
     shaderReflectionManager.CreateShader(vkApi, "test.slang");
-    shaderReflectionManager.CreateShader(vkApi, "raster-simple.slang");
+    /*
+    shaderReflectionManager.CreateShader(vkApi, "mesh-shader.slang");
+    shaderReflectionManager.CreateShader(vkApi, "test.slang");
     */
 }
 void ArcEngine::VulkanGraphics::TestingRender()
@@ -356,9 +356,9 @@ void ArcEngine::VulkanGraphics::RenderMesh()
 
     draw_background(cmd);
 
-    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, mesh_pipeline);
-    uint32_t num_workgroups = 1;
-    vkCmdDrawMeshTasksNV(cmd, num_workgroups, 0);
+    //vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, mesh_pipeline);
+    //uint32_t num_workgroups = 1;
+    //vkCmdDrawMeshTasksNV(cmd, num_workgroups, 0);
 
     //transition the draw image and the swapchain image into their correct transfer layouts
     vkutil::transition_image(cmd, _drawImage.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);

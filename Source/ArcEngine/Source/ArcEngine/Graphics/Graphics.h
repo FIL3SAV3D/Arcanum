@@ -28,6 +28,9 @@ namespace ArcEngine
         void RenderMeshInstanced();
         void RenderMeshIndirect();
 
+        void CreateShader();
+        void DestroyShader();
+
     private:
         std::unique_ptr<IGraphics> graphics;
     };
