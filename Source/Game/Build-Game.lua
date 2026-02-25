@@ -26,6 +26,7 @@ project "Game"
         "../../Library/fmt/include",
         "../../Library/vma",
         "../../Library/volk",
+        "../../Library/zpp_bits-4.6",
 
         "../../Library/SLANG-2026.2.2/include",
 
@@ -44,8 +45,8 @@ project "Game"
         "../../Library/SLANG-2026.2.2/lib/slang.lib",
     }
 
-    targetdir ("../../Binaries/" .. OutputDir .. "/%{prj.name}")
-    objdir ("../../Binaries/Intermediates/" .. OutputDir .. "/%{prj.name}")
+    targetdir (BuildDir .. OutputDir )
+    objdir (BuildDir .. "Intermediates/" .. OutputDir .. "/%{prj.name}")
 
     filter "system:windows"
        systemversion "latest"

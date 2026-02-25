@@ -8,7 +8,8 @@ x64/
 bin/
 obj/
 
-Binaries/
+Build/Intermediates/
+Build/windows-x86_64-Debug/
 
 # Prerequisites
 *.d

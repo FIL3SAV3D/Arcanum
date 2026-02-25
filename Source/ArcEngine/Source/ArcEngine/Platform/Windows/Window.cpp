@@ -18,7 +18,32 @@ bool ArcEngine::Window::Create(const WindowSpecification& _Specification)
     // We initialize SDL and create a window with it.
     SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN);
+    SDL_WindowFlags window_flags{};
+
+    switch (_graphicsAPI)
+    {
+    case VULKAN:
+    {
+        window_flags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN);
+        break;
+    }
+    case OPENGL:
+    {
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
+        window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+
+        SDL_GL_LoadLibrary(NULL);
+        break;
+    }
+    default:
+        break;
+    }
 
     window = SDL_CreateWindow(
         _windowName.c_str(),

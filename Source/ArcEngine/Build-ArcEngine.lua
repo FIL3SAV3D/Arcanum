@@ -30,6 +30,7 @@ project "ArcEngine"
         "../../Library/volk",
         "../../Library/SDL/include",
         "../../Library/SLANG-2026.2.2/include",
+        "../../Library/zpp_bits-4.6",
 
         "$(VULKAN_SDK)/include",
     }
@@ -46,8 +47,8 @@ project "ArcEngine"
         "../../Library/SLANG-2026.2.2/lib/slang.lib",
     }
 
-    targetdir ("../../Binaries/" .. OutputDir .. "/%{prj.name}")
-    objdir ("../../Binaries/Intermediates/" .. OutputDir .. "/%{prj.name}")
+    targetdir (BuildDir .. OutputDir )
+    objdir (BuildDir .. "Intermediates/" .. OutputDir .. "/%{prj.name}")
 
     filter "system:windows"
        systemversion "latest"

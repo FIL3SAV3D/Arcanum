@@ -22,16 +22,23 @@ namespace ArcEngine
     public:
         void Create(const GraphicsAPI& _graphicsAPI, std::shared_ptr<Window> _window);
         void Destroy();
+        void Resize(const glm::uvec2& _Size);
 
         void Blit();
         void RenderMesh();
         void RenderMeshInstanced();
         void RenderMeshIndirect();
 
+    protected:
         void CreateShader();
         void DestroyShader();
 
+        void CreateMesh();
+        void DestroyMesh();
+
     private:
         std::unique_ptr<IGraphics> graphics;
+
+        //friend class AssetManager;
     };
 }

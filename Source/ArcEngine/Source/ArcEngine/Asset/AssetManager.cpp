@@ -15,6 +15,16 @@ namespace ArcEngine
         m_ModelFactory.reset();
     }
 
+    void AssetManager::Create()
+    {
+
+    }
+
+    void AssetManager::Destroy()
+    {
+
+    }
+
     std::shared_ptr<IAsset> AssetManager::LoadAsset(const std::filesystem::path& _AssetPath)
     {
         std::shared_ptr<IAsset> asset;

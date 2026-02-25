@@ -216,6 +216,10 @@ void ArcEngine::VulkanGraphics::Destroy()
     vkDestroyInstance(_instance, nullptr);
 }
 
+void ArcEngine::VulkanGraphics::Resize(const glm::uvec2& _Size)
+{
+}
+
 void ArcEngine::VulkanGraphics::immediate_submit(std::function<void(VkCommandBuffer cmd)>&& function)
 {
     VK_CHECK(vkResetFences(_device, 1, &_immFence));

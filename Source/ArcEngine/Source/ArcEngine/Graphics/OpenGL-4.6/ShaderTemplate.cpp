@@ -12,6 +12,8 @@
 #include <fstream>
 #include <filesystem>
 
+#include "ArcEngine/Util/Filepath.h"
+
 void ShaderTemplate::Use()
 {
 	glUseProgram(ID);
@@ -64,13 +66,6 @@ void ShaderTemplate::setMat4(const char* _name, const glm::mat4& _value) const
 
 void ShaderTemplate::CreateShader(const char* _vertexShaderPath, const char* _fragmentShaderPath, const char* _geometryShaderPath)
 {
-	std::string directory;
-	std::string currentPath = std::filesystem::current_path().string();
-	const size_t last_slash_idx = currentPath.rfind('\\');
-	if (std::string::npos != last_slash_idx)
-	{
-		directory = currentPath.substr(0, last_slash_idx);
-	}
 
 	std::string shaderSearchPath;
 	shaderSearchPath.append("D:\\PersonalProjects");

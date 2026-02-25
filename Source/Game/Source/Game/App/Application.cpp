@@ -2,7 +2,7 @@
 
 #include "Game/Modes/GameMode.h"
 
-ApplicationSpecification specs("App", glm::vec2(720, 480), false);
+ApplicationSpecification specs("App", 720, 480, false);
 
 Application::Application() : IApplication{ specs }
 {

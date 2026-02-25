@@ -17,22 +17,20 @@
 #include <ArcEngine/Asset/AssetManager.h>
 
 #include <ArcEngine/Graphics/Graphics.h>
+#include <zpp_bits.h>
+
 
 struct ApplicationSpecification
 {
-	std::string name;
-	glm::vec2 windowSize;
-	bool fullscreen;
-
-	ApplicationSpecification(
-		std::string _Name,
-		glm::vec2 _WindowSize,
-		bool _Fullscreen)
+	constexpr static auto serialize(auto& archive, auto& self)
 	{
-		name = _Name;
-		windowSize = _WindowSize;
-		fullscreen = _Fullscreen;
+		return archive(self.name, self.windowSizeX, self.windowSizeY, self.fullscreen);
 	}
+
+	std::string name{};
+	int windowSizeX;
+	int windowSizeY;
+	bool fullscreen = false;
 };
 
 struct GLFWwindow;
@@ -43,8 +41,8 @@ public:
 	IApplication(const ApplicationSpecification& _Spec);
 	~IApplication();
 
-	virtual void Initialize() {};
-	virtual void Deinitialize() {};
+	virtual void Create() {};
+	virtual void Destroy() {};
 
 	template<typename T>
 	void RegisterMode(const std::string& _Name)

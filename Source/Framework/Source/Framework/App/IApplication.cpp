@@ -31,48 +31,72 @@
 #include <backends/imgui_impl_vulkan.h>
 #include <backends/imgui_impl_sdl3.h>
 
-IApplication::IApplication(const ApplicationSpecification& _Spec) 
+#include <fmt/core.h>
+
+#include <iostream>
+#include <fstream>
+
+IApplication::IApplication(const ApplicationSpecification& _Spec)
 	//modeManger{ std::make_unique<ModeManager>() },
-	/*inputHandler{ std::make_shared<InputHandler>() },*/
-	//clock{ std::make_unique<Clock>() },
-	//coordinator{ std::make_shared<Coordinator>() },
-	//assetManager{ std::make_shared<ArcEngine::AssetManager>() }
-{
-	//window = std::make_shared<ArcEngine::Window>();
-
 	
+	//clock{ std::make_unique<Clock>() },
+{
+	auto [data, in, out] = zpp::bits::data_in_out();
 
-	//window->Create(windowSpecification);
+	ApplicationSpecification specs;
 
-	//glfwSetWindowUserPointer(window->GetNativeWindow(), this);
-	//glfwSetFramebufferSizeCallback(window->GetNativeWindow(), FrameBufferSizeCallback);
+	std::string code;
+	std::ifstream ShaderFile;
+	ShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-	//glfwSetCursorPosCallback(window->GetNativeWindow(), InputHandler::CursorCallBackImpl);
-	//glfwSetScrollCallback(window->GetNativeWindow(), InputHandler::ScrollCallBackImpl);
-	//glfwSetKeyCallback(window->GetNativeWindow(), InputHandler::KeyCallBackImpl);
+	try
+	{
+		ShaderFile.open((std::filesystem::current_path().string() + "\\AppTest"));
+		std::stringstream ShaderStream;
+		ShaderStream << ShaderFile.rdbuf();
+		ShaderFile.close();
+		code = ShaderStream.str();
+	}
+	catch (std::ifstream::failure e)
+	{
+		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << (std::filesystem::current_path().string() + "AppTest") << std::endl;
+	}
 
+	data.resize(code.size());
+	memcpy(&data[0], &code[0], code.size());
 
-	//glfwSetWindowUserPointer(window->GetNativeWindow(), this);
+	auto result = in(specs);
 
-	//Initialize();
+	if (failure(result)) {
+		// `result` is implicitly convertible to `std::errc`.
+		// handle the error or return/throw exception.
+		fmt::println("Error");
+		specs = _Spec;
+	}
+
 
 	ArcEngine::WindowSpecification windowSpecification;
 	windowSpecification.graphicsAPI = ArcEngine::EngineGraphicsAPI::OPENGL;
-	windowSpecification.windowName = _Spec.name;
-	windowSpecification.windowSize = _Spec.windowSize;
+	windowSpecification.windowName = specs.name;
+	windowSpecification.windowSize = glm::uvec2(specs.windowSizeX, specs.windowSizeY);
 
 	window = std::make_shared<ArcEngine::Window>();
 	window->Create(windowSpecification);
 
-	graphics.Create(ArcEngine::Graphics::VULKAN, window);
+	graphics.Create(ArcEngine::Graphics::OPENGL, window);
+
+	//assetManager = std::make_shared<ArcEngine::AssetManager>();
+
+	//coordinator = std::make_shared<Coordinator>();
+
+	inputHandler = std::make_shared<InputHandler>();
+
+	clock = std::make_unique<Clock>();
 }
 
 IApplication::~IApplication()
 {
-	graphics.Destroy();
-
-	window->Destroy();
-	window.reset();
+	
 }
 
 void IApplication::SetMode()
@@ -88,6 +112,13 @@ void IApplication::Run()
 		if (e.type == SDL_EVENT_QUIT)
 			bQuit = true;
 
+		if (e.type == SDL_EVENT_WINDOW_RESIZED)
+		{
+			int x{}, y{};
+			SDL_GetWindowSize(window->GetNativeWindow(), &x, &y);
+			graphics.Resize(glm::uvec2(x, y));
+		}
+
 		const bool* key_states = SDL_GetKeyboardState(nullptr);
 
 		if (key_states[SDL_SCANCODE_ESCAPE])
@@ -102,7 +133,7 @@ void IApplication::Run()
 			stop_rendering = false;
 		}
 
-		ImGui_ImplSDL3_ProcessEvent(&e);
+		//ImGui_ImplSDL3_ProcessEvent(&e);
 	}
 	//OnInput();
 
@@ -124,15 +155,15 @@ void IApplication::Run()
 	//OnCheckForDisabled();
 
 	// imgui new frame
-	ImGui_ImplVulkan_NewFrame();
-	ImGui_ImplSDL3_NewFrame();
-	ImGui::NewFrame();
+	//ImGui_ImplVulkan_NewFrame();
+	//ImGui_ImplSDL3_NewFrame();
+	//ImGui::NewFrame();
 
-	//some imgui UI to test
-	ImGui::ShowDemoWindow();
+	////some imgui UI to test
+	//ImGui::ShowDemoWindow();
 
-	//make imgui calculate internal draw structures
-	ImGui::Render();
+	////make imgui calculate internal draw structures
+	//ImGui::Render();
 
 	graphics.RenderMesh();
 }
@@ -142,22 +173,23 @@ void IApplication::Run()
 // Start
 void IApplication::OnCreate()
 {
-	//coordinator->RegisterComponent<RenderComponent>();
 	//coordinator->RegisterComponent<TransformComponent>();
+	//coordinator->RegisterComponent<RenderComponent>();
 	//coordinator->RegisterComponent<RigidBodyComponent>();
 
 	////UI = std::static_pointer_cast<UIRenderSystem>(coordinator->RegisterSystem<UIRenderSystem, 10>(window));
 
-	//coordinator->RegisterSystem<MeshRenderSystem, 10>(inputHandler, window);
 	////coordinator->RegisterSystem<ECSPhysicsSystem, 20>();
 
-	//Signature signature;
-	////signature.set(coordinator->GetComponentType<TransformComponent>());
-	////signature.set(coordinator->GetComponentType<RigidBodyComponent>());
-	////coordinator->SetSystemSignature<ECSPhysicsSystem>(signature);
+	/*signature.set(coordinator->GetComponentType<TransformComponent>());
+	signature.set(coordinator->GetComponentType<RigidBodyComponent>());
+	coordinator->SetSystemSignature<ECSPhysicsSystem>(signature);*/
 
 	//signature.reset();
 
+	//coordinator->RegisterSystem<MeshRenderSystem, 10>(inputHandler, window);
+
+	//Signature signature;
 	//signature.set(coordinator->GetComponentType<TransformComponent>());
 	//signature.set(coordinator->GetComponentType<RenderComponent>());
 	//coordinator->SetSystemSignature<MeshRenderSystem>(signature);
@@ -239,7 +271,7 @@ void IApplication::OnInput()
 
 void IApplication::OnUpdate(const float& _DeltaTime)
 {
-	/*coordinator->OnUpdate(_DeltaTime);*/
+	coordinator->OnUpdate(_DeltaTime);
 }
 
 void IApplication::OnLateUpdate(const float& _DeltaTime)
@@ -249,7 +281,7 @@ void IApplication::OnLateUpdate(const float& _DeltaTime)
 
 void IApplication::OnRender()
 {
-	/*coordinator->OnRender();*/
+	coordinator->OnRender();
 }
 
 void IApplication::OnRenderUI()
@@ -281,7 +313,29 @@ void IApplication::OnDisable()
 
 void IApplication::OnDestroy()
 {
+	auto [data, out] = zpp::bits::data_out();
 
+	graphics.Destroy();
+
+	ApplicationSpecification specs;
+
+	SDL_GetWindowSize(window->GetNativeWindow(), &specs.windowSizeX, &specs.windowSizeY);
+
+	auto result = out(specs);
+
+	if (failure(result)) {
+		// `result` is implicitly convertible to `std::errc`.
+		// handle the error or return/throw exception.
+		fmt::println("Error");
+	}
+	else
+	{
+		std::ofstream outfile("AppTest", std::ios::out | std::ios::binary);
+		outfile.write(reinterpret_cast<char*>(data.data()), static_cast<long>(data.size()));
+	}
+
+	window->Destroy();
+	window.reset();
 }
 // Quit
 
@@ -300,4 +354,9 @@ void IApplication::FrameBufferSizeCallback(GLFWwindow* _window, int _width, int 
 
 	ptr->window->SetScreenSize(newSize);
 	ptr->coordinator->OnResize(newSize);*/
+}
+
+auto Serialize(const ApplicationSpecification& person) -> zpp::bits::members<3>
+{
+	return zpp::bits::members<3>();
 }

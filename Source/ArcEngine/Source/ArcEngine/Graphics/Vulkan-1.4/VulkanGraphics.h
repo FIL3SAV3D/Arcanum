@@ -60,6 +60,8 @@ namespace ArcEngine
 
         void Create(std::shared_ptr<Window> _window) override;
         void Destroy() override;
+		void Resize(const glm::uvec2& _Size) override;
+
         void Blit() override;
         void RenderMesh() override;
 		void draw_background(VkCommandBuffer cmd);

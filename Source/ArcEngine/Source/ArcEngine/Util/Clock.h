@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 class Clock
 {
 public:
@@ -9,13 +11,13 @@ public:
 
 	void Update();
 
-	float GetTime();
+	double GetTime();
 
-	float GetDeltaTime();
+	double GetDeltaTime();
 
 
 private:
-	float m_CurrentTime;
-	float m_LastTime;
-	float m_DeltaTime;
+	uint64_t m_CurrentTime;
+	uint64_t m_LastTime;
+	double m_DeltaTime;
 };

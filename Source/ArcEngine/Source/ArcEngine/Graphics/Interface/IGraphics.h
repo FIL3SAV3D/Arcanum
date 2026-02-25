@@ -11,10 +11,14 @@ namespace ArcEngine
     public:
         virtual void Create(std::shared_ptr<Window> _window) = 0;
         virtual void Destroy() = 0;
+        virtual void Resize(const glm::uvec2& _Size) = 0;
 
         virtual void Blit() = 0;
         virtual void RenderMesh() = 0;
         virtual void RenderMeshInstanced() = 0;
         virtual void RenderMeshIndirect() = 0;
+
+        virtual void CreateMesh()  {};
+        virtual void DestroyMesh() {};
     };
 }

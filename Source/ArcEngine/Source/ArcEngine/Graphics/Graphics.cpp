@@ -18,7 +18,7 @@ void ArcEngine::Graphics::Create(const GraphicsAPI& _graphicsAPI, std::shared_pt
     }
     case Graphics::OPENGL:
     {
-        assert(false && "Not Yet Implemented");
+        graphics = std::make_unique<OpenGLGraphics>();
         break;
     }
     default:
@@ -36,6 +36,11 @@ void ArcEngine::Graphics::Destroy()
     graphics->Destroy();
 
     graphics.reset();
+}
+
+void ArcEngine::Graphics::Resize(const glm::uvec2& _Size)
+{
+    graphics->Resize(_Size);
 }
 
 void ArcEngine::Graphics::Blit()

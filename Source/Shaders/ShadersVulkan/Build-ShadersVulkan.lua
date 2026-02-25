@@ -15,8 +15,8 @@ project "ShadersVulkan"
         "Source",
     }
 
-    targetdir ("../../Binaries/" .. OutputDir .. "/%{prj.name}")
-    objdir ("../../Binaries/Intermediates/" .. OutputDir .. "/%{prj.name}")
+    targetdir (BuildDir .. OutputDir )
+    objdir (BuildDir .. "Intermediates/" .. OutputDir .. "/%{prj.name}")
 
     filter 'files:**.frag'
             buildmessage 'Compiling %{file.relpath}'

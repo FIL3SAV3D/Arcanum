@@ -11,6 +11,8 @@
 #include "ArcEngine/Asset/Factories/MeshFactory.h"
 #include "ArcEngine/Asset/Factories/ModelFactory.h"
 
+#include "ArcEngine/Graphics/Graphics.h"
+
 namespace ArcEngine
 {
     class AssetManager
@@ -19,26 +21,34 @@ namespace ArcEngine
         AssetManager();
         ~AssetManager();
 
+        void Create();
+        void Destroy();
+
         std::shared_ptr<IAsset> LoadAsset(const std::filesystem::path& _AssetPath);
 
     private:
         AssetType GetTypeByExtension(const std::filesystem::path& _AssetPath);
 
     private:
+        std::filesystem::path m_AssetFolderFilePath;
+
+
         std::unique_ptr<ModelFactory> m_ModelFactory;
+
+        Graphics graphics;
+
+
     };
 
+    //class AssetLoadCommand : ICommand
+    //{
+    //    void Execute() const
+    //    {
+    //    }
 
+    //    void Undo() const
+    //    {
+    //    }
 
-    class AssetLoadCommand : ICommand
-    {
-        void Execute() const
-        {
-        }
-
-        void Undo() const
-        {
-        }
-
-    };
+    //};
 }
