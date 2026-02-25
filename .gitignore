@@ -9,7 +9,7 @@ bin/
 obj/
 
 Build/Intermediates/
-Build/windows-x86_64-Debug/
+#Build/windows-x86_64-Debug/
 
 # Prerequisites
 *.d
