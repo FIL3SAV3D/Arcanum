@@ -72,3 +72,8 @@ void ArcEngine::Graphics::DestroyShader()
 {
 
 }
+
+void ArcEngine::Graphics::CreateMesh(MeshCreationInfo& _Info)
+{
+    graphics->CreateMesh(_Info);
+}

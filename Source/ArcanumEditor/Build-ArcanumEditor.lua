@@ -46,6 +46,7 @@ project "ArcanumEditor"
         "../../Library/GLFW/lib-vc2022/glfw3.lib",
         "../../Library/SDL/lib/SDL3.lib",
         "../../Library/SLANG-2026.2.2/lib/slang.lib",
+
     }
 
     -- targetdir ("../../Binaries/" .. OutputDir .. "/%{prj.name}")
@@ -63,8 +64,8 @@ project "ArcanumEditor"
 
        links 
        { 
-        "../../Library/Assimp/dll/assimp-vc143-mtd.dll",
         "../../Library/fmt/lib/fmtd.lib",
+        "../../Library/Assimp/lib/assimp-vc143-mtd.lib",
        }
 
     filter "configurations:Release"
@@ -75,8 +76,8 @@ project "ArcanumEditor"
 
        links 
        { 
-        "../../Library/Assimp/dll/assimp-vc143-mt.dll",
         "../../Library/fmt/lib/fmt.lib",
+        "../../Library/Assimp/lib/assimp-vc143-mt.lib",
         }
 
     filter "configurations:Dist"
@@ -87,5 +88,5 @@ project "ArcanumEditor"
 
        links 
        { 
-        "../../Library/Assimp/dll/assimp-vc143-mt.dll",
-        }
+        "../../Library/Assimp/lib/assimp-vc143-mt.lib",
+    }

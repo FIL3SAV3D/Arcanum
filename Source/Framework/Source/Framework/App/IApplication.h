@@ -12,24 +12,21 @@
 #include "Framework/Managers/ModeManager.h"
 #include "Framework/ECS/Systems/UIRenderSystem.h"
 
-#include <memory>
-
 #include <ArcEngine/Asset/AssetManager.h>
-
 #include <ArcEngine/Graphics/Graphics.h>
+
 #include <zpp_bits.h>
-
-
+#include <memory>
 struct ApplicationSpecification
 {
-	constexpr static auto serialize(auto& archive, auto& self)
-	{
-		return archive(self.name, self.windowSizeX, self.windowSizeY, self.fullscreen);
-	}
+	//constexpr static auto serialize(auto& archive, auto& self)
+	//{
+	//	return archive(self.name, self.windowSizeX, self.windowSizeY, self.fullscreen);
+	//}
 
 	std::string name{};
-	int windowSizeX;
-	int windowSizeY;
+	int windowSizeX{};
+	int windowSizeY{};
 	bool fullscreen = false;
 };
 
@@ -92,11 +89,10 @@ public:
 	bool bQuit = false;
 	bool stop_rendering = false;
 private:
-
 	std::shared_ptr<ArcEngine::Window> window;
-	ArcEngine::Graphics graphics;
+	std::shared_ptr<ArcEngine::Graphics> graphics;
 
-	std::shared_ptr<ArcEngine::AssetManager> assetManager;
+	ArcEngine::AssetManager assetManager;
 
 	std::shared_ptr<Coordinator> coordinator;
 

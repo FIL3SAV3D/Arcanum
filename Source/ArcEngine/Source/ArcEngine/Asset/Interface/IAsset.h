@@ -1,17 +1,20 @@
 #pragma once
 
+#include <cinttypes>
+#include <string>
+
 enum AssetType
 {
-    MESH,
     MODEL,
     TEXTURE,
-    VERTEX_SHADER,
-    FRAGMENT_SHADER,
-    COMPUTE_SHADER,
+    SHADER,
     NONE
 };
+
+typedef std::uint32_t AssetID;
 
 struct IAsset
 {
     AssetType type;
+    std::string assetPath;
 };

@@ -14,14 +14,23 @@ namespace ArcEngine
         void Resize(const glm::uvec2& _Size) override;
 
         void Blit() override;
+
         void RenderMesh() override;
         void RenderMeshInstanced() override;
         void RenderMeshIndirect() override;
+
+        void CreateMesh(MeshCreationInfo& _Info) override;
+        void DestroyMesh() override;
+
+        void CreateTexture() override;
+        void DestroyTexture() override;
 
     private:
         SDL_GLContext glContext;
 
     private:
+        std::vector<MeshInfo> meshArray;
+
         std::shared_ptr<Window> window;
     };
 }

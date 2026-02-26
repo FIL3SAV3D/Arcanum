@@ -1,6 +1,3 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include "IApplication.h"
 #include <format>
 #include "Framework/Modes/ModeMain.h"
@@ -36,44 +33,21 @@
 #include <iostream>
 #include <fstream>
 
-IApplication::IApplication(const ApplicationSpecification& _Spec)
-	//modeManger{ std::make_unique<ModeManager>() },
-	
-	//clock{ std::make_unique<Clock>() },
-{
-	auto [data, in, out] = zpp::bits::data_in_out();
+#include "ArcEngine/Util/Filepath.h"
 
+#include <filesystem>
+
+#include "ArcEngine/Asset/Serializer.h"
+
+IApplication::IApplication(const ApplicationSpecification& _Spec)
+{
 	ApplicationSpecification specs;
 
-	std::string code;
-	std::ifstream ShaderFile;
-	ShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-	try
-	{
-		ShaderFile.open((std::filesystem::current_path().string() + "\\AppTest"));
-		std::stringstream ShaderStream;
-		ShaderStream << ShaderFile.rdbuf();
-		ShaderFile.close();
-		code = ShaderStream.str();
-	}
-	catch (std::ifstream::failure e)
-	{
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << (std::filesystem::current_path().string() + "AppTest") << std::endl;
-	}
-
-	data.resize(code.size());
-	memcpy(&data[0], &code[0], code.size());
-
-	auto result = in(specs);
-
-	if (failure(result)) {
-		// `result` is implicitly convertible to `std::errc`.
-		// handle the error or return/throw exception.
-		fmt::println("Error");
-		specs = _Spec;
-	}
-
+	std::filesystem::path path{ Filepath::FindDataFolder() };
+	//if (!Serializer::Deserialize(path, "\\ApplicationConfig.Scroll", specs))
+	//{
+	specs = _Spec;
+	//}
 
 	ArcEngine::WindowSpecification windowSpecification;
 	windowSpecification.graphicsAPI = ArcEngine::EngineGraphicsAPI::OPENGL;
@@ -83,11 +57,13 @@ IApplication::IApplication(const ApplicationSpecification& _Spec)
 	window = std::make_shared<ArcEngine::Window>();
 	window->Create(windowSpecification);
 
-	graphics.Create(ArcEngine::Graphics::OPENGL, window);
+	graphics = std::make_shared<ArcEngine::Graphics>();
+	graphics->Create(ArcEngine::Graphics::OPENGL, window);
 
-	//assetManager = std::make_shared<ArcEngine::AssetManager>();
+	assetManager.Create(graphics, true);
+	assetManager.LoadAsset("Cube.fbx");
 
-	//coordinator = std::make_shared<Coordinator>();
+	coordinator = std::make_shared<Coordinator>();
 
 	inputHandler = std::make_shared<InputHandler>();
 
@@ -116,7 +92,7 @@ void IApplication::Run()
 		{
 			int x{}, y{};
 			SDL_GetWindowSize(window->GetNativeWindow(), &x, &y);
-			graphics.Resize(glm::uvec2(x, y));
+			graphics->Resize(glm::uvec2(x, y));
 		}
 
 		const bool* key_states = SDL_GetKeyboardState(nullptr);
@@ -146,7 +122,7 @@ void IApplication::Run()
 
 	//// Set camera bindings
 
-	//OnRender();
+	OnRender();
 
 	////OnRenderUI();
 
@@ -165,7 +141,7 @@ void IApplication::Run()
 	////make imgui calculate internal draw structures
 	//ImGui::Render();
 
-	graphics.RenderMesh();
+	//graphics.RenderMesh();
 }
 
 #pragma region  IApplicationStart
@@ -173,8 +149,8 @@ void IApplication::Run()
 // Start
 void IApplication::OnCreate()
 {
-	//coordinator->RegisterComponent<TransformComponent>();
-	//coordinator->RegisterComponent<RenderComponent>();
+	coordinator->RegisterComponent<TransformComponent>();
+	coordinator->RegisterComponent<RenderComponent>();
 	//coordinator->RegisterComponent<RigidBodyComponent>();
 
 	////UI = std::static_pointer_cast<UIRenderSystem>(coordinator->RegisterSystem<UIRenderSystem, 10>(window));
@@ -187,65 +163,63 @@ void IApplication::OnCreate()
 
 	//signature.reset();
 
-	//coordinator->RegisterSystem<MeshRenderSystem, 10>(inputHandler, window);
+	coordinator->RegisterSystem<MeshRenderSystem, 10>(inputHandler, window);
 
-	//Signature signature;
-	//signature.set(coordinator->GetComponentType<TransformComponent>());
-	//signature.set(coordinator->GetComponentType<RenderComponent>());
-	//coordinator->SetSystemSignature<MeshRenderSystem>(signature);
+	Signature signature;
+	signature.set(coordinator->GetComponentType<TransformComponent>());
+	signature.set(coordinator->GetComponentType<RenderComponent>());
+	coordinator->SetSystemSignature<MeshRenderSystem>(signature);
 
-	//coordinator->m_SystemManager->RecalculateUpdateOrder();
+	coordinator->m_SystemManager->RecalculateUpdateOrder();
 
-	//coordinator->OnCreate();
+	coordinator->OnCreate();
 
-	//auto m_cubeModel = assetManager->LoadAsset(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
+	//auto m_cubeModel = assetManager.LoadAsset(std::string("Rat.glb").c_str());
 
-	//std::vector<Entity> entities(100);
+	std::vector<Entity> entities(100);
 
-	//std::default_random_engine generator;
-	//std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
-	//std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
-	//std::uniform_real_distribution<float> randScale(3.0f, 5.0f);
-	//std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
+	std::default_random_engine generator;
+	std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
+	std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
+	std::uniform_real_distribution<float> randScale(3.0f, 5.0f);
+	std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
 
-	//float scale = randScale(generator);
+	float scale = randScale(generator);
 
-	//for (auto& entity : entities)
-	//{
-	//	entity = coordinator->CreateEntity();
+	for (auto& entity : entities)
+	{
+		entity = coordinator->CreateEntity();
 
-	//	glm::mat4 transform = glm::mat4{ 1.0f };
-	//	transform = glm::translate(transform, glm::vec3(randPosition(generator), randPosition(generator), randPosition(generator)));
-	//	auto rotQuat = glm::quat(glm::vec3(randRotation(generator), randRotation(generator), randRotation(generator)));
-	//	transform = transform * glm::mat4_cast(rotQuat);
-	//	transform = glm::scale(transform, glm::vec3(scale));
+		glm::mat4 transform = glm::mat4{ 1.0f };
+		transform = glm::translate(transform, glm::vec3(randPosition(generator), randPosition(generator), randPosition(generator)));
+		auto rotQuat = glm::quat(glm::vec3(randRotation(generator), randRotation(generator), randRotation(generator)));
+		transform = transform * glm::mat4_cast(rotQuat);
+		transform = glm::scale(transform, glm::vec3(scale));
 
-	//	coordinator->AddComponent(
-	//		entity,
-	//		TransformComponent{
-	//			.transform = transform
-	//		});
+		coordinator->AddComponent(
+			entity,
+			TransformComponent{
+				.transform = transform
+			});
 
-	//	coordinator->AddComponent(
-	//		entity,
-	//		RigidBodyComponent{}
-	//	);
+		coordinator->AddComponent(
+			entity,
+			RigidBodyComponent{}
+		);
 
-	//	RenderComponent renderComponent{};
+		RenderComponent renderComponent{};
 
-	//	renderComponent.model = *std::static_pointer_cast<Model>(m_cubeModel);
+		//renderComponent.model = *std::static_pointer_cast<Model>(m_cubeModel);
 
-	//	coordinator->AddComponent(
-	//		entity,
-	//		renderComponent);
-	//}
+		coordinator->AddComponent(
+			entity,
+			renderComponent);
+	}
 
-	//auto cameraEntity = coordinator->CreateEntity();
-	//coordinator->AddComponent(cameraEntity, TransformComponent{});
-	//
-	//glfwSetInputMode(window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	auto cameraEntity = coordinator->CreateEntity();
+	coordinator->AddComponent(cameraEntity, TransformComponent{});
 
-	//coordinator->OnStart();
+	coordinator->OnStart();
 }
 
 void IApplication::OnEnable()
@@ -315,7 +289,7 @@ void IApplication::OnDestroy()
 {
 	auto [data, out] = zpp::bits::data_out();
 
-	graphics.Destroy();
+	graphics->Destroy();
 
 	ApplicationSpecification specs;
 
@@ -330,7 +304,7 @@ void IApplication::OnDestroy()
 	}
 	else
 	{
-		std::ofstream outfile("AppTest", std::ios::out | std::ios::binary);
+		std::ofstream outfile("AppTest.Scroll", std::ios::out | std::ios::binary);
 		outfile.write(reinterpret_cast<char*>(data.data()), static_cast<long>(data.size()));
 	}
 

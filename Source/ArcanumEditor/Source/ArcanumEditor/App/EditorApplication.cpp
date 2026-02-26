@@ -2,10 +2,10 @@
 
 void EditorApplication::Initialize()
 {
-    Application::Initialize();
+    Application::Create();
 }
 
 void EditorApplication::Deinitialize()
 {
-    Application::Deinitialize();
+    Application::Destroy();
 }

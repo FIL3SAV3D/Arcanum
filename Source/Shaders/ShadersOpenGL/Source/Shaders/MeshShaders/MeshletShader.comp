@@ -1,9 +1,14 @@
 #version 460 core
 
+#extension GL_ARB_shading_language_include : enable
+
 #extension GL_NV_mesh_shader : require
 
-layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
-layout(triangles, max_vertices = 64, max_primitives = 128) out;
+const uint WORKGROUP_SIZE = 32;
+
+layout(local_size_x=WORKGROUP_SIZE) in;
+layout(max_vertices=64, max_primitives=126) out;
+layout(triangles) out;
 
 layout (std140, binding = 0) uniform uniforms_t
 {  
@@ -17,40 +22,25 @@ struct s_vertex
   vec3 Position;
 };
 
-layout (std430, binding = 1) buffer _vertices
-{
-  s_vertex vertices[];
-} VertexBuffer;
-
-layout (std430, binding = 2) buffer _indices
-{
-  uint indices[];
-} IndexBuffer;
-
-layout (std430, binding = 3) buffer _triangles
-{
-  uint triangles[];
-} TriangleBuffer;
-
-struct s_meshlet
+struct Meshlet
 {
     uint VertexOffset;
     uint TriangleOffset;
     uint VertexCount;
-    uint TriangleCount;
+    uint triangle_count;
 };
 
-layout (std430, binding = 4) buffer _meshlets
-{
-  s_meshlet meshlets[];
-} MeshletBuffer;
+layout(binding = 0) readonly buffer Meshlets { Meshlet meshlets[]; };
+layout(binding = 1) readonly buffer MeshletVertices { uint meshlet_vertices[]; };
+layout(binding = 2) readonly buffer MeshletTriangles { uint8_t meshlet_triangles[]; };
 
-// Mesh shader output block.
-//
-layout (location = 0) out PerVertexData
-{
-  vec3 color;
-} v_out[];   // [max_vertices]
+out gl_MeshPerVertexNV {
+    vec4 gl_Position;
+    vec3 color;
+} gl_MeshVerticesNV[];
+
+out uint gl_PrimitiveCountNV;
+out uint gl_PrimitiveIndicesNV[];
 
 #define MAX_COLORS 10
 vec3 meshletcolors[MAX_COLORS] = {
@@ -68,31 +58,18 @@ vec3 meshletcolors[MAX_COLORS] = {
 
 void main()
 {
-    uint gtid  = gl_WorkGroupID.x;
-    uint gid   = gl_LocalInvocationID.x;
+    Meshlet meshlet = meshlets[gl_WorkGroupID.x];
+    SetMeshOutputsEXT(meshlet.vertex_count, meshlet.triangle_count);
 
-    s_meshlet m = MeshletBuffer.meshlets[gtid];
-
-    uint vertOffset = m.VertexOffset;
-    for(int i = 0; i < m.VertexCount; i++)
-    {
-        uint index = vertOffset + i;
-        gl_MeshVerticesNV[index].gl_Position = transform_ub.ProjectionMatrix * transform_ub.ViewMatrix * transform_ub.ModelMatrix * vec4(VertexBuffer.vertices[index].Position, 1.0);
-
-        vec3 color = vec3(
-            float(gid & 1),
-            float(gid & 3) / 4,
-            float(gid & 7) / 8);
-        v_out[index].color = color;
-    }
-     
-     gl_PrimitiveCountNV = uint(m.TriangleCount) / 3;
-
-    uint triOffset = m.TriangleOffset;
-    for (uint i = 0; i < m.TriangleCount; i++)
-    {
-        uint index = triOffset + i;
-        gl_PrimitiveIndicesNV[index] = uint(IndexBuffer.indices[index]);
+    for (uint i = gl_LocalInvocationIndex; i < meshlet.vertex_count; i += gl_WorkGroupSize.x) {
+        uint index = meshlet_vertices[meshlet.vertex_offset + i];
+        gl_MeshVerticesNV[i].gl_Position = world_view_projection * vec4(vertex_positions[index], 1);
+        gl_MeshVerticesNV[i].color = meshletcolors[mod(index, MAX_COLORS)];
     }
 
+    for (uint i = gl_LocalInvocationIndex; i < meshlet.triangle_count; i += gl_WorkGroupSize.x) {
+        uint offset = meshlet.triangle_offset + i * 3;
+        gl_PrimitiveIndicesNV[i] = uvec3(
+            meshlet_triangles[offset], meshlet_triangles[offset + 1], meshlet_triangles[offset + 2]);
+    }
 }

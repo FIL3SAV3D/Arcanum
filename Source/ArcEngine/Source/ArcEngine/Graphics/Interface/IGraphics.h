@@ -4,6 +4,8 @@
 
 #include <memory>
 
+#include "ArcEngine/Asset/Types/Mesh.h"
+
 namespace ArcEngine
 {
     class IGraphics
@@ -18,7 +20,10 @@ namespace ArcEngine
         virtual void RenderMeshInstanced() = 0;
         virtual void RenderMeshIndirect() = 0;
 
-        virtual void CreateMesh()  {};
+        virtual void CreateMesh(MeshCreationInfo& _Info)  {};
         virtual void DestroyMesh() {};
+
+        virtual void CreateTexture() {};
+        virtual void DestroyTexture() {};
     };
 }

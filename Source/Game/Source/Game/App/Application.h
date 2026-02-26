@@ -9,6 +9,6 @@ public:
     ~Application();
 
     // Inherited via IApplication
-    void Initialize();
-    void Deinitialize();
+    void Create() override;
+    void Destroy() override;
 };

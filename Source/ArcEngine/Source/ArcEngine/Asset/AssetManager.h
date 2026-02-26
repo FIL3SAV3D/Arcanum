@@ -1,17 +1,19 @@
 #pragma once
 
 #include "ArcEngine/Asset/Interface/IAsset.h"
-#include "ArcEngine/Asset/Interface/IAssetFactory.h"
+
 #include "ArcEngine/Util/Command/ICommand.h"
 
 #include <filesystem>
 #include <queue>
 #include <unordered_map>
+#include <string>
+#include <memory>
+#include "Factories/MeshletFactory.h"
 
-#include "ArcEngine/Asset/Factories/MeshFactory.h"
-#include "ArcEngine/Asset/Factories/ModelFactory.h"
-
-#include "ArcEngine/Graphics/Graphics.h"
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 
 namespace ArcEngine
 {
@@ -21,34 +23,50 @@ namespace ArcEngine
         AssetManager();
         ~AssetManager();
 
-        void Create();
+        void Create(std::weak_ptr<Graphics> _GraphicsAPI, bool _MeshShading = false);
         void Destroy();
 
-        std::shared_ptr<IAsset> LoadAsset(const std::filesystem::path& _AssetPath);
+        void CreateFactories();
+        void DestroyFactories();
+
+
+        void CreateAsset(const std::filesystem::path& _AssetPath);
+        void DestroyAsset();
+
+        void ScanAssetFolder();
+
+        void DeserializeAssets();
+        void SerializeAssets();
+
+        std::shared_ptr<IAsset> LoadAsset(const char* _Name);
+
+        std::shared_ptr<IAsset> GetAssetByName(const char* _Name);
 
     private:
         AssetType GetTypeByExtension(const std::filesystem::path& _AssetPath);
 
+        AssetID MakeNewAssetID();
+
+        const aiScene* ImportObject(const std::filesystem::path& _AssetPath);
+
+        void ProcessNode(aiNode* _Node, const aiScene* _Scene);
+        void ProcessMesh(aiMesh* _mesh, const aiScene* _scene);
+
     private:
-        std::filesystem::path m_AssetFolderFilePath;
 
+        std::string m_AssetFolderFilePath{};
+        std::string m_SerializedAssetFolderFilePath{};
 
-        std::unique_ptr<ModelFactory> m_ModelFactory;
+        std::unordered_map<std::string, std::shared_ptr<IAsset>> m_AssetList{};
 
-        Graphics graphics;
+        std::vector<std::string> availableAssets;
 
+        bool m_MeshShading = false;
 
+    private:
+        Assimp::Importer importer;
+        std::unique_ptr<MeshletFactory> m_MeshletFactory;
+
+        std::weak_ptr<Graphics> graphicsAPI;
     };
-
-    //class AssetLoadCommand : ICommand
-    //{
-    //    void Execute() const
-    //    {
-    //    }
-
-    //    void Undo() const
-    //    {
-    //    }
-
-    //};
 }

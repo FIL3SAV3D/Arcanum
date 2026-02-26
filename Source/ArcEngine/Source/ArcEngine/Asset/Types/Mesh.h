@@ -8,6 +8,19 @@
 #define kMaxTriangles 124
 #define kMaxVertices  64
 
+struct MeshInfo
+{
+    unsigned int VAO = 0;
+    unsigned int VBO = 0;
+    unsigned int EBO = 0;
+};
+
+struct MeshCreationInfo
+{
+    std::vector< VertexData > vertices{};
+    std::vector< unsigned int > indices{};
+};
+
 struct Mesh : public IAsset
 {
 public:
@@ -27,4 +40,12 @@ public:
     unsigned int MSMeshletVerticiesBuffer;
     unsigned int MSMeshletTrianglesBuffer;
 
+    constexpr static auto serialize(auto& archive, auto& self)
+    {
+        archive.type = self.type;
+        archive.vertices = self.vertices;
+        archive.indices = self.indices;
+
+        return archive;
+    }
 };

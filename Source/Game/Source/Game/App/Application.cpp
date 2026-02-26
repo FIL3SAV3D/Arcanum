@@ -9,11 +9,11 @@ Application::Application() : IApplication{ specs }
 
 }
 
-void Application::Initialize()
+void Application::Create()
 {
-    RegisterDefaultMode<GameMode>("Game");
+    RegisterMode<GameMode>("Game");
 }
 
-void Application::Deinitialize()
+void Application::Destroy()
 {
 }

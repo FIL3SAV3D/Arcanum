@@ -61,8 +61,8 @@ project "ArcEngine"
 
        links 
        { 
-        "../../Library/Assimp/dll/assimp-vc143-mtd.dll",
         "../../Library/fmt/lib/fmtd.lib",
+        "../../Library/Assimp/lib/assimp-vc143-mtd.lib",
        }
 
     filter "configurations:Release"
@@ -73,14 +73,12 @@ project "ArcEngine"
 
        links 
        { 
-        "../../Library/Assimp/dll/assimp-vc143-mtd.dll",
         "../../Library/fmt/lib/fmt.lib",
-       }
+        "../../Library/Assimp/lib/assimp-vc143-mt.lib",
+        }
 
     filter "configurations:Dist"
        defines { "DIST" }
        runtime "Release"
        optimize "On"
        symbols "Off"
-
-       links { "../../Library/Assimp/lib/assimp-vc143-mt.lib" }

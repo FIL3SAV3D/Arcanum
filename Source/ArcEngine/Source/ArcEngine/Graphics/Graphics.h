@@ -6,6 +6,7 @@
 
 #include "ArcEngine/Graphics/Interface/IGraphics.h"
 
+
 struct SDL_Window;
 
 namespace ArcEngine
@@ -33,12 +34,15 @@ namespace ArcEngine
         void CreateShader();
         void DestroyShader();
 
-        void CreateMesh();
+        void CreateMesh(MeshCreationInfo& _Info);
         void DestroyMesh();
+
+        void CreateMeshlet();
+        void DestroyMeshlet();
 
     private:
         std::unique_ptr<IGraphics> graphics;
 
-        //friend class AssetManager;
+        friend class MeshletFactory;
     };
 }
