@@ -20,24 +20,55 @@ InputHandler::~InputHandler()
 	}
 }
 
-void InputHandler::ProcessInput(GLFWwindow* window)
+void InputHandler::ProcessInput()
 {
 	SDL_Event e;
 
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
-		glfwSetWindowShouldClose(window, true);
+	while (SDL_PollEvent(&e) != 0) {
+		// close the window when user alt-f4s or clicks the X button
+		if (e.type == SDL_EVENT_QUIT)
+			quit = true;
+
+		//if (e.type == SDL_EVENT_WINDOW_RESIZED)
+		//{
+		//	int x{}, y{};
+		//	SDL_GetWindowSize(window->GetNativeWindow(), &x, &y);
+		//	graphics->Resize(glm::uvec2(x, y));
+		//}
+
+		const bool* key_states = SDL_GetKeyboardState(nullptr);
+
+		for (auto listener : listeners)
+		{
+			listener->UpdateInput(key_states);
+		}
+
+		if (key_states[SDL_SCANCODE_ESCAPE])
+		{
+			quit = true;
+		}
+
+		//if (e.window.type == SDL_EVENT_WINDOW_MINIMIZED) {
+		//	stop_rendering = true;
+		//}
+		//if (e.window.type == SDL_EVENT_WINDOW_RESTORED) {
+		//	stop_rendering = false;
+		//}
+
+		//ImGui_ImplSDL3_ProcessEvent(&e);
 	}
 
-	for (auto listener : listeners)
-	{
-		listener->UpdateInput(window);
-	}
+	//if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	//{
+	//	glfwSetWindowShouldClose(window, true);
+	//}
 
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
-		glfwSetWindowShouldClose(window, true);
-	}
+	//
+
+	//if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	//{
+	//	glfwSetWindowShouldClose(window, true);
+	//}
 }
 
 void InputHandler::AddListener(const std::shared_ptr<iInputListener> _listener)

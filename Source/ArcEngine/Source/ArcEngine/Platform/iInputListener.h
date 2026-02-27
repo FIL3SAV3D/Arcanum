@@ -5,5 +5,5 @@ struct GLFWwindow;
 class iInputListener
 {
 public:
-	virtual void UpdateInput(GLFWwindow* window) = 0;
+	virtual void UpdateInput(const bool* _KeyStates) = 0;
 };

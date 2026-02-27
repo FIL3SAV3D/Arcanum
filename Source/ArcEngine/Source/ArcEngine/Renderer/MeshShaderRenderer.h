@@ -5,9 +5,11 @@
 #include <memory>
 #include "ArcEngine/Asset/Types/ComputeShader.h"
 #include "ArcEngine/Asset/Types/MeshShader.h"
+#include <ArcEngine/Asset/Types/ClusterModel.h>
 
 class MeshShaderRenderer : public IRenderer
 {
+public:
     // Inherited via IRenderer
     void Create(std::shared_ptr<ArcEngine::Window> _Window) override;
     void Destroy() override;
@@ -17,6 +19,8 @@ class MeshShaderRenderer : public IRenderer
     void EndRender(const RenderParams& _RParams) const override;
     void Blit() const override;
     void Resize(std::shared_ptr<ArcEngine::Window> _Window) override;
+
+    void RenderClusterMesh(const RenderParams& _RParams, const ClusterModel& _Mesh, const int& _SubMeshIndex, const glm::mat4& objectToWorld);
 
     struct uniforms
     {

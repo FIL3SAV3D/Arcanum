@@ -61,7 +61,6 @@ IApplication::IApplication(const ApplicationSpecification& _Spec)
 	graphics->Create(ArcEngine::Graphics::OPENGL, window);
 
 	assetManager.Create(graphics, true);
-	assetManager.LoadAsset("Cube.fbx");
 
 	coordinator = std::make_shared<Coordinator>();
 
@@ -81,42 +80,43 @@ void IApplication::SetMode()
 
 void IApplication::Run()
 {
-	SDL_Event e;
+	inputHandler->ProcessInput();
+	//SDL_Event e;
 
-	while (SDL_PollEvent(&e) != 0) {
-		// close the window when user alt-f4s or clicks the X button
-		if (e.type == SDL_EVENT_QUIT)
-			bQuit = true;
+	//while (SDL_PollEvent(&e) != 0) {
+	//	// close the window when user alt-f4s or clicks the X button
+	//	if (e.type == SDL_EVENT_QUIT)
+	//		bQuit = true;
 
-		if (e.type == SDL_EVENT_WINDOW_RESIZED)
-		{
-			int x{}, y{};
-			SDL_GetWindowSize(window->GetNativeWindow(), &x, &y);
-			graphics->Resize(glm::uvec2(x, y));
-		}
+	//	if (e.type == SDL_EVENT_WINDOW_RESIZED)
+	//	{
+	//		int x{}, y{};
+	//		SDL_GetWindowSize(window->GetNativeWindow(), &x, &y);
+	//		graphics->Resize(glm::uvec2(x, y));
+	//	}
 
-		const bool* key_states = SDL_GetKeyboardState(nullptr);
+	//	const bool* key_states = SDL_GetKeyboardState(nullptr);
 
-		if (key_states[SDL_SCANCODE_ESCAPE])
-		{
-			bQuit = true;
-		}
+	//	if (key_states[SDL_SCANCODE_ESCAPE])
+	//	{
+	//		bQuit = true;
+	//	}
 
-		if (e.window.type == SDL_EVENT_WINDOW_MINIMIZED) {
-			stop_rendering = true;
-		}
-		if (e.window.type == SDL_EVENT_WINDOW_RESTORED) {
-			stop_rendering = false;
-		}
+	//	if (e.window.type == SDL_EVENT_WINDOW_MINIMIZED) {
+	//		stop_rendering = true;
+	//	}
+	//	if (e.window.type == SDL_EVENT_WINDOW_RESTORED) {
+	//		stop_rendering = false;
+	//	}
 
-		//ImGui_ImplSDL3_ProcessEvent(&e);
-	}
+	//	//ImGui_ImplSDL3_ProcessEvent(&e);
+	//}
 	//OnInput();
 
-	//clock->Update();
-	//const float deltaTime = clock->GetDeltaTime();
+	clock->Update();
+	const float deltaTime = clock->GetDeltaTime();
 
-	//OnUpdate(deltaTime);
+	OnUpdate(deltaTime);
 
 	//OnLateUpdate(deltaTime);
 
@@ -142,6 +142,8 @@ void IApplication::Run()
 	//ImGui::Render();
 
 	//graphics.RenderMesh();
+
+	SDL_GL_SwapWindow(window->GetNativeWindow());
 }
 
 #pragma region  IApplicationStart
@@ -151,7 +153,6 @@ void IApplication::OnCreate()
 {
 	coordinator->RegisterComponent<TransformComponent>();
 	coordinator->RegisterComponent<RenderComponent>();
-	//coordinator->RegisterComponent<RigidBodyComponent>();
 
 	////UI = std::static_pointer_cast<UIRenderSystem>(coordinator->RegisterSystem<UIRenderSystem, 10>(window));
 
@@ -174,14 +175,15 @@ void IApplication::OnCreate()
 
 	coordinator->OnCreate();
 
-	//auto m_cubeModel = assetManager.LoadAsset(std::string("Rat.glb").c_str());
+	auto cubeModel = assetManager.LoadAsset("Cube.fbx");
 
-	std::vector<Entity> entities(100);
+
+	std::vector<Entity> entities(1);
 
 	std::default_random_engine generator;
-	std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
+	std::uniform_real_distribution<float> randPosition(-1.0f, 1.0f);
 	std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
-	std::uniform_real_distribution<float> randScale(3.0f, 5.0f);
+	std::uniform_real_distribution<float> randScale(1.0f, 1.0f);
 	std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
 
 	float scale = randScale(generator);
@@ -202,14 +204,9 @@ void IApplication::OnCreate()
 				.transform = transform
 			});
 
-		coordinator->AddComponent(
-			entity,
-			RigidBodyComponent{}
-		);
-
 		RenderComponent renderComponent{};
 
-		//renderComponent.model = *std::static_pointer_cast<Model>(m_cubeModel);
+		renderComponent.model = *std::static_pointer_cast<ClusterModel>(cubeModel);
 
 		coordinator->AddComponent(
 			entity,

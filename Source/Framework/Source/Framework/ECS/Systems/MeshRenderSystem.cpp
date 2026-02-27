@@ -31,30 +31,27 @@ void MeshRenderSystem::OnUpdate(const float& _DeltaTime)
 
 void MeshRenderSystem::OnRender()
 {
-	RenderParams rParam
-	{
-		.camera = cam.get(),
-		.shader = nullptr
-	};
+    RenderParams rParam
+    {
+        .camera = cam.get(),
+        .shader = nullptr
+    };
 
-	m_Renderer->BeginRender(rParam);
+    m_Renderer->BeginRender(rParam);
 
-	for (auto const& entity : mEntities)
-	{
-		auto& renderComponent = coordinator->GetComponent<RenderComponent>(entity);
-		auto& transformComponent = coordinator->GetComponent<TransformComponent>(entity);
+    for (auto const& entity : mEntities)
+    {
+        auto& renderComponent = coordinator->GetComponent<RenderComponent>(entity);
+        auto& transformComponent = coordinator->GetComponent<TransformComponent>(entity);
 
-		glm::mat4& transform = transformComponent.transform;
+        glm::mat4& transform = transformComponent.transform;
 
-		for (auto& mesh : renderComponent.model.meshes)
-		{
-			m_Renderer->RenderMesh(rParam, mesh, 0, transform);
-			break;
-		}
-		break;
-	}
 
-	m_Renderer->EndRender(rParam);
+        m_Renderer->RenderClusterMesh(rParam, renderComponent.model, 0, transform);
+    }
+
+
+    m_Renderer->EndRender(rParam);
 }
 
 void MeshRenderSystem::OnResize(const glm::uvec2& _Size)

@@ -5,6 +5,7 @@
 
 #include "ArcEngine/Graphics/OpenGL-4.6/Camera.h"
 #include <ArcEngine/Platform/InputHandler.h>
+#include <ArcEngine/Renderer/MeshShaderRenderer.h>
 
 class MeshRenderSystem : public ISystem
 {
@@ -18,7 +19,7 @@ public:
 	void OnResize(const glm::uvec2& _Size) override;
 
 private:
-	std::shared_ptr<IRenderer> m_Renderer;
+	std::shared_ptr<MeshShaderRenderer> m_Renderer;
 	std::shared_ptr<Camera> cam;
 
 	std::shared_ptr<ArcEngine::Window> window;

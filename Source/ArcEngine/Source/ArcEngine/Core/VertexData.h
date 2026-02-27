@@ -6,8 +6,8 @@
 struct VertexData
 {
     glm::vec3 aPosition{};
-    glm::vec3 aNormal{};
-    glm::vec3 aTangent{};
-    glm::vec3 aBiTangent{};
-    glm::vec2 aTexCoords{};
+    //glm::vec3 aNormal{};
+    //glm::vec3 aTangent{};
+    //glm::vec3 aBiTangent{};
+    //glm::vec2 aTexCoords{};
 };

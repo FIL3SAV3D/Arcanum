@@ -17,11 +17,12 @@ public:
 	static void ScrollCallBackImpl(GLFWwindow* window, double xoffset, double yoffset) { /*std::cout << "SCROLLING" << std::endl;*/ };
 	static void KeyCallBackImpl(GLFWwindow* window, int key, int scancode, int action, int mods)		{ /*std::cout << "KEY INPUT" << std::endl;*/ };
 
-	void ProcessInput(GLFWwindow* window);
+	void ProcessInput();
 
 	void AddListener(const std::shared_ptr<iInputListener> _listener);
 	void RemoveListener(const std::shared_ptr<iInputListener> _listener);
 
 private:
+	bool quit = false;
 	std::vector<std::shared_ptr<iInputListener>> listeners = {};
 };

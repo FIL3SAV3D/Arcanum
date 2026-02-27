@@ -54,7 +54,7 @@ MeshShader::MeshShader(const char* _MeshShaderPath, const char* _FragPath)
     const char* cShaderCodeFrag = fragCode.c_str();
 
     unsigned int meshShader;
-    meshShader = glCreateShader(GL_MESH_SHADER_NV);
+    meshShader = glCreateShader(GL_MESH_SHADER_EXT);
     glShaderSource(meshShader, 1, &cShaderCodeMeshShader, NULL);
     glCompileShader(meshShader);
     CheckCompileErrors(meshShader, "MESH_SHADER");

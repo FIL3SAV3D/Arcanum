@@ -5,6 +5,7 @@
 
 #include "ArcEngine/Graphics/OpenGL-4.6/Shader.h"
 #include <glm/gtc/type_ptr.hpp>
+#include <SDL3/SDL_video.h>
 
 
 void MeshShaderRenderer::Create(std::shared_ptr<ArcEngine::Window> _Window)
@@ -12,15 +13,16 @@ void MeshShaderRenderer::Create(std::shared_ptr<ArcEngine::Window> _Window)
     screenQuad = std::make_unique<Shader>("Debug\\ScreenQuad.vert", "Debug\\ScreenQuad.frag");
 
     // texture size
-    computeShader = std::make_unique<ComputeShader>("D:\\PersonalProjects\\Arcanum\\Source\\Shaders\\Source\\Shaders\\Compute\\TestCompute.comp");
+    //computeShader = std::make_unique<ComputeShader>("D:\\PersonalProjects\\Arcanum\\Source\\Shaders\\Source\\Shaders\\Compute\\TestCompute.comp");
+    // 
     debugmeshShader = std::make_unique<MeshShader>(
-        "D:\\PersonalProjects\\Arcanum\\Source\\Shaders\\Source\\Shaders\\MeshShaders\\TriangleDebug.comp",
-        "D:\\PersonalProjects\\Arcanum\\Source\\Shaders\\Source\\Shaders\\MeshShaders\\TriangleDebug.frag"
+        "D:\\PersonalProjects\\Arcanum\\Source\\Shaders\\ShadersOpenGL\\Source\\Shaders\\MeshShaders\\TriangleDebug.comp",
+        "D:\\PersonalProjects\\Arcanum\\Source\\Shaders\\ShadersOpenGL\\Source\\Shaders\\MeshShaders\\TriangleDebug.frag"
         );
 
     meshShader = std::make_unique<MeshShader>(
-        "D:\\PersonalProjects\\Arcanum\\Source\\Shaders\\Source\\Shaders\\MeshShaders\\MeshletShader.comp",
-        "D:\\PersonalProjects\\Arcanum\\Source\\Shaders\\Source\\Shaders\\MeshShaders\\MeshletShader.frag"
+        "D:\\PersonalProjects\\Arcanum\\Source\\Shaders\\ShadersOpenGL\\Source\\Shaders\\MeshShaders\\MeshletShader.comp",
+        "D:\\PersonalProjects\\Arcanum\\Source\\Shaders\\ShadersOpenGL\\Source\\Shaders\\MeshShaders\\MeshletShader.frag"
     );
 
 
@@ -94,10 +96,10 @@ void MeshShaderRenderer::Create(std::shared_ptr<ArcEngine::Window> _Window)
     glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2, &data.z);
     std::printf("GL_MAX_COMPUTE_WORK_GROUP_SIZE: %i * %i * %i\n", data.x, data.y, data.z);
 
-    glGetIntegeri_v(GL_MAX_MESH_WORK_GROUP_SIZE_NV, 0, &data.x);
-    glGetIntegeri_v(GL_MAX_MESH_WORK_GROUP_SIZE_NV, 1, &data.y);
-    glGetIntegeri_v(GL_MAX_MESH_WORK_GROUP_SIZE_NV, 2, &data.z);
-    std::printf("GL_MAX_MESH_WORK_GROUP_SIZE_NV: %i * %i * %i\n", data.x, data.y, data.z);
+    glGetIntegeri_v(GL_MAX_MESH_WORK_GROUP_SIZE_EXT, 0, &data.x);
+    glGetIntegeri_v(GL_MAX_MESH_WORK_GROUP_SIZE_EXT, 1, &data.y);
+    glGetIntegeri_v(GL_MAX_MESH_WORK_GROUP_SIZE_EXT, 2, &data.z);
+    std::printf("GL_MAX_MESH_WORK_GROUP_SIZE_EXT: %i * %i * %i\n", data.x, data.y, data.z);
 
     glGetIntegerv(GL_MESH_VERTICES_OUT_NV, &x);
     std::printf("MAX Vert SIZE: %i\n", x);
@@ -148,41 +150,10 @@ void MeshShaderRenderer::RenderMesh(const RenderParams& _RParams, const Mesh& _M
     glDrawArrays(GL_TRIANGLES, 0, 6);*/
 
     
-    // Debug
-    debugmeshShader->use();
-    uint32_t num_workgroups = 3;
-    glDrawMeshTasksNV(0, num_workgroups);
 
-    //meshShader->use();
 
-    //uniforms uni;
-    //uni.projection = _RParams.camera->GetProjectionMatrix();
-    //uni.view = _RParams.camera->GetViewMatrix();
-    //uni.view = objectToWorld;
 
-    //glBindBuffer(GL_UNIFORM_BUFFER, ssbo);
-    //glBufferSubData(GL_UNIFORM_BUFFER, 0                    , sizeof(glm::mat4), glm::value_ptr(uni.projection));
-    //glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)    , sizeof(glm::mat4), glm::value_ptr(uni.view));
-    //glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(objectToWorld));
-    //glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSVerticesBuffer);
-    //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _Mesh.MSVerticesBuffer);
-    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSIndicesBuffer);
-    //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _Mesh.MSIndicesBuffer);
-    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSMeshletTrianglesBuffer);
-    //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _Mesh.MSMeshletTrianglesBuffer);
-    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MSMeshletBuffer);
-    //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, _Mesh.MSMeshletBuffer);
-    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    //glDrawMeshTasksNV(0, _Mesh.MSMeshletAmount);
+    
 }
 
 void MeshShaderRenderer::RenderMeshInstanced(const RenderParams& _RParams, const Mesh& _Mesh, const int& _SubMeshIndex, std::vector<glm::mat4> _InstanceData, const int& _InstanceCount)
@@ -219,4 +190,47 @@ void MeshShaderRenderer::Resize(std::shared_ptr<ArcEngine::Window> _Window)
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
+}
+
+void MeshShaderRenderer::RenderClusterMesh(const RenderParams& _RParams, const ClusterModel& _Mesh, const int& _SubMeshIndex, const glm::mat4& objectToWorld)
+{
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+    glDepthMask(GL_TRUE);
+
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+
+    //// Debug
+    //debugmeshShader->use();
+    //uint32_t num_workgroups = 3;
+    //glDrawMeshTasksNV(0, num_workgroups);
+
+
+    meshShader->use();
+
+    meshShader->setMat4("projection", _RParams.camera->GetProjectionMatrix());
+    meshShader->setMat4("view", _RParams.camera->GetViewMatrix());
+    meshShader->setMat4("model", objectToWorld);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.VBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, _Mesh.VBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _Mesh.MBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MVBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _Mesh.MVBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _Mesh.MTBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _Mesh.MTBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glDrawMeshTasksNV(0, _Mesh.meshletCount);
+
+
 }

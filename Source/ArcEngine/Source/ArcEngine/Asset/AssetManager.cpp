@@ -27,6 +27,8 @@ namespace ArcEngine
         graphicsAPI = _GraphicsAPI;
         m_MeshShading = _MeshShading;
 
+        m_MeshletFactory = std::make_unique<MeshletFactory>();
+
         m_AssetFolderFilePath = Filepath::FindAssetFolder();
         m_SerializedAssetFolderFilePath = std::string(m_AssetFolderFilePath).append("\\SerializedAssets");
         //DeserializeAssets();
@@ -56,78 +58,6 @@ namespace ArcEngine
         }
 
         return scene;
-    }
-
-    void AssetManager::ProcessNode(aiNode* _Node, const aiScene* _Scene)
-    {
-        // process all the node's meshes (if any)
-        for (unsigned int i = 0; i < _Node->mNumMeshes; i++)
-        {
-            aiMesh* mesh = _Scene->mMeshes[_Node->mMeshes[i]];
-            ProcessMesh(mesh, _Scene);
-        }
-
-        // then do the same for each of its children
-        for (unsigned int i = 0; i < _Node->mNumChildren; i++)
-        {
-            ProcessNode(_Node->mChildren[i], _Scene);
-        }
-    }
-
-    void AssetManager::ProcessMesh(aiMesh* _mesh, const aiScene* _scene)
-    {
-        std::vector<VertexData> vertices;
-        std::vector<unsigned int> indices;
-
-        for (unsigned int i = 0; i < _mesh->mNumVertices; i++)
-        {
-            VertexData vertex;
-            glm::vec3 vector;
-
-            vector.x = _mesh->mVertices[i].x;
-            vector.y = _mesh->mVertices[i].y;
-            vector.z = _mesh->mVertices[i].z;
-            vertex.aPosition = vector;
-
-            vector.x = _mesh->mNormals[i].x;
-            vector.y = _mesh->mNormals[i].y;
-            vector.z = _mesh->mNormals[i].z;
-            vertex.aNormal = vector;
-
-            vector.x = _mesh->mTangents[i].x;
-            vector.y = _mesh->mTangents[i].y;
-            vector.z = _mesh->mTangents[i].z;
-            vertex.aTangent = vector;
-
-            vector.x = _mesh->mBitangents[i].x;
-            vector.y = _mesh->mBitangents[i].y;
-            vector.z = _mesh->mBitangents[i].z;
-            vertex.aBiTangent = vector;
-
-            if (_mesh->mTextureCoords[0])
-            {
-                glm::vec2 vec;
-                vec.x = _mesh->mTextureCoords[0][i].x;
-                vec.y = _mesh->mTextureCoords[0][i].y;
-                vertex.aTexCoords = vec;
-            }
-            else
-                vertex.aTexCoords = glm::vec2(0.0f, 0.0f);
-
-            vertices.push_back(vertex);
-
-        }
-
-        unsigned int itr = 0;
-        // process indices
-        for (unsigned int i = 0; i < _mesh->mNumFaces; i++)
-        {
-            aiFace face = _mesh->mFaces[i];
-            for (unsigned int j = 0; j < face.mNumIndices; j++)
-            {
-                indices.push_back(face.mIndices[j]);
-            }
-        }
     }
 
     void AssetManager::CreateAsset(const std::filesystem::path& _AssetPath)
@@ -199,7 +129,9 @@ namespace ArcEngine
         case MODEL:
         {
             const aiScene* scene = ImportObject(assetPath);
-            ProcessNode(scene->mRootNode, scene);
+            auto asset = m_MeshletFactory->CreateAsset(graphicsAPI, scene);
+            asset->assetPath = assetPath.string();
+            return asset;
         }
         case TEXTURE:
         {

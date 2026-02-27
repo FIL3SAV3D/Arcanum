@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ArcEngine/Asset/Interface/IAssimpFactory.h"
+#include "ArcEngine/Core/VertexData.h"
 
 struct ClusterModel;
 
@@ -18,5 +19,8 @@ namespace ArcEngine
     private:
         void ProcessNode(aiNode* _Node, const aiScene* _Scene, std::shared_ptr<ClusterModel> _ClusterModel);
         void ProcessMesh(aiMesh* _mesh, const aiScene* _scene, std::shared_ptr<ClusterModel> _ClusterModel);
+
+        std::vector<VertexData> GenerateRemapedVertexBuffer(const void* vertices, size_t vertex_count, size_t vertex_size, const unsigned int* remap);
+        std::vector<unsigned int> GenerateRemapedIndexBuffer(const unsigned int* indices, size_t index_count, const unsigned int* remap);
     };
 }

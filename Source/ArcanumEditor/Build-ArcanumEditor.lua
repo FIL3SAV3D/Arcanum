@@ -66,6 +66,7 @@ project "ArcanumEditor"
        { 
         "../../Library/fmt/lib/fmtd.lib",
         "../../Library/Assimp/lib/assimp-vc143-mtd.lib",
+        "../../Library/Assimp/lib/zlibstaticd.lib"
        }
 
     filter "configurations:Release"
@@ -78,6 +79,7 @@ project "ArcanumEditor"
        { 
         "../../Library/fmt/lib/fmt.lib",
         "../../Library/Assimp/lib/assimp-vc143-mt.lib",
+        "../../Library/Assimp/lib/zlibstatic.lib"
         }
 
     filter "configurations:Dist"
