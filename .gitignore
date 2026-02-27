@@ -8,8 +8,7 @@ x64/
 bin/
 obj/
 
-Build/Intermediates
-Build/windows-x86_64-Debug
+Build/Intermediates/
 
 # Prerequisites
 *.d
@@ -48,3 +47,5 @@ Build/windows-x86_64-Debug
 # Ignore volatile UI-related state
 ArcanumRoadMap/.obsidian/workspace.json
 ArcanumRoadMap/.obsidian/app.json
+
+Build/windows-x86_64-Debug
