@@ -1,9 +1,6 @@
-[submodule "Source/ThirdParty/DearImGUI"]
-	path = Source/ThirdParty/DearImGUI
+[submodule "Source/RES_ThirdParty/DearImGUI"]
+	path = Source/RES_ThirdParty/DearImGUI
 	url = https://github.com/ocornut/imgui.git
-[submodule "Source/ThirdParty/JoltPhysics-Arcanum"]
-	path = Source/ThirdParty/JoltPhysics-Arcanum
+[submodule "Source/RES_ThirdParty/JoltPhysics-Arcanum"]
+	path = Source/RES_ThirdParty/JoltPhysics-Arcanum
 	url = https://github.com/FIL3SAV3D/JoltPhysics-Arcanum.git
-[submodule "Source/ThirdParty/SDL"]
-	path = Source/ThirdParty/SDL
-	url = https://github.com/libsdl-org/SDL.git

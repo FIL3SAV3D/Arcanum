@@ -1,5 +1,7 @@
 VULKAN_SDK = os.getenv("VULKAN_SDK")
 
+StaticLinking = "off";
+
 workspace "Arcanum"
    architecture "x64"
    configurations { "Debug", "Release", "Dist" }
@@ -12,29 +14,34 @@ workspace "Arcanum"
 OutputDir = "%{cfg.system}-%{cfg.architecture}-%{cfg.buildcfg}"
 BuildDir = "../../Build/"
 
-group "EntryPoints"
-	include "Source/ArcanumEditor/Build-ArcanumEditor.lua"
-	include "Source/Standalone/Build-Standalone.lua"
+group "00_EntryPoints"
+	include "Source/00_Arcanum/Build-Arcanum.lua"
+	include "Source/00_StandaloneGame/Build-StandaloneGame.lua"
 group ""
 
-group "Game"
-	include "Source/Game/Build-Game.lua"
+group "01_Editor"
+	include "Source/01_Editor/Build-Editor.lua"
 group ""
 
-group "Framework"
-	include "Source/Framework/Build-Framework.lua"
+group "01_Game"
+	include "Source/01_Game/Build-Game.lua"
 group ""
 
-group "ArcEngine"
-	include "Source/ArcEngine/Build-ArcEngine.lua"
+group "02_Framework"
+	include "Source/02_Framework/Build-Framework.lua"
 group ""
 
-group "ThirdParty"
-	include "Source/ThirdParty/Build-JoltPhysics.lua"
-	include "Source/ThirdParty/Build-DearImGUI.lua"
+group "03_ArcEngine"
+	include "Source/03_ArcEngine/Build-ArcEngine.lua"
 group ""
 
-group "Shaders"
-	include "Source/Shaders/ShadersOpenGL/Build-ShadersOpenGL.lua"
-	include "Source/Shaders/ShadersVulkan/Build-ShadersVulkan.lua"
+group "RES_Shaders"
+	include "Source/RES_Shaders/ShadersOpenGL/Build-ShadersOpenGL.lua"
+	include "Source/RES_Shaders/ShadersVulkan/Build-ShadersVulkan.lua"
 group ""
+
+group "RES_ThirdParty"
+	include "Source/RES_ThirdParty/Build-JoltPhysics.lua"
+	include "Source/RES_ThirdParty/Build-DearImGUI.lua"
+group ""
+
