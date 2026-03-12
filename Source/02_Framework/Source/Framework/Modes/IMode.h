@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
+class Coordinator;
 
 class IMode
 {
@@ -9,5 +9,9 @@ public:
 	~IMode() = default;
 
 public:
-	virtual void RegisterSystems() {};
+	virtual void Create (Coordinator& _Coordinator)  = 0;
+	virtual void Destroy(Coordinator& _Coordinator) = 0;
+
+	virtual void RegisterSystems  (Coordinator& _Coordinator) {};
+	virtual void UnregisterSystems(const Coordinator& _Coordinator) {};
 };

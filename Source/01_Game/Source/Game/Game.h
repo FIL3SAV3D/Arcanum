@@ -18,7 +18,7 @@ public:
 
     void OnExit();
 
-    bool IsQuitting() { return false; };
+    bool IsQuitting() { return m_Framework->IsQuitting(); };
 
 protected:
     void SetFramework(const std::shared_ptr<Framework> _Framework);

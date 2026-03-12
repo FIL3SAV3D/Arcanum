@@ -8,137 +8,133 @@
 
 #include "ArcEngine/Renderer/IRenderer.h"
 
-class Coordinator : public std::enable_shared_from_this<Coordinator>
+class Coordinator
 {
 public:
-    Coordinator()
+    Coordinator()  = default;
+    ~Coordinator() = default;
+
+    void Create()
     {
-        mEntityManager    = std::make_unique<EntityManager>();
-        mComponentManager = std::make_unique<ComponentManager>();
-        m_SystemManager    = std::make_unique<SystemManager>();
+        m_EntityManager.Create();
     }
-    ~Coordinator()
+    void Destroy()
     {
-        mEntityManager.reset();
-        mComponentManager.reset();
-        m_SystemManager.reset();
+        m_EntityManager.Destroy();
     }
 
     // Entity methods
     Entity CreateEntity()
     {
-        return mEntityManager->CreateEntity();
+        return m_EntityManager.CreateEntity();
     }
 
     void DestroyEntity(Entity entity)
     {
-        mEntityManager->DestroyEntity(entity);
+        m_EntityManager.DestroyEntity(entity);
 
-        mComponentManager->EntityDestroyed(entity);
+        m_ComponentManager.EntityDestroyed(entity);
 
-        m_SystemManager->EntityDestroyed(entity);
+        m_SystemManager.EntityDestroyed(entity);
     }
 
     // Component methods
     template<typename T>
     void RegisterComponent()
     {
-        mComponentManager->RegisterComponent<T>();
+        m_ComponentManager.RegisterComponent<T>();
     }
 
     template<typename T>
     void AddComponent(Entity entity, T component)
     {
-        mComponentManager->AddComponent<T>(entity, component);
+        m_ComponentManager.AddComponent<T>(entity, component);
 
-        auto signature = mEntityManager->GetSignature(entity);
-        signature.set(mComponentManager->GetComponentType<T>(), true);
-        mEntityManager->SetSignature(entity, signature);
+        auto signature = m_EntityManager.GetSignature(entity);
+        signature.set(m_ComponentManager.GetComponentType<T>(), true);
+        m_EntityManager.SetSignature(entity, signature);
 
-        m_SystemManager->EntitySignatureChanged(entity, signature);
+        m_SystemManager.EntitySignatureChanged(entity, signature);
     }
 
     template<typename T>
     void RemoveComponent(Entity entity)
     {
-        mComponentManager->RemoveComponent<T>(entity);
+        m_ComponentManager.RemoveComponent<T>(entity);
 
-        auto signature = mEntityManager->GetSignature(entity);
-        signature.set(mComponentManager->GetComponentType<T>(), false);
-        mEntityManager->SetSignature(entity, signature);
+        auto signature = m_EntityManager.GetSignature(entity);
+        signature.set(m_ComponentManager.GetComponentType<T>(), false);
+        m_EntityManager.SetSignature(entity, signature);
 
-        m_SystemManager->EntitySignatureChanged(entity, signature);
+        m_SystemManager.EntitySignatureChanged(entity, signature);
     }
 
     template<typename T>
     T& GetComponent(Entity entity)
     {
-        return mComponentManager->GetComponent<T>(entity);
+        return m_ComponentManager.GetComponent<T>(entity);
     }
 
     template<typename T>
     ComponentType GetComponentType()
     {
-        return mComponentManager->GetComponentType<T>();
+        return m_ComponentManager.GetComponentType<T>();
     }
 
     template<typename T>
     bool HasComponent(Entity entity)
     {
-        return mComponentManager->HasComponent<T>(entity);
+        return m_ComponentManager.HasComponent<T>(entity);
     }
 
     // System methods
     template<typename T, const int priority, typename... Args >
     std::shared_ptr<ISystem> RegisterSystem(Args ..._args)
     {
-        return std::static_pointer_cast<ISystem>(m_SystemManager->RegisterSystem<T, priority, Args... >(shared_from_this(), _args...));
+        return std::static_pointer_cast<ISystem>(m_SystemManager.RegisterSystem<T, priority, Args... >(m_ComponentManager, _args...));
     }
 
     template<typename T>
     void SetSystemSignature(Signature signature)
     {
-        m_SystemManager->SetSignature<T>(signature);
+        m_SystemManager.SetSignature<T>(signature);
     }
 
 public:
-    const void OnCreate() const { m_SystemManager->OnCreate(); }
-    const void OnStart() const { m_SystemManager->OnStart(); }
-    const void OnInput(std::shared_ptr<ArcEngine::Window> _Window) const { m_SystemManager->OnInput(_Window); }
-    void OnUpdate(const float& _DeltaTime)
+    void OnCreate(State& _State) { m_SystemManager.OnCreate(_State); }
+    void OnStart(State& _State) { m_SystemManager.OnStart(_State); }
+    void OnInput(std::shared_ptr<ArcEngine::Window> _Window) { m_SystemManager.OnInput(_Window); }
+
+    void OnUpdate(State& _State, const float& _DeltaTime) { m_SystemManager.OnUpdate(_State, _DeltaTime); };
+
+    void OnLateUpdate(State& _State, const float& _DeltaTime)
     {
-        m_SystemManager->OnUpdate(_DeltaTime);
-    }
-    void OnLateUpdate(const float& _DeltaTime)
-    {
-        m_SystemManager->OnLateUpdate(_DeltaTime);
+        m_SystemManager.OnLateUpdate(_State, _DeltaTime);
     }
 
-    const void OnBeginRender(const RenderParams& _RenderParams) const {  };
-    const void OnRender     () const { m_SystemManager->OnRender(); };
-    const void OnEndRender  (const RenderParams& _RenderParams) const {  };
+    void OnRender (State& _State) { m_SystemManager.OnRender(_State); }
 
     void OnRenderUI(const RenderParams& _RenderParams)
     {
-        m_SystemManager->OnRenderUI(_RenderParams);
+        m_SystemManager.OnRenderUI(_RenderParams);
     }
 
     void OnApplicationPause()
     {
-        m_SystemManager->OnApplicationPause();
+        m_SystemManager.OnApplicationPause();
     }
     void OnCheckForDisabled()
     {
-        m_SystemManager->OnApplicationPause();
+        m_SystemManager.OnApplicationPause();
     }
 
     void OnResize(const glm::uvec2& _Size)
     {
-        m_SystemManager->OnResize(_Size);
+        m_SystemManager.OnResize(_Size);
     }
 
 public:
-    std::unique_ptr<ComponentManager> mComponentManager;
-    std::unique_ptr<EntityManager> mEntityManager;
-    std::unique_ptr<SystemManager> m_SystemManager;
+    ComponentManager m_ComponentManager;
+    EntityManager    m_EntityManager;
+    SystemManager    m_SystemManager;
 };

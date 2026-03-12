@@ -17,7 +17,7 @@ class SystemManager
 {
 public:
 	template<typename T, const int priority, typename ...Args>
-	std::shared_ptr<ISystem> RegisterSystem(std::shared_ptr<Coordinator> _Coordinator, Args ..._args)
+	std::shared_ptr<ISystem> RegisterSystem(ComponentManager& _ComponentManager, Args ..._args)
 	{
 		const char* typeName = typeid(T).name();
 
@@ -25,10 +25,17 @@ public:
 
 		// Create a pointer to the system and return it so it can be used externally
 		std::shared_ptr<ISystem> system = std::static_pointer_cast<ISystem>(std::make_shared<T>(_args...));
-		system->coordinator = _Coordinator;
 		mSystems.insert({ typeName, system });
 
 		mUpdateOrderHolder[priority] = system;
+
+		SignatureParameters params{
+		.componentManager = _ComponentManager,
+		};
+		system->GetSignature(params);
+		SetSignature<T>(params.signature);
+
+		RecalculateUpdateOrder();
 
 		return system;
 	}
@@ -88,19 +95,19 @@ public:
 		}
 	}
 
-	void OnCreate()
+	void OnCreate(State& _State)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnCreate();
+			system->OnCreate(_State);
 		}
 	}
 
-	void OnStart()
+	void OnStart(State& _State)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnStart();
+			system->OnStart(_State);
 		}
 	}
 
@@ -112,27 +119,27 @@ public:
 		}
 	}
 
-	void OnUpdate(const float& _DeltaTime)
+	void OnUpdate(State& _State, const float& _DeltaTime)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnUpdate(_DeltaTime);
+			system->OnUpdate(_State, _DeltaTime);
 		}
 	}
 
-	void OnLateUpdate(const float& _DeltaTime)
+	void OnLateUpdate(State& _State, const float& _DeltaTime)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnLateUpdate(_DeltaTime);
+			system->OnLateUpdate(_State, _DeltaTime);
 		}
 	}
 
-	void OnRender()
+	void OnRender(State& _State)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnRender();
+			system->OnRender(_State);
 		}
 	}
 
@@ -146,25 +153,17 @@ public:
 
 	void OnApplicationPause()
 	{
-		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
-		{
-			system->OnApplicationPause();
-		}
 	}
 
 	void OnCheckForDisabled()
 	{
-		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
-		{
-			system->OnCheckForDisabled();
-		}
 	}
 
-	void OnDestroy()
+	void OnDestroy(State& _State)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnDestroy();
+			system->OnDestroy(_State);
 		}
 	}
 

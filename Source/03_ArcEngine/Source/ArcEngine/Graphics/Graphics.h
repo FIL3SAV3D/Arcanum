@@ -21,12 +21,16 @@ namespace ArcEngine
         };
 
     public:
-        void Create(const GraphicsAPI& _graphicsAPI, std::shared_ptr<Window> _window);
+        void Create(const GraphicsAPI& _GraphicsAPI, const Window& _Window);
         void Destroy();
+
+        void FrameStart(const Window& _Window);
+        void FrameEnd  (const Window& _Window);
+
         void Resize(const glm::uvec2& _Size);
 
         void Blit();
-        void RenderMesh();
+        void RenderMesh(const Model& _Model, const glm::mat4x4& _ObjectToWorld);
         void RenderMeshInstanced();
         void RenderMeshIndirect();
 

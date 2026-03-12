@@ -14,6 +14,9 @@ void Game::Create()
 void Game::OnEnter()
 {
     m_Framework->RegisterMode<TemplateMode01>("TemplateMode01");
+    m_Framework->SwitchMode("TemplateMode01");
+
+    m_Framework->Start();
 }
 
 void Game::Run()

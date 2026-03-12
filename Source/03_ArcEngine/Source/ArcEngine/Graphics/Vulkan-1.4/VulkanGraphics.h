@@ -58,12 +58,16 @@ namespace ArcEngine
 		void Testing();
 		void TestingRender();
 
-        void Create(std::shared_ptr<Window> _window) override;
+        void Create(const Window& _Window) override;
         void Destroy() override;
+
+		void FrameStart(const Window& _Window) override;
+		void FrameEnd(const Window& _Window) override;
+
 		void Resize(const glm::uvec2& _Size) override;
 
         void Blit() override;
-        void RenderMesh() override;
+        void RenderMesh(const Model& _Model, const glm::mat4x4& _ObjectToWorld) override;
 		void draw_background(VkCommandBuffer cmd);
         void RenderMeshInstanced() override;
         void RenderMeshIndirect() override;

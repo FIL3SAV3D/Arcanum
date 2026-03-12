@@ -3,18 +3,15 @@
 #include <ArcEngine/ArcEngine.h>
 
 #include "Framework/Managers/ModeManager.h"
+#include "Framework/Managers/AssetManager.h"
 #include "Framework/ECS/Coordinator.h"
 
 #include <zpp_bits.h>
 #include <memory>
+#include <ArcEngine/Util/Clock.h>
 
 struct ApplicationSpecification
 {
-	//constexpr static auto serialize(auto& archive, auto& self)
-	//{
-	//	return archive(self.name, self.windowSizeX, self.windowSizeY, self.fullscreen);
-	//}
-
 	std::string name{};
 	int windowSizeX{};
 	int windowSizeY{};
@@ -35,16 +32,21 @@ public:
 	template<typename T>
 	void RegisterMode(const std::string& _Name)
 	{
-		modeManger.RegisterMode<T>(_Name, coordinator);
+		modeManger.RegisterMode<T>(_Name, m_ECSCoordinator);
 	}
 
-	void SetMode();
+	void SwitchMode(const std::string& _Name)
+	{
+		modeManger.SwitchMode(_Name, m_ECSCoordinator);
+	}
+
+	void Start();
 
 	void Run();
 
 	bool IsQuitting();
 
-public:
+private:
 	// Application Being Created
 	void OnCreate();
 	// Before Application First Run
@@ -54,10 +56,11 @@ public:
 
 	// Update
 	void OnInput();
-	void OnUpdate(const float& _DeltaTime);
+	void OnUpdate(State& _State, const float& _DeltaTime);
 	void OnLateUpdate(const float& _DeltaTime);
-	void OnRender();
-	void OnRenderUI();
+
+	void OnRender(State& _State);
+
 	void OnApplicationPause();
 	void OnCheckForDisabled();
 
@@ -71,14 +74,9 @@ public:
 	bool stop_rendering = false;
 private:
 	ModeManager modeManger;
-	ArcEngine::ArcEngine m_ArcEngine;
+	Coordinator m_ECSCoordinator;
+	AssetManager m_AssetManager;
+	Clock clock;
 
-	Coordinator coordinator;
-
-	//std::shared_ptr<InputHandler> inputHandler;
-
-	//std::unique_ptr<Clock> clock;
-
-	//std::weak_ptr<UIRenderSystem> UI;
-
+	ArcEngine::ArcEngine    m_ArcEngine;
 };

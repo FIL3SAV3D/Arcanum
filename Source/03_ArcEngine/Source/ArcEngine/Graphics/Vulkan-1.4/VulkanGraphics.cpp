@@ -29,7 +29,7 @@ void ArcEngine::VulkanGraphics::TestingRender()
     
 }
 
-void ArcEngine::VulkanGraphics::Create(std::shared_ptr<Window> _window)
+void ArcEngine::VulkanGraphics::Create(const Window& _window)
 {
     Testing();
 
@@ -216,6 +216,14 @@ void ArcEngine::VulkanGraphics::Destroy()
     vkDestroyInstance(_instance, nullptr);
 }
 
+void ArcEngine::VulkanGraphics::FrameStart(const Window& _Window)
+{
+}
+
+void ArcEngine::VulkanGraphics::FrameEnd(const Window& _Window)
+{
+}
+
 void ArcEngine::VulkanGraphics::Resize(const glm::uvec2& _Size)
 {
 }
@@ -326,7 +334,7 @@ void ArcEngine::VulkanGraphics::Blit()
 {
 }
 
-void ArcEngine::VulkanGraphics::RenderMesh()
+void ArcEngine::VulkanGraphics::RenderMesh(const Model& _Model, const glm::mat4x4& _ObjectToWorld)
 {
     // wait until the gpu has finished rendering the last frame. Timeout of 1
     // second

@@ -16,7 +16,7 @@ Clock::~Clock()
 void Clock::Update()
 {
 	m_CurrentTime = SDL_GetPerformanceCounter();
-	m_DeltaTime = (double)((m_CurrentTime - m_LastTime) * 1000 / (double)SDL_GetPerformanceFrequency());
+	m_DeltaTime = ((double)m_CurrentTime - (double)m_LastTime) / (double)SDL_GetPerformanceFrequency();
 	m_DeltaTime = m_DeltaTime * 0.001;
 	m_LastTime = m_CurrentTime;
 }

@@ -19,9 +19,9 @@ public:
 	UIRenderSystem(std::shared_ptr<ArcEngine::Window> _window);
 	~UIRenderSystem();
 
-	void OnCreate() override;
+	void OnCreate();
 	void OnRenderUI(const RenderParams& _RenderParams) override;
-	void OnDestroy() override;
+	void OnDestroy();
 
 	glm::vec4 clear_color{ 0.1f, 0.1f, 0.1f, 1.0f };
 private:

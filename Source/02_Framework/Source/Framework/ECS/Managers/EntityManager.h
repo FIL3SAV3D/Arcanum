@@ -9,20 +9,41 @@
 class EntityManager
 {
 public:
-	EntityManager()
+	EntityManager()  = default;
+	~EntityManager() = default;
+
+protected:
+	void Create()
 	{
+		m_AliveEntities.resize(MAX_ENTITIES);
+
 		for (Entity entity = 0; entity < MAX_ENTITIES; ++entity)
 		{
-			mAvailableEntities.push(entity);
+			m_AvailableEntities.push(entity);
 		}
 	}
 
+	void Destroy()
+	{
+		size_t size = m_AliveEntities.size();
+		for (size_t i = 0; i < size; i++)
+		{
+			Entity entity = m_AliveEntities.at(i);
+			DestroyEntity(entity);
+		}
+	}
+
+	friend class Coordinator;
+
+public:
 	Entity CreateEntity()
 	{
 		assert(mLivingEntityCount < MAX_ENTITIES && "Too many entities in existance");
 
-		Entity id = mAvailableEntities.front();
-		mAvailableEntities.pop();
+		Entity id = m_AvailableEntities.front();
+		m_AvailableEntities.pop();
+
+		
 		++mLivingEntityCount;
 
 		return id;
@@ -34,7 +55,7 @@ public:
 
 		mSignatures[entity].reset();
 
-		mAvailableEntities.push(entity);
+		m_AvailableEntities.push(entity);
 		--mLivingEntityCount;
 	}
 
@@ -53,7 +74,9 @@ public:
 	}
 
 private:
-	std::queue<Entity> mAvailableEntities{};
+	std::queue<Entity> m_AvailableEntities{};
+
+	std::vector<Entity> m_AliveEntities{};
 
 	std::array<Signature, MAX_ENTITIES> mSignatures{};
 

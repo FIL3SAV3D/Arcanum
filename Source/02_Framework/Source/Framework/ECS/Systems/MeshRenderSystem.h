@@ -12,9 +12,9 @@ class MeshRenderSystem : public ISystem
 public:
 	MeshRenderSystem(std::shared_ptr<InputHandler> _InputHandler, std::shared_ptr<ArcEngine::Window> _Window);
 
-	void OnCreate() override;
-	void OnUpdate(const float& _DeltaTime) override;
-	void OnRender() override;
+	void OnCreate();
+	//void OnUpdate(const float& _DeltaTime) override;
+	//void OnRender() override;
 
 	void OnResize(const glm::uvec2& _Size) override;
 

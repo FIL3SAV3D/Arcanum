@@ -7,6 +7,8 @@
 #include "Framework/ECS/Data/ECSTypeInfo.h"
 #include "Framework/ECS/Data/ComponentArray.h"
 
+#include "fmt/core.h"
+
 class ComponentManager
 {
 public:
@@ -15,7 +17,13 @@ public:
 	{
 		const char* typeName = typeid(T).name();
 
-		assert(mComponentTypes.find(typeName) == mComponentTypes.end() && "Registering component type more than once.");
+		if (mComponentTypes.find(typeName) != mComponentTypes.end())
+		{
+			fmt::println("Component {}: Already Registered; Skipping", typeName);
+			return;
+		}
+
+		fmt::println("Component {}: Registering Component ", typeName);
 
 		mComponentTypes.insert({ typeName, mNextComponentType });
 
@@ -29,7 +37,11 @@ public:
 	{
 		const char* typeName = typeid(T).name();
 
-		assert(mComponentTypes.find(typeName) != mComponentTypes.end() && "Component not registered before use.");
+		if (mComponentTypes.find(typeName) == mComponentTypes.end())
+		{
+			fmt::println("Component {}: Not Registered", typeName);
+			RegisterComponent<T>();
+		}
 
 		return mComponentTypes[typeName];
 	}

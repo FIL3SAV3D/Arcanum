@@ -29,14 +29,17 @@ bool ArcEngine::Window::Create(const WindowSpecification& _Specification)
     }
     case OPENGL:
     {
+        const char* glsl_version = "#version 460";
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-        window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+        window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY);
 
         SDL_GL_LoadLibrary(NULL);
         break;
@@ -45,10 +48,12 @@ bool ArcEngine::Window::Create(const WindowSpecification& _Specification)
         break;
     }
 
+    float main_scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+
     window = SDL_CreateWindow(
         _windowName.c_str(),
-        _windowExtent.x,
-        _windowExtent.y,
+        _windowExtent.x * main_scale,
+        _windowExtent.y * main_scale,
         window_flags);
 
     windowExtent = _windowExtent;

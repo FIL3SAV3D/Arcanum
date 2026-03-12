@@ -10,33 +10,56 @@
 #include "ArcEngine/Platform/Window.h"
 
 class Coordinator;
+class ComponentManager;
+
+namespace ArcEngine
+{
+    class ArcEngine;
+}
+
+enum UpdatePriorities
+{
+    BEGIN_UPDATE = 0,
+    UPDATE = 100,
+    LATE_UPDATE = 200,
+    END_UPDATE = 300,
+};
+
+struct SignatureParameters
+{
+    Signature signature{};
+    ComponentManager& componentManager;
+};
+
+struct State
+{
+    Coordinator& coordinator;
+    ArcEngine::ArcEngine& engine;
+};
 
 class ISystem
 {
 public:
-    virtual void OnCreate          ()                                     {};
-    virtual void OnStart() {};
-    virtual void OnInput           (std::shared_ptr<ArcEngine::Window> _Window)      {};
-    virtual void OnUpdate          (const float& _DeltaTime)              {};
-    virtual void OnLateUpdate      (const float& _DeltaTime)              {};
+    virtual void GetSignature(SignatureParameters& _Parameters) = 0;
 
-    virtual void OnBeginRender     (const RenderParams& _RenderParams) {};
-    virtual void OnRender          () {};
-    virtual void OnEndRender       (const RenderParams& _RenderParams) {};
+public:
+    virtual void OnCreate       (State& _State)                              {};
+    virtual void OnDestroy      (State& _State)                              {};
 
-    virtual void OnBeginRenderUI   (const RenderParams& _RenderParams) {};
+    virtual void OnStart        (State& _State)                              {};
+    virtual void OnEnd          (State& _State)                              {};
+
+    virtual void OnInput           (std::shared_ptr<ArcEngine::Window> _Window) {};
+
+    virtual void OnUpdate          (State& _State, const float& _DeltaTime)     {};
+    virtual void OnLateUpdate      (State& _State, const float& _DeltaTime)     {};
+
+    virtual void OnRender          (State& _State) {};
     virtual void OnRenderUI        (const RenderParams& _RenderParams) {};
-    virtual void OnEndRenderUI   (const RenderParams& _RenderParams) {};
 
-    virtual void OnApplicationPause()                                     {};
-    virtual void OnCheckForDisabled()                                     {};
-    virtual void OnQuit() {};
-    virtual void OnDestroy         ()                                     {};
 
     virtual void OnResize(const glm::uvec2& _Size) {};
 
 public:
     std::set<Entity> mEntities{};
-
-    std::shared_ptr<Coordinator> coordinator;
 };

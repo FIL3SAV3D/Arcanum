@@ -68,10 +68,10 @@ void ShaderTemplate::CreateShader(const char* _vertexShaderPath, const char* _fr
 {
 
 	std::string shaderSearchPath;
-	shaderSearchPath.append("D:\\PersonalProjects");
-	shaderSearchPath.append("\\Arcanum");
-	shaderSearchPath.append("\\Source\\Shaders");
-	shaderSearchPath.append("\\Source\\Shaders\\");
+	//shaderSearchPath.append("D:\\PersonalProjects");
+	//shaderSearchPath.append("\\Arcanum");
+	//shaderSearchPath.append("\\Source\\Shaders");
+	//shaderSearchPath.append("\\Source\\Shaders\\");
 
 	ID = glCreateProgram();
 

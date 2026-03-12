@@ -6,10 +6,11 @@
 #include "ArcEngine/Graphics/Interface/IGraphics.h"
 
 #include <cassert>
+#include <ArcEngine/Asset/Types/Model.h>
 
-void ArcEngine::Graphics::Create(const GraphicsAPI& _graphicsAPI, std::shared_ptr<Window> _window)
+void ArcEngine::Graphics::Create(const GraphicsAPI& _GraphicsAPI, const Window& _Window)
 {
-    switch (_graphicsAPI)
+    switch (_GraphicsAPI)
     {
     case Graphics::VULKAN:
     {
@@ -28,7 +29,7 @@ void ArcEngine::Graphics::Create(const GraphicsAPI& _graphicsAPI, std::shared_pt
     }
     }
 
-    graphics->Create(_window);
+    graphics->Create(_Window);
 }
 
 void ArcEngine::Graphics::Destroy()
@@ -36,6 +37,16 @@ void ArcEngine::Graphics::Destroy()
     graphics->Destroy();
 
     graphics.reset();
+}
+
+void ArcEngine::Graphics::FrameStart(const Window& _Window)
+{
+    graphics->FrameStart(_Window);
+}
+
+void ArcEngine::Graphics::FrameEnd(const Window& _Window)
+{
+    graphics->FrameEnd(_Window);
 }
 
 void ArcEngine::Graphics::Resize(const glm::uvec2& _Size)
@@ -48,9 +59,9 @@ void ArcEngine::Graphics::Blit()
     graphics->Blit();
 }
 
-void ArcEngine::Graphics::RenderMesh()
+void ArcEngine::Graphics::RenderMesh(const Model& _Model, const glm::mat4x4& _ObjectToWorld)
 {
-    graphics->RenderMesh();
+    graphics->RenderMesh(_Model, _ObjectToWorld);
 }
 
 void ArcEngine::Graphics::RenderMeshInstanced()

@@ -210,11 +210,14 @@ public:
 class ECSPhysicsSystem : public ISystem
 {
 public:
-    void OnCreate() override;
+	void GetSignature(SignatureParameters& _Parameters) override;
 
-	void OnStart() override;
+    void OnCreate(State& _State) override;
+	void OnStart(State& _State) override;
 
-    void OnUpdate(const float& _DeltaTime) override;
+	void OnUpdate(State& _State, const float& _DeltaTime) override;
+
+    //void OnUpdate(const float& _DeltaTime) override;
 
 private:
     // We simulate the physics world in discrete time steps. 60 Hz is a good rate to update the physics system.

@@ -5,13 +5,7 @@
 
 #include <Framework/ECS/Coordinator.h>
 
-
-
-
-
-
-
-void ECSPhysicsSystem::OnCreate()
+void ECSPhysicsSystem::OnCreate(State& _State)
 {
     // Register allocation hook. In this example we'll just let Jolt use malloc / free but you can override these if you want (see Memory.h).
     // This needs to be done before any other Jolt function is called.
@@ -108,12 +102,14 @@ void ECSPhysicsSystem::OnCreate()
     physics_system->OptimizeBroadPhase();
 }
 
-void ECSPhysicsSystem::OnStart()
+void ECSPhysicsSystem::OnStart(State& _State)
 {
+    Coordinator& coordinator = _State.coordinator;
+
     for (auto const& entity : mEntities)
     {
-        auto& rigidBody = coordinator->GetComponent<RigidBodyComponent>(entity);
-        auto& transform = coordinator->GetComponent<TransformComponent>(entity);
+        auto& rigidBody = coordinator.GetComponent<RigidBodyComponent>(entity);
+        auto& transform = coordinator.GetComponent<TransformComponent>(entity);
 
         BodyCreationSettings sphere_settings(new SphereShape(0.5f), RVec3(0.0_r, 2.0_r, 0.0_r), Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING);
         BodyInterface& body_interface = physics_system->GetBodyInterface();
@@ -123,15 +119,31 @@ void ECSPhysicsSystem::OnStart()
     }
 }
 
-void ECSPhysicsSystem::OnUpdate(const float& _DeltaTime)
+void ECSPhysicsSystem::OnUpdate(State& _State, const float& _DeltaTime)
 {
-    physics_system->Update(cDeltaTime, cCollisionSteps, temp_allocator.get(), job_system.get());
+    Coordinator& coordinator = _State.coordinator;
+
+    physics_system->Update(_DeltaTime, cCollisionSteps, temp_allocator.get(), job_system.get());
+
+    JPH::Vec3 position{};
+    JPH::Quat rotation{};
 
     for (auto const& entity : mEntities)
     {
-        auto& rigidBody = coordinator->GetComponent<RigidBodyComponent>(entity);
-        auto& transform = coordinator->GetComponent<TransformComponent>(entity);
+        auto& rigidBody = coordinator.GetComponent<RigidBodyComponent>(entity);
+        auto& transform = coordinator.GetComponent<TransformComponent>(entity);
 
-        //physics_system->GetBodyInterface().GetPositionAndRotation(rigidBody.ID, transform.position, transform.rotation);
+        physics_system->GetBodyInterface().GetPositionAndRotation(rigidBody.ID, position, rotation);
+
+        transform.transform = glm::translate(transform.transform, glm::vec3(position.GetX(), position.GetY(), position.GetZ()));
     }
+}
+
+void ECSPhysicsSystem::GetSignature(SignatureParameters& _Parameters)
+{
+    Signature& signature = _Parameters.signature;
+    ComponentManager& componentManager = _Parameters.componentManager;
+
+    signature.set(componentManager.GetComponentType<TransformComponent>());
+    signature.set(componentManager.GetComponentType<RigidBodyComponent>());
 }
