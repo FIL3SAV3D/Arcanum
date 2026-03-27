@@ -17,22 +17,11 @@ project "Framework"
         "../../Library/GLM",
         "../../Library/Assimp/include",
         "../../Library/asio-1.34.2/include",
-        "../../Library/GLAD/include",
-        "../../Library/GLFW/include",
-        "../../Library/std_image",
         "../../Library/SDL/include",
         "../../Library/fmt/include",
-        "../../Library/vma",
-        "../../Library/volk",
-        "../../Library/zpp_bits-4.6",
-        "../../Library/SLANG-2026.2.2/include",
 
         -- Resource includes
-        "../RES_ThirdParty/JoltPhysics-Arcanum",
         "../RES_ThirdParty/DearImGUI",
-
-        -- OS includes
-        "$(VULKAN_SDK)/include",
     }
 
     links
@@ -41,7 +30,6 @@ project "Framework"
         "ArcEngine",
 
         -- Library links
-        "../../Library/GLFW/lib-vc2022/glfw3.lib",
         "../../Library/SDL/lib/SDL3.lib",
         "../../Library/SLANG-2026.2.2/lib/slang.lib",
 
@@ -73,13 +61,13 @@ project "Framework"
        }
 
     filter "configurations:Release"
-       defines { "RELEASE" }
-       runtime "Release"
-       optimize "On"
-       symbols "On"
+        defines { "RELEASE" }
+        runtime "Release"
+        optimize "On"
+        symbols "On"
 
-       links 
-       { 
+        links 
+        { 
         "../../Library/fmt/lib/fmt.lib",
         "../../Library/Assimp/lib/assimp-vc143-mt.lib",
         "../../Library/Assimp/lib/zlibstatic.lib"
@@ -90,3 +78,10 @@ project "Framework"
        runtime "Release"
        optimize "On"
        symbols "Off"
+
+       links 
+        { 
+        "../../Library/fmt/lib/fmt.lib",
+        "../../Library/Assimp/lib/assimp-vc143-mt.lib",
+        "../../Library/Assimp/lib/zlibstatic.lib"
+        }

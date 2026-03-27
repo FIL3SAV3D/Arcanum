@@ -12,10 +12,16 @@ int main(int /*NumArgs*/, char** /*ppArgs*/)
 
         editor->Create();
 
+        // Game Loop
+        //editor->OnEnter();
+
         while (!editor->IsQuitting())
         {
             editor->Run();
         }
+
+        //editor->OnExit();
+        // Game Loop
 
         editor->Destroy();
 

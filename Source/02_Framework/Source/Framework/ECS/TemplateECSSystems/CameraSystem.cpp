@@ -121,24 +121,23 @@ void CameraSystem::OnLateUpdate(GameState& _State, const float& _DeltaTime)
     const glm::vec3 right = glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f));
     const glm::vec3 up = glm::cross(right, forward);
 
-    const auto& position = glm::vec3(transformComponent.transform[3]);
 
-    const glm::mat4 inverted = glm::inverse(transformComponent.transform);
+    const glm::vec3 rightVelocity   = right   * inputComponent.movementInput.x;
+    const glm::vec3 upVelocity      = up      * inputComponent.movementInput.y;
+    const glm::vec3 forwardVelocity = forward * inputComponent.movementInput.z;
 
-    glm::vec3 rightVelocity   = right * inputComponent.movementInput.x;
-    glm::vec3 upVelocity      = up * inputComponent.movementInput.y;
-    glm::vec3 forwardVelocity = forward * inputComponent.movementInput.z;
+    const glm::vec requestedVelocity = rightVelocity + upVelocity + forwardVelocity;
 
-    glm::vec requestedVelocity = rightVelocity + upVelocity + forwardVelocity;
-
-    float speed = inputComponent.isPressingShift ? m_CameraShiftSpeed : m_CameraSpeed;
+    const float speed = inputComponent.isPressingShift ? m_CameraShiftSpeed : m_CameraSpeed;
 
     transformComponent.transform = glm::translate(transformComponent.transform, requestedVelocity * speed * _DeltaTime);
+    //transformComponent.transform = glm::rotate(transformComponent.transform, );
 
     const auto& windowSize = _State.engine->GetWindowSize();
 
+    //const glm::mat4 inverted = glm::inverse(transformComponent.transform);
+    const auto& position = glm::vec3(transformComponent.transform[3]);
     cameraComponent.view = glm::lookAt(position, position + forward, up);
-    ;
     cameraComponent.projection = glm::perspective(glm::radians(45.0f), (float)windowSize.x / (float)windowSize.y, 0.1f, 1000.0f);
 }
 

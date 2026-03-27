@@ -9,54 +9,13 @@ project "Arcanum"
 
     includedirs
     {
-        -- Engine hierarchy includes from top to bottom (Editor)
         "Source",
-        "../01_Editor/Source",
-        "../01_Game/Source",
-        "../02_Framework/Source",
-        "../03_ArcEngine/Source",
-
-        -- Library includes
-        "../../Library/GLM",
-        "../../Library/Assimp/include",
-        "../../Library/asio-1.34.2/include",
-        "../../Library/GLAD/include",
-        "../../Library/GLFW/include",
-        "../../Library/std_image",
-        "../../Library/SDL/include",
-        "../../Library/fmt/include",
-        "../../Library/vma",
-        "../../Library/volk",
-        "../../Library/zpp_bits-4.6",
-        "../../Library/SLANG-2026.2.2/include",
-
-        -- Resource includes
-        "../RES_ThirdParty/JoltPhysics-Arcanum",
-        "../RES_ThirdParty/DearImGUI",
-
-        -- OS includes
-        "$(VULKAN_SDK)/include",
+        "../01_Editor/Source"
     }
 
     links
     {
-        -- Engine hierarchy links from top to bottom (Editor)
-        "Editor",
-        "Game",
-        "Framework",
-        "ArcEngine",
-        
-        -- Library links
-        "../../Library/GLFW/lib-vc2022/glfw3.lib",
-        "../../Library/SDL/lib/SDL3.lib",
-        "../../Library/SLANG-2026.2.2/lib/slang.lib",
-
-        -- Resource links
-        "JoltPhysics-Arcanum",
-        "DearImGUI",
-
-        -- OS links
-        "%{VULKAN_SDK}/Lib/vulkan-1.lib",
+        "Editor"
     }
 
     -- targetdir ("../../Binaries/" .. OutputDir .. "/%{prj.name}")
@@ -64,41 +23,34 @@ project "Arcanum"
     objdir (BuildDir .. "Intermediates/" .. OutputDir .. "/%{prj.name}")
 
     filter "system:windows"
-       systemversion "latest"
-       defines { }
+        systemversion "latest"
+        defines { }
 
     filter "configurations:Debug"
-       defines { "DEBUG" }
-       runtime "Debug"
-       symbols "On"
+        defines { "DEBUG" }
+        runtime "Debug"
+        symbols "On"
 
-       links 
-       { 
-        "../../Library/fmt/lib/fmtd.lib",
-        "../../Library/Assimp/lib/assimp-vc143-mtd.lib",
-        "../../Library/Assimp/lib/zlibstaticd.lib"
-       }
+        links 
+        { 
+        }
 
     filter "configurations:Release"
-       defines { "RELEASE" }
-       runtime "Release"
-       optimize "On"
-       symbols "On"
+        defines { "RELEASE" }
+        runtime "Release"
+        optimize "On"
+        symbols "On"
 
-       links 
-       { 
-        "../../Library/fmt/lib/fmt.lib",
-        "../../Library/Assimp/lib/assimp-vc143-mt.lib",
-        "../../Library/Assimp/lib/zlibstatic.lib"
+        links 
+        { 
         }
 
     filter "configurations:Dist"
-       defines { "DIST" }
-       runtime "Release"
-       optimize "On"
-       symbols "Off"
+        defines { "DIST" }
+        runtime "Release"
+        optimize "On"
+        symbols "Off"
 
-       links 
-       { 
-        "../../Library/Assimp/lib/assimp-vc143-mt.lib",
-    }
+        links 
+        { 
+        }

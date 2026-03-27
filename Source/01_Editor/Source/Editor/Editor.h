@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Game/Game.h>
-#include <Framework/Framework.h>
-
 #include <memory>
+
+class Game;
+class Framework;
 
 class Editor
 {
@@ -19,6 +19,6 @@ public:
     bool IsQuitting();
 
 private:
-    std::unique_ptr<Game> m_Game;
+    std::shared_ptr<Game> m_Game = nullptr;
     std::shared_ptr<Framework> m_Framework;
 };

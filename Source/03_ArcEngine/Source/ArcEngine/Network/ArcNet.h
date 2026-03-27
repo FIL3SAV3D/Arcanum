@@ -1,9 +1,6 @@
 #pragma once
-#include <Net/NetCommon.h>
 
-#include <Net/NetMessage.h>
-#include <Net/NetConnection.h>
-#include <Net/NetThreadSafeQueue.h>
+class Network
+{
 
-#include <Net/NetClient.h>
-#include <Net/NetServer.h>
+};

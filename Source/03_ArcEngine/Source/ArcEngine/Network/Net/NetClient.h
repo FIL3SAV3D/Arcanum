@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Net/NetCommon.h>
-#include <Net/NetMessage.h>
-#include <Net/NetThreadSafeQueue.h>
-#include <Net/NetConnection.h>
+#include "ArcEngine/Network/Net/NetCommon.h"
+#include "ArcEngine/Network/Net/NetMessage.h"
+#include "ArcEngine/Network/Net/NetThreadSafeQueue.h"
+#include "ArcEngine/Network/Net/NetConnection.h"
 
 namespace arc
 {

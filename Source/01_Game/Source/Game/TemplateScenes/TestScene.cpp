@@ -13,7 +13,7 @@ void TestScene::Create(std::shared_ptr<Coordinator> _Coordinator)
 {
 	//auto cubeModel = assetManager.LoadAsset("Cube.fbx");
 
-	std::vector<Entity> entities(100);
+	std::vector<Entity> entities(1000);
 
 	std::default_random_engine generator;
 	std::uniform_real_distribution<float> randPosition(-50.0f, 50.0f);

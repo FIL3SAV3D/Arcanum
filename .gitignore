@@ -49,3 +49,4 @@ ArcanumRoadMap/.obsidian/app.json
 Build/Intermediates/
 Build/windows-x86_64-Debug
 Build/windows-x86_64-Release
+Build/windows-x86_64-Dist
