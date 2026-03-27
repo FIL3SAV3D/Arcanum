@@ -8,8 +8,6 @@ x64/
 bin/
 obj/
 
-Build/Intermediates/
-
 # Prerequisites
 *.d
 
@@ -48,4 +46,6 @@ Build/Intermediates/
 ArcanumRoadMap/.obsidian/workspace.json
 ArcanumRoadMap/.obsidian/app.json
 
+Build/Intermediates/
 Build/windows-x86_64-Debug
+Build/windows-x86_64-Release
