@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Jolt/Jolt.h"
-#include "Jolt/Math/Vec3.h"
+#include <glm/glm.hpp>
 
 struct InputComponent
 {
-    JPH::Vec3 direction;
-    double xPos;
-    double yPos;
+    glm::vec2 mouseInput{};
+    glm::vec2 lastMouseInput{};
 
-    bool mouseOne;
-    bool mouseTwo;
+    glm::vec3 movementInput{};
+    bool isPressingShift = false;
 };

@@ -29,6 +29,10 @@ void ArcEngine::VulkanGraphics::TestingRender()
     
 }
 
+void ArcEngine::VulkanGraphics::UpdateCameraData(const glm::vec4& _Position, const glm::mat4& _View, const glm::mat4& _Projection)
+{
+}
+
 void ArcEngine::VulkanGraphics::Create(const Window& _window)
 {
     Testing();
@@ -334,7 +338,7 @@ void ArcEngine::VulkanGraphics::Blit()
 {
 }
 
-void ArcEngine::VulkanGraphics::RenderMesh(const Model& _Model, const glm::mat4x4& _ObjectToWorld)
+void ArcEngine::VulkanGraphics::RenderMesh(std::shared_ptr<Model> _Model, const glm::mat4x4& _ObjectToWorld)
 {
     // wait until the gpu has finished rendering the last frame. Timeout of 1
     // second

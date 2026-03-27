@@ -5,31 +5,33 @@
 #include "ArcEngine/Graphics/UIGraphics.h"
 
 #include "ArcEngine/Asset/Types/Model.h"
+#include "Graphics/CameraData.h"
 
-namespace ArcEngine
+class Engine
 {
-    class ArcEngine
-    {
-    public:
-        ArcEngine()  = default;
-        ~ArcEngine() = default;
+public:
+    Engine() = default;
+    ~Engine() = default;
 
-        void Create();
-        void Destroy();
+    void Create();
+    void Destroy();
 
-        void RenderMesh(const Model& _Model, const glm::mat4x4& _ObjectToWorld);
+    void UpdateCameraData(const glm::vec4& _Position, const glm::mat4& _View, const glm::mat4& _Projection);
 
-        void RenderStart();
-        void RenderEnd();
+    void RenderMesh(std::shared_ptr<Model> _Model, const glm::mat4x4& _ObjectToWorld);
 
-        void RenderUIStart();
-        void RenderUIEnd();
+    void RenderStart();
+    void RenderEnd();
 
-        void SwapFrame();
+    void RenderUIStart();
+    void RenderUIEnd();
 
-    private:
-        Window m_Window;
-        Graphics m_Graphics;
-        UIGraphics m_UIGraphics;
-    };
-}
+    const glm::uvec2 GetWindowSize();
+    void ResizeSwapchain(const glm::uvec2& _Size);
+    void SwapFrame();
+
+private:
+    ArcEngine::Window m_Window;
+    ArcEngine::Graphics m_Graphics;
+    ArcEngine::UIGraphics m_UIGraphics;
+};

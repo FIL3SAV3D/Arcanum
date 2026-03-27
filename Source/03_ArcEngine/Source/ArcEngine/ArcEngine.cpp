@@ -1,19 +1,19 @@
 #include "ArcEngine.h"
 
-void ArcEngine::ArcEngine::Create()
+void Engine::Engine::Create()
 {
-    WindowSpecification specs;
-    specs.graphicsAPI = OPENGL;
+    ArcEngine::WindowSpecification specs;
+    specs.graphicsAPI = ArcEngine::OPENGL;
     specs.windowName = "test";
-    specs.windowSize = glm::uvec2(600, 400);
+    specs.windowSize = glm::uvec2(1920, 1080);
     m_Window.Create(specs);
 
-    m_Graphics.Create(Graphics::OPENGL, m_Window);
+    m_Graphics.Create(ArcEngine::Graphics::OPENGL, m_Window);
 
-    m_UIGraphics.Create(Graphics::OPENGL, m_Window);
+    m_UIGraphics.Create(ArcEngine::Graphics::OPENGL, m_Window);
 }
 
-void ArcEngine::ArcEngine::Destroy()
+void Engine::Engine::Destroy()
 {
     m_UIGraphics.Destroy(m_Window);
 
@@ -22,31 +22,48 @@ void ArcEngine::ArcEngine::Destroy()
     m_Window.Destroy();
 }
 
-void ArcEngine::ArcEngine::RenderMesh(const Model& _Model, const glm::mat4x4& _ObjectToWorld)
+void Engine::UpdateCameraData(const glm::vec4& _Position, const glm::mat4& _View, const glm::mat4& _Projection)
 {
+    m_Graphics.UpdateCameraData(_Position, _View, _Projection);
+}
+
+void Engine::Engine::RenderMesh(std::shared_ptr<Model> _Model, const glm::mat4x4& _ObjectToWorld)
+{
+
     m_Graphics.RenderMesh(_Model, _ObjectToWorld);
 }
 
-void ArcEngine::ArcEngine::RenderStart()
+void Engine::Engine::RenderStart()
 {
     m_Graphics.FrameStart(m_Window);
 }
 
-void ArcEngine::ArcEngine::RenderEnd()
+void Engine::Engine::RenderEnd()
 {
     m_Graphics.FrameEnd(m_Window);
 }
 
-void ArcEngine::ArcEngine::RenderUIStart()
+void Engine::Engine::RenderUIStart()
 {
     m_UIGraphics.FrameStart(m_Window);
 }
 
-void ArcEngine::ArcEngine::RenderUIEnd()
+void Engine::Engine::RenderUIEnd()
 {
     m_UIGraphics.FrameEnd(m_Window);
 }
 
-void ArcEngine::ArcEngine::SwapFrame()
+const glm::uvec2 Engine::GetWindowSize()
+{
+    return m_Window.GetScreenSize();
+}
+
+void Engine::Engine::ResizeSwapchain(const glm::uvec2& _Size)
+{
+    m_Graphics.Resize(_Size);
+    m_Window.SetScreenSize(_Size);
+}
+
+void Engine::Engine::SwapFrame()
 {
 }

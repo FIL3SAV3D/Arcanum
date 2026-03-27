@@ -6,8 +6,6 @@
 #include "Framework/ECS/Managers/EntityManager.h"
 #include "Framework/ECS/Managers/ComponentManager.h"
 
-#include "ArcEngine/Renderer/IRenderer.h"
-
 class Coordinator
 {
 public:
@@ -101,22 +99,25 @@ public:
     }
 
 public:
-    void OnCreate(State& _State) { m_SystemManager.OnCreate(_State); }
-    void OnStart(State& _State) { m_SystemManager.OnStart(_State); }
-    void OnInput(std::shared_ptr<ArcEngine::Window> _Window) { m_SystemManager.OnInput(_Window); }
+    void OnCreate(StartState& _State) { m_SystemManager.OnCreate(_State); }
+    void OnStart(StartState& _State) { m_SystemManager.OnStart(_State); }
+    void OnInput(InputState& _InputState) { m_SystemManager.OnInput(_InputState); }
 
-    void OnUpdate(State& _State, const float& _DeltaTime) { m_SystemManager.OnUpdate(_State, _DeltaTime); };
+    void OnUpdate(GameState& _State, const float& _DeltaTime) { m_SystemManager.OnUpdate(_State, _DeltaTime); };
 
-    void OnLateUpdate(State& _State, const float& _DeltaTime)
+    void OnLateUpdate(GameState& _State, const float& _DeltaTime)
     {
         m_SystemManager.OnLateUpdate(_State, _DeltaTime);
     }
 
-    void OnRender (State& _State) { m_SystemManager.OnRender(_State); }
+    void OnRenderStart  (RenderState& _State) { m_SystemManager.OnRenderStart(_State); }
+    void OnRender       (RenderState& _State) { m_SystemManager.OnRender(_State); }
+    void OnRenderEnd    (RenderState& _State) { m_SystemManager.OnRenderEnd(_State); }
 
-    void OnRenderUI(const RenderParams& _RenderParams)
+
+    void OnRenderUI(RenderState& _State)
     {
-        m_SystemManager.OnRenderUI(_RenderParams);
+        m_SystemManager.OnRenderUI(_State);
     }
 
     void OnApplicationPause()

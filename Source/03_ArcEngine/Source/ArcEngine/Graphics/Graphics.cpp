@@ -59,7 +59,12 @@ void ArcEngine::Graphics::Blit()
     graphics->Blit();
 }
 
-void ArcEngine::Graphics::RenderMesh(const Model& _Model, const glm::mat4x4& _ObjectToWorld)
+void ArcEngine::Graphics::UpdateCameraData(const glm::vec4& _Position, const glm::mat4& _View, const glm::mat4& _Projection)
+{
+    graphics->UpdateCameraData(_Position, _View, _Projection);
+}
+
+void ArcEngine::Graphics::RenderMesh(std::shared_ptr<Model> _Model, const glm::mat4x4& _ObjectToWorld)
 {
     graphics->RenderMesh(_Model, _ObjectToWorld);
 }

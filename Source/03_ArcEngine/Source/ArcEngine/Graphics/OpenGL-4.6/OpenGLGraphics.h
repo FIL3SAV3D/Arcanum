@@ -16,12 +16,14 @@ namespace ArcEngine
         void Destroy() override;
         void Resize(const glm::uvec2& _Size) override;
 
+        void UpdateCameraData(const glm::vec4& _Position, const glm::mat4& _View, const glm::mat4& _Projection) override;
+
         void FrameStart(const Window& _Window) override;
         void FrameEnd  (const Window& _Window) override;
 
         void Blit() override;
 
-        void RenderMesh(const Model& _Model, const glm::mat4x4& _ObjectToWorld) override;
+        void RenderMesh(std::shared_ptr<Model> _Model, const glm::mat4x4& _ObjectToWorld) override;
         void RenderMeshInstanced() override;
         void RenderMeshIndirect() override;
 
@@ -38,9 +40,10 @@ namespace ArcEngine
         unsigned int quadVAO;
         unsigned int quadVBO;
 
+        unsigned int cameraUBO;
+
         std::vector<MeshInfo> meshArray;
 
         std::unique_ptr<Shader> blinn;
-        Camera cam;
     };
 }

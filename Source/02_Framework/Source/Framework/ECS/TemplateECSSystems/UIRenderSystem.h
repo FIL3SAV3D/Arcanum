@@ -20,7 +20,7 @@ public:
 	~UIRenderSystem();
 
 	void OnCreate();
-	void OnRenderUI(const RenderParams& _RenderParams) override;
+	void OnRenderUI();
 	void OnDestroy();
 
 	glm::vec4 clear_color{ 0.1f, 0.1f, 0.1f, 1.0f };

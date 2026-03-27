@@ -2,49 +2,87 @@
 #include <SDL3/SDL.h>
 #include <backends/imgui_impl_sdl3.h>
 
+#include <ArcEngine/ArcEngine.h>
+#include <ArcEngine/Util/Clock.h>
+
+#include "Framework/Managers/AssetManager.h"
+#include "Framework/Managers/SceneManager.h"
+#include "Framework/ECS/Coordinator.h"
+
 void Framework::Create()
 {
-    m_ArcEngine.Create();
+    arcEngine       = std::make_shared<Engine>();
+    assetManager    = std::make_shared<AssetManager>();
+    coordinator = std::make_shared<Coordinator>();
+    modeManger      = std::make_shared<ModeManager>();
+    sceneManager    = std::make_shared<SceneManager>();
+    clock           = std::make_shared<Clock>();
 
-    m_AssetManager.Create();
+    arcEngine->Create();
+    assetManager->Create();
+    coordinator->Create();
 
-    m_ECSCoordinator.Create();
+    startState = StartState{
+        .coordinator = coordinator,
+    };
 }
 
 void Framework::Destroy()
 {
-    m_ECSCoordinator.Destroy();
+    coordinator->Destroy();
+    coordinator.reset();
 
-    m_AssetManager.Destroy();
+    assetManager->Destroy();
+    assetManager.reset();
 
-    m_ArcEngine.Destroy();
+    arcEngine->Destroy();
+    arcEngine.reset();
 }
 
 void Framework::Start()
 {
-    State state
-    {
-        .coordinator = m_ECSCoordinator,
-        .engine = m_ArcEngine
+    coordinator->OnCreate(startState);
+    coordinator->OnStart(startState);
+
+    clock->Update();
+
+    inputState = InputState{
+        .coordinator = coordinator,
+        .event = {}
     };
 
-    m_ECSCoordinator.OnCreate(state);
-    m_ECSCoordinator.OnStart(state);
+    gameState = GameState{
+        .coordinator = coordinator,
+        .engine = arcEngine
+    };
+
+    renderState = RenderState{
+        .coordinator = coordinator,
+        .engine = arcEngine
+    };
 }
 
 void Framework::Run()
 {
-    SDL_Event e;
+    HandleInput();
 
-    while (SDL_PollEvent(&e) != 0) {
-        if (e.type == SDL_EVENT_QUIT)
+    HandleUpdate();
+
+    HandleRender();
+}
+
+void Framework::HandleInput()
+{
+    SDL_Event event;
+    while (SDL_PollEvent(&event) != 0) {
+        if (event.type == SDL_EVENT_QUIT)
             bQuit = true;
 
-        if (e.type == SDL_EVENT_WINDOW_RESIZED)
+        if (event.type == SDL_EVENT_WINDOW_RESIZED)
         {
-            //int x{}, y{};
-            //SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &x, &y);
-            //m_ArcEngine->Resize(glm::uvec2(x, y));
+            int x{}, y{};
+            SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &x, &y);
+            arcEngine->ResizeSwapchain(glm::uvec2(x, y));
         }
 
         const bool* key_states = SDL_GetKeyboardState(nullptr);
@@ -54,155 +92,58 @@ void Framework::Run()
             bQuit = true;
         }
 
-        if (e.window.type == SDL_EVENT_WINDOW_MINIMIZED) {
+        if (event.window.type == SDL_EVENT_WINDOW_MINIMIZED) {
             stop_rendering = true;
         }
-        if (e.window.type == SDL_EVENT_WINDOW_RESTORED) {
+        if (event.window.type == SDL_EVENT_WINDOW_RESTORED) {
             stop_rendering = false;
         }
 
-        ImGui_ImplSDL3_ProcessEvent(&e);
+        inputState.event = &event;
+
+        coordinator->OnInput(inputState);
+
+        ImGui_ImplSDL3_ProcessEvent(&event);
     }
-
-    State state
-    {
-        .coordinator = m_ECSCoordinator,
-        .engine      = m_ArcEngine
-    };
-
-    //OnInput();
-
-    clock.Update();
-    const float deltaTime = clock.GetDeltaTime();
-
-    OnUpdate(state, deltaTime);
-
-    //OnLateUpdate(deltaTime);
-
-    //// Set camera bindings
-
-    OnRender(state);
-
-    //OnApplicationPause();
-
-    //OnCheckForDisabled();
 }
 
-#pragma region  FrameworkStart
-
-// Start
-void Framework::OnCreate()
+void Framework::HandleUpdate()
 {
+    clock->Update();
+    const float deltaTime = static_cast<float>(clock->GetDeltaTime());
+
+    { // Update
+        coordinator->OnUpdate(gameState, deltaTime);
+    } // Update
+
+    { // LateUpdate
+        coordinator->OnLateUpdate(gameState, deltaTime);
+    } // LateUpdate
 }
 
-void Framework::OnEnable()
+void Framework::HandleRender()
 {
-}
+    arcEngine->RenderStart();
 
-void Framework::OnStart()
-{
-}
-// Start
+    coordinator->OnRenderStart(renderState);
 
-#pragma endregion
-
-#pragma region FrameworkRun
-
-// Update
-void Framework::OnInput()
-{
-    /*inputHandler->ProcessInput(window->GetNativeWindow());
-
-    coordinator->OnInput(window);*/
-}
-
-void Framework::OnUpdate(State& _State, const float& _DeltaTime)
-{
-    m_ECSCoordinator.OnUpdate(_State, _DeltaTime);
-}
-
-void Framework::OnLateUpdate(const float& _DeltaTime)
-{
-    /*coordinator->OnLateUpdate(_DeltaTime);*/
-}
-
-void Framework::OnRender(State& _State)
-{
-    m_ArcEngine.RenderStart();
-
-    m_ECSCoordinator.OnRender(_State);
+    coordinator->OnRender(renderState);
 
     { // UI Rendering
-        m_ArcEngine.RenderUIStart();
+        arcEngine->RenderUIStart();
 
-        //m_ECSCoordinator.OnRenderUI();
+        //coordinator.OnRenderUI(renderState);
 
-        m_ArcEngine.RenderUIEnd();
+        arcEngine->RenderUIEnd();
     } // UI Rendering
 
+    coordinator->OnRenderEnd(renderState);
 
-    m_ArcEngine.RenderEnd();
+
+    arcEngine->RenderEnd();
 }
-
-void Framework::OnApplicationPause()
-{
-}
-
-void Framework::OnCheckForDisabled()
-{
-}
-// Update
-
-#pragma endregion
-
-#pragma region FrameworkEnd
-
-// Quit
-void Framework::OnQuit()
-{
-}
-
-void Framework::OnDisable()
-{
-}
-
-void Framework::OnDestroy()
-{
-    //auto [data, out] = zpp::bits::data_out();
-
-    //graphics->Destroy();
-
-    //ApplicationSpecification specs;
-
-    //SDL_GetWindowSize(window->GetNativeWindow(), &specs.windowSizeX, &specs.windowSizeY);
-
-    //auto result = out(specs);
-
-    //if (failure(result)) {
-    //	// `result` is implicitly convertible to `std::errc`.
-    //	// handle the error or return/throw exception.
-    //	fmt::println("Error");
-    //}
-    //else
-    //{
-    //	std::ofstream outfile("AppTest.Scroll", std::ios::out | std::ios::binary);
-    //	outfile.write(reinterpret_cast<char*>(data.data()), static_cast<long>(data.size()));
-    //}
-
-    //window->Destroy();
-    //window.reset();
-}
-// Quit
-
-#pragma endregion
 
 bool Framework::IsQuitting()
 {
     return bQuit;
-    /*return glfwWindowShouldClose(window->GetNativeWindow());*/
-}
-
-auto Serialize(const ApplicationSpecification& person) -> zpp::bits::members<3>
-{
-    return zpp::bits::members<3>();
 }

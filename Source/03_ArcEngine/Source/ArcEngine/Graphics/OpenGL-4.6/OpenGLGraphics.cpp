@@ -5,6 +5,7 @@
 
 #include "fmt/core.h"
 #include <stb_image.h>
+#include <ArcEngine/Graphics/CameraData.h>
 
 void ArcEngine::OpenGLGraphics::Create(const Window& _Window)
 {
@@ -28,7 +29,7 @@ void ArcEngine::OpenGLGraphics::Create(const Window& _Window)
     }
 
     SDL_GL_MakeCurrent(_Window.GetNativeWindow(), glContext);
-    SDL_GL_SetSwapInterval(1); // Enable vsync
+    SDL_GL_SetSwapInterval(0); // Enable vsync
     SDL_SetWindowPosition(_Window.GetNativeWindow(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     SDL_ShowWindow(_Window.GetNativeWindow());
 
@@ -70,7 +71,15 @@ void ArcEngine::OpenGLGraphics::Create(const Window& _Window)
         "D:\\PersonalProjects\\Arcanum\\Source\\RES_Shaders\\ShadersOpenGL\\Source\\Shaders\\blinnPhong.frag"
     );
 
-    cam.LookAt(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glGenBuffers(1, &cameraUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraData), nullptr, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    blinn->Use();
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void ArcEngine::OpenGLGraphics::Destroy()
@@ -83,6 +92,16 @@ void ArcEngine::OpenGLGraphics::Resize(const glm::uvec2& _Size)
     glViewport(0, 0, _Size.x, _Size.y);
 }
 
+void ArcEngine::OpenGLGraphics::UpdateCameraData(const glm::vec4& _Position, const glm::mat4& _View, const glm::mat4& _Projection)
+{
+    CameraData data = { _Position, _View, _Projection };
+    glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4), &data.position);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::vec4), sizeof(glm::mat4), &data.view);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) + sizeof(glm::mat4), sizeof(glm::mat4), &data.projection);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
 void ArcEngine::OpenGLGraphics::FrameStart(const Window& _Window)
 {
     const glm::uvec2& size = _Window.GetScreenSize();
@@ -90,6 +109,8 @@ void ArcEngine::OpenGLGraphics::FrameStart(const Window& _Window)
     glViewport(0, 0, size.x, size.y);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+    blinn->Use();
 }
 
 void ArcEngine::OpenGLGraphics::FrameEnd(const Window& _Window)
@@ -103,20 +124,17 @@ void ArcEngine::OpenGLGraphics::Blit()
 
 }
 
-void ArcEngine::OpenGLGraphics::RenderMesh(const Model& _Model, const glm::mat4x4& _ObjectToWorld)
+void ArcEngine::OpenGLGraphics::RenderMesh(std::shared_ptr<Model> _Model, const glm::mat4x4& _ObjectToWorld)
 {
-    blinn->Use();
-    blinn->setMat4("view", cam.GetViewMatrix());
-    blinn->setMat4("projection", cam.GetProjectionMatrix());
     blinn->setMat4("model", _ObjectToWorld);
 
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-
 }
 
-void ArcEngine::OpenGLGraphics::RenderMeshInstanced()
+void ArcEngine::OpenGLGraphics::RenderMeshInstanced(/*std::shared_ptr<Model> _Model, uint32_t _Count, */)
 {
+    //glDrawElementsInstanced();
 }
 
 void ArcEngine::OpenGLGraphics::RenderMeshIndirect()

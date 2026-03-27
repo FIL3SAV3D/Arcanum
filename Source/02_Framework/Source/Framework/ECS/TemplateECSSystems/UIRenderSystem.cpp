@@ -21,7 +21,7 @@ void UIRenderSystem::OnCreate()
     m_ImGUIHandler->Initialize(window);
 }
 
-void UIRenderSystem::OnRenderUI(const RenderParams& _RenderParams)
+void UIRenderSystem::OnRenderUI()
 {
     m_ImGUIHandler->Update();
     clear_color = m_ImGUIHandler->clear_color;

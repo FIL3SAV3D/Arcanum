@@ -1,6 +1,9 @@
 #pragma once
 
+#include <memory>
+
 class Coordinator;
+class SceneManager;
 
 class IMode
 {
@@ -9,9 +12,9 @@ public:
 	~IMode() = default;
 
 public:
-	virtual void Create (Coordinator& _Coordinator)  = 0;
-	virtual void Destroy(Coordinator& _Coordinator) = 0;
+	virtual void Create (std::shared_ptr < Coordinator> _Coordinator, std::shared_ptr < SceneManager> _SceneManager)  = 0;
+	virtual void Destroy(std::shared_ptr < Coordinator> _Coordinator, std::shared_ptr < SceneManager> _SceneManager) = 0;
 
-	virtual void RegisterSystems  (Coordinator& _Coordinator) {};
-	virtual void UnregisterSystems(const Coordinator& _Coordinator) {};
+	virtual void RegisterSystems  (std::shared_ptr < Coordinator> _Coordinator) {};
+	virtual void UnregisterSystems(std::shared_ptr < Coordinator> _Coordinator) {};
 };

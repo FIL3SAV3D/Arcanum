@@ -1,13 +1,10 @@
 #pragma once
 
 #include <set>
-
 #include "Framework/ECS/Data/ECSTypeInfo.h"
-#include <ArcEngine/Renderer/IRenderer.h>
-
 #include <memory>
-
-#include "ArcEngine/Platform/Window.h"
+#include <glm/glm.hpp>
+#include <Framework/States/States.h>
 
 class Coordinator;
 class ComponentManager;
@@ -31,11 +28,7 @@ struct SignatureParameters
     ComponentManager& componentManager;
 };
 
-struct State
-{
-    Coordinator& coordinator;
-    ArcEngine::ArcEngine& engine;
-};
+
 
 class ISystem
 {
@@ -43,22 +36,23 @@ public:
     virtual void GetSignature(SignatureParameters& _Parameters) = 0;
 
 public:
-    virtual void OnCreate       (State& _State)                              {};
-    virtual void OnDestroy      (State& _State)                              {};
+    virtual void OnCreate           (StartState& _State)                              {};
+    virtual void OnDestroy          (EndState& _State)                              {};
 
-    virtual void OnStart        (State& _State)                              {};
-    virtual void OnEnd          (State& _State)                              {};
+    virtual void OnStart            (StartState& _State)                              {};
+    virtual void OnEnd              (EndState& _State)                              {};
 
-    virtual void OnInput           (std::shared_ptr<ArcEngine::Window> _Window) {};
+    virtual void OnInput            (InputState& _InputState) {};
 
-    virtual void OnUpdate          (State& _State, const float& _DeltaTime)     {};
-    virtual void OnLateUpdate      (State& _State, const float& _DeltaTime)     {};
+    virtual void OnUpdate           (GameState& _State, const float& _DeltaTime)     {};
+    virtual void OnLateUpdate       (GameState& _State, const float& _DeltaTime)     {};
 
-    virtual void OnRender          (State& _State) {};
-    virtual void OnRenderUI        (const RenderParams& _RenderParams) {};
+    virtual void OnRenderStart      (RenderState& _RenderState) {};
+    virtual void OnRender           (RenderState& _RenderState) {};
+    virtual void OnRenderUI         (RenderState& _RenderState) {};
+    virtual void OnRenderEnd        (RenderState& _RenderState) {};
 
-
-    virtual void OnResize(const glm::uvec2& _Size) {};
+    virtual void OnWindowResize(const glm::uvec2& _Size) {};
 
 public:
     std::set<Entity> mEntities{};

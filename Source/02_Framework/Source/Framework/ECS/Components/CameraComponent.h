@@ -1,11 +1,9 @@
 #pragma once
 
-#include "Jolt/Jolt.h"
-#include "Jolt/Math/Mat44.h"
+#include <glm/glm.hpp>
 
-class CameraComponent
+struct CameraComponent
 {
-public:
-    JPH::Vec3 forward;
-    JPH::Vec3 position;
+    glm::mat4 view       = glm::identity<glm::mat4>();
+    glm::mat4 projection = glm::identity<glm::mat4>();
 };

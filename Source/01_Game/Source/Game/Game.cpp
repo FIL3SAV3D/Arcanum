@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#include <Framework/Framework.h>
+
 #include "TemplateModes/TemplateMode01.h"
 
 void Game::Create()
@@ -42,4 +44,9 @@ void Game::SetFramework(const std::shared_ptr<Framework> _Framework)
 {
     m_EditorPiloted = true;
     m_Framework = _Framework;
+}
+
+bool Game::IsQuitting()
+{
+    return m_Framework->IsQuitting();
 }

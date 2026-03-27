@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Framework/Framework.h>
 #include <memory>
+
+class Framework;
 
 class Game
 {
@@ -18,7 +19,7 @@ public:
 
     void OnExit();
 
-    bool IsQuitting() { return m_Framework->IsQuitting(); };
+    bool IsQuitting();
 
 protected:
     void SetFramework(const std::shared_ptr<Framework> _Framework);

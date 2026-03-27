@@ -1,8 +1,11 @@
 #pragma once
 
-#include "ArcEngine/Asset/Types/Model.h"
+//#include <ArcEngine/Asset/Types/Model.h>
 
+#include <memory>
+
+struct Model;
 struct ModelComponent
 {
-    Model model;
+    std::shared_ptr<Model> model;
 };

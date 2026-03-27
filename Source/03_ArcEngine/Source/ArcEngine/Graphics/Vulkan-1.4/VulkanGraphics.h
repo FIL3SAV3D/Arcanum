@@ -58,6 +58,8 @@ namespace ArcEngine
 		void Testing();
 		void TestingRender();
 
+		void UpdateCameraData(const glm::vec4& _Position, const glm::mat4& _View, const glm::mat4& _Projection) override;
+
         void Create(const Window& _Window) override;
         void Destroy() override;
 
@@ -67,7 +69,7 @@ namespace ArcEngine
 		void Resize(const glm::uvec2& _Size) override;
 
         void Blit() override;
-        void RenderMesh(const Model& _Model, const glm::mat4x4& _ObjectToWorld) override;
+        void RenderMesh(std::shared_ptr<Model> _Model, const glm::mat4x4& _ObjectToWorld) override;
 		void draw_background(VkCommandBuffer cmd);
         void RenderMeshInstanced() override;
         void RenderMeshIndirect() override;

@@ -8,8 +8,7 @@
 
 #include "Framework/ECS/Data/ECSTypeInfo.h"
 #include "Framework/ECS/Interfaces/ISystem.h"
-
-#include <GLFW/glfw3.h>
+#include "Framework/States/States.h"
 
 class Coordinator;
 
@@ -95,7 +94,7 @@ public:
 		}
 	}
 
-	void OnCreate(State& _State)
+	void OnCreate(StartState& _State)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
@@ -103,7 +102,7 @@ public:
 		}
 	}
 
-	void OnStart(State& _State)
+	void OnStart(StartState& _State)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
@@ -111,15 +110,15 @@ public:
 		}
 	}
 
-	void OnInput(std::shared_ptr<ArcEngine::Window> _Window)
+	void OnInput(InputState& _InputState)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnInput(_Window);
+			system->OnInput(_InputState);
 		}
 	}
 
-	void OnUpdate(State& _State, const float& _DeltaTime)
+	void OnUpdate(GameState& _State, const float& _DeltaTime)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
@@ -127,7 +126,7 @@ public:
 		}
 	}
 
-	void OnLateUpdate(State& _State, const float& _DeltaTime)
+	void OnLateUpdate(GameState& _State, const float& _DeltaTime)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
@@ -135,7 +134,15 @@ public:
 		}
 	}
 
-	void OnRender(State& _State)
+	void OnRenderStart(RenderState& _State)
+	{
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnRenderStart(_State);
+		}
+	}
+
+	void OnRender(RenderState& _State)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
@@ -143,11 +150,19 @@ public:
 		}
 	}
 
-	void OnRenderUI(const RenderParams& _RenderParams)
+	void OnRenderEnd(RenderState& _State)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnRenderUI(_RenderParams);
+			system->OnRenderEnd(_State);
+		}
+	}
+
+	void OnRenderUI(RenderState& _State)
+	{
+		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
+		{
+			system->OnRenderUI(_State);
 		}
 	}
 
@@ -159,7 +174,7 @@ public:
 	{
 	}
 
-	void OnDestroy(State& _State)
+	void OnDestroy(EndState& _State)
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
@@ -171,7 +186,7 @@ public:
 	{
 		for (const std::shared_ptr<ISystem> system : mSystemsUpdateOrder)
 		{
-			system->OnResize(_Size);
+			system->OnWindowResize(_Size);
 		}
 	}
 

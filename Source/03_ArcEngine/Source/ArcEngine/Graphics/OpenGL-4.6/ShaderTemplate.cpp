@@ -66,7 +66,6 @@ void ShaderTemplate::setMat4(const char* _name, const glm::mat4& _value) const
 
 void ShaderTemplate::CreateShader(const char* _vertexShaderPath, const char* _fragmentShaderPath, const char* _geometryShaderPath)
 {
-
 	std::string shaderSearchPath;
 	//shaderSearchPath.append("D:\\PersonalProjects");
 	//shaderSearchPath.append("\\Arcanum");

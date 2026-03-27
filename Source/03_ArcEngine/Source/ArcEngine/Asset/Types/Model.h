@@ -7,5 +7,7 @@
 
 struct Model : public IAsset
 {
-    std::vector<Mesh> meshes;
+    std::vector<Mesh> meshes = {};
+    bool isInstanced = false;
+    uint32_t ID = 0;
 };

@@ -1,21 +1,22 @@
 #pragma once
 
-#include <ArcEngine/ArcEngine.h>
-
-#include "Framework/Managers/ModeManager.h"
-#include "Framework/Managers/AssetManager.h"
-#include "Framework/ECS/Coordinator.h"
-
-#include <zpp_bits.h>
+#include "States/States.h"
 #include <memory>
-#include <ArcEngine/Util/Clock.h>
+#include <string>
+#include "Managers/ModeManager.h"
+
+class Engine;
+class SceneManager;
+class AssetManager;
+class Coordinator;
+class Clock;
 
 struct ApplicationSpecification
 {
-	std::string name{};
-	int windowSizeX{};
-	int windowSizeY{};
-	bool fullscreen = false;
+    std::string name{};
+    int windowSizeX{};
+    int windowSizeY{};
+    bool fullscreen = false;
 };
 
 struct GLFWwindow;
@@ -23,60 +24,53 @@ struct GLFWwindow;
 class Framework
 {
 public:
-	Framework()  = default;
-	~Framework() = default;
+    Framework()  = default;
+    ~Framework() = default;
 
-	void Create();
-	void Destroy();
+    void Create();
+    void Destroy();
 
-	template<typename T>
-	void RegisterMode(const std::string& _Name)
-	{
-		modeManger.RegisterMode<T>(_Name, m_ECSCoordinator);
-	}
+    template<typename T>
+    void RegisterMode(const std::string& _Name)
+    {
+        modeManger->RegisterMode<T>(_Name, coordinator);
+    }
 
-	void SwitchMode(const std::string& _Name)
-	{
-		modeManger.SwitchMode(_Name, m_ECSCoordinator);
-	}
+    void SwitchMode(const std::string& _Name)
+    {
+        modeManger->SwitchMode(_Name, coordinator, sceneManager);
+    }
 
-	void Start();
+    void Start();
 
-	void Run();
+    void Run();
 
-	bool IsQuitting();
+    bool IsQuitting();
 
 private:
-	// Application Being Created
-	void OnCreate();
-	// Before Application First Run
-	void OnStart();
-	// 
-	void OnEnable();
-
-	// Update
-	void OnInput();
-	void OnUpdate(State& _State, const float& _DeltaTime);
-	void OnLateUpdate(const float& _DeltaTime);
-
-	void OnRender(State& _State);
-
-	void OnApplicationPause();
-	void OnCheckForDisabled();
-
-	// End
-	void OnDisable();
-	void OnQuit();
-	void OnDestroy();
+    void HandleInput();
+    void HandleUpdate();
+    void HandleRender();
 
 public:
-	bool bQuit = false;
-	bool stop_rendering = false;
-private:
-	ModeManager modeManger;
-	Coordinator m_ECSCoordinator;
-	AssetManager m_AssetManager;
-	Clock clock;
+    bool bQuit = false;
+    bool stop_rendering = false;
 
-	ArcEngine::ArcEngine    m_ArcEngine;
+private:
+    StartState  startState  = {};
+    InputState  inputState  = {};
+    GameState   gameState   = {};
+    RenderState renderState = {};
+    EndState    endState    = {};
+
+private:
+    std::shared_ptr<ModeManager> modeManger;
+    std::shared_ptr<SceneManager> sceneManager;
+    std::shared_ptr<AssetManager> assetManager;
+
+    std::shared_ptr<Coordinator> coordinator;
+
+    std::shared_ptr<Clock> clock;
+
+    std::shared_ptr<Engine> arcEngine;
 };
