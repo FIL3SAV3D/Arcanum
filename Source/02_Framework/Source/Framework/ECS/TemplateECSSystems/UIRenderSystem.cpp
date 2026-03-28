@@ -2,33 +2,33 @@
 
 #include "ArcEngine/Platform/Window.h"
 
-#include <backends/imgui_impl_opengl3.h>
-#include <backends/imgui_impl_glfw.h>
+#include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
 
-UIRenderSystem::UIRenderSystem(std::shared_ptr<ArcEngine::Window> _window)
+void UIRenderSystem::GetSignature(SignatureParameters& _Parameters)
 {
-    window = _window;
+
 }
 
-UIRenderSystem::~UIRenderSystem()
+void UIRenderSystem::OnRenderUI(RenderState& _RenderState)
 {
-    window = nullptr;
-}
+    //ImGui::ShowDemoWindow();
 
-void UIRenderSystem::OnCreate()
-{
-    m_ImGUIHandler = std::make_unique<ImGUIHandler>();
-    m_ImGUIHandler->Initialize(window);
-}
+    if(ImGui::Begin("Project Window", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::Text("Connect to host IP Adress:");
+        ImGui::InputText("IP Adress", &adress);
+        if (ImGui::Button("Connect"))
+        {
+            adress.clear();
+        }
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
+        ImGui::Text("Host Temp Project");
+        if (ImGui::Button("Host"))
+        {
+            adress.clear();
+        }
 
-void UIRenderSystem::OnRenderUI()
-{
-    m_ImGUIHandler->Update();
-    clear_color = m_ImGUIHandler->clear_color;
-}
-
-void UIRenderSystem::OnDestroy()
-{
-    m_ImGUIHandler->DeInitialize();
-    m_ImGUIHandler.reset();
+        ImGui::End();
+    }
 }

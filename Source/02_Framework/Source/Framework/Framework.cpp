@@ -132,7 +132,7 @@ void Framework::HandleRender()
     { // UI Rendering
         arcEngine->RenderUIStart();
 
-        //coordinator.OnRenderUI(renderState);
+        coordinator->OnRenderUI(renderState);
 
         arcEngine->RenderUIEnd();
     } // UI Rendering

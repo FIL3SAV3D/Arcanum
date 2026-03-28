@@ -2,10 +2,10 @@
 
 #include <Framework/Modes/IMode.h>
 
-class TemplateMode01 : public IMode
+class EditorMode : public IMode
 {
 public:
-    void Create (std::shared_ptr<Coordinator> _Coordinator, std::shared_ptr<SceneManager> _SceneManager)  override;
+    void Create (std::shared_ptr<Coordinator> _Coordinator, std::shared_ptr<SceneManager> _SceneManager) override;
     void Destroy(std::shared_ptr<Coordinator> _Coordinator, std::shared_ptr<SceneManager> _SceneManager) override;
 
 public:

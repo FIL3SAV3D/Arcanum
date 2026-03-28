@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include "ArcEngine/Network/Net/"
 
 class NetworkManager
 {
@@ -21,5 +20,5 @@ public:
     void StopClient();
 
 private:
-    std::unique_ptr<>
+   //std::unique_ptr<>
 };

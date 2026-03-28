@@ -93,6 +93,12 @@ public:
     }
 
     template<typename T>
+    void UnregisterSystem()
+    {
+        return m_SystemManager.unreg<T>();
+    }
+
+    template<typename T>
     void SetSystemSignature(Signature signature)
     {
         m_SystemManager.SetSignature<T>(signature);
@@ -112,13 +118,8 @@ public:
 
     void OnRenderStart  (RenderState& _State) { m_SystemManager.OnRenderStart(_State); }
     void OnRender       (RenderState& _State) { m_SystemManager.OnRender(_State); }
+    void OnRenderUI     (RenderState& _State) { m_SystemManager.OnRenderUI(_State); }
     void OnRenderEnd    (RenderState& _State) { m_SystemManager.OnRenderEnd(_State); }
-
-
-    void OnRenderUI(RenderState& _State)
-    {
-        m_SystemManager.OnRenderUI(_State);
-    }
 
     void OnApplicationPause()
     {

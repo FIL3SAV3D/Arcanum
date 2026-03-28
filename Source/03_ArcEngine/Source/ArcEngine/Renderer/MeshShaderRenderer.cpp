@@ -1,7 +1,6 @@
 #include "MeshShaderRenderer.h"
 
 #include "glad/glad.h"
-#include "GLFW/glfw3.h"
 
 #include "ArcEngine/Graphics/OpenGL-4.6/Shader.h"
 #include <glm/gtc/type_ptr.hpp>

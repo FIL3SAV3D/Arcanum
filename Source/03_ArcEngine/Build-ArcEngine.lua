@@ -17,7 +17,6 @@ project "ArcEngine"
         "../../Library/Assimp/include",
         "../../Library/asio-1.34.2/include",
         "../../Library/GLAD/include",
-        "../../Library/GLFW/include",
         "../../Library/std_image",
         "../../Library/SDL/include",
         "../../Library/fmt/include",
@@ -36,11 +35,7 @@ project "ArcEngine"
 
     links
     {
-        -- Engine hierarchy links from top to bottom (Both)
-        -- None
-
         -- Library links
-        "../../Library/GLFW/lib-vc2022/glfw3.lib",
         "../../Library/SDL/lib/SDL3.lib",
         "../../Library/SLANG-2026.2.2/lib/slang.lib",
 
@@ -83,8 +78,16 @@ project "ArcEngine"
         "../../Library/Assimp/lib/assimp-vc143-mt.lib",
         "../../Library/Assimp/lib/zlibstatic.lib"
         }
+
     filter "configurations:Dist"
        defines { "DIST" }
        runtime "Release"
        optimize "On"
        symbols "Off"
+
+       links 
+       { 
+        "../../Library/fmt/lib/fmt.lib",
+        "../../Library/Assimp/lib/assimp-vc143-mt.lib",
+        "../../Library/Assimp/lib/zlibstatic.lib"
+        }

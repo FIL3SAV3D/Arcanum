@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Net/NetCommon.h>
+#include <ArcEngine/Network/Net/NetCommon.h>
 
 namespace arc
 {

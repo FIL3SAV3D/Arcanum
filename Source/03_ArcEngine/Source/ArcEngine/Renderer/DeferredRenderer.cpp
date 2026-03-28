@@ -1,6 +1,4 @@
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include "DeferredRenderer.h"
 
 #include "ArcEngine/Platform/Window.h"

@@ -67,8 +67,8 @@ void ArcEngine::OpenGLGraphics::Create(const Window& _Window)
     }
 
     blinn = std::make_unique<Shader>(
-        "D:\\PersonalProjects\\Arcanum\\Source\\RES_Shaders\\ShadersOpenGL\\Source\\Shaders\\blinnPhong.vert",
-        "D:\\PersonalProjects\\Arcanum\\Source\\RES_Shaders\\ShadersOpenGL\\Source\\Shaders\\blinnPhong.frag"
+        "F:\\PersonalProjects\\Arcanum\\Source\\RES_Shaders\\ShadersOpenGL\\Source\\Shaders\\blinnPhong.vert",
+        "F:\\PersonalProjects\\Arcanum\\Source\\RES_Shaders\\ShadersOpenGL\\Source\\Shaders\\blinnPhong.frag"
     );
 
     glGenBuffers(1, &cameraUBO);

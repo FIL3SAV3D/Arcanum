@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Net/NetCommon.h>
-#include <Net/NetMessage.h>
-#include <Net/NetThreadSafeQueue.h>
+#include <ArcEngine/Network/Net/NetCommon.h>
+#include <ArcEngine/Network/Net/NetMessage.h>
+#include <ArcEngine/Network/Net/NetThreadSafeQueue.h>
 
 namespace arc
 {

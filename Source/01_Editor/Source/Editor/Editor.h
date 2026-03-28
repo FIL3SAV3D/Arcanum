@@ -19,6 +19,7 @@ public:
     bool IsQuitting();
 
 private:
+    bool isPlaying = false;
     std::shared_ptr<Game> m_Game = nullptr;
     std::shared_ptr<Framework> m_Framework;
 };

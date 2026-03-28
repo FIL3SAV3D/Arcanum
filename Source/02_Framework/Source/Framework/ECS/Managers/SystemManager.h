@@ -39,6 +39,13 @@ public:
 		return system;
 	}
 
+	template<typename T>
+	void UnregisterSystem()
+	{
+		const char* typeName = typeid(T).name();
+		mSystems.erase(typeName);
+	}
+
 	void RecalculateUpdateOrder()
 	{
 		mSystemsUpdateOrder.clear();

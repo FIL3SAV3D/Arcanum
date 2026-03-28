@@ -1,6 +1,5 @@
 #include "Camera.h"
 
-#include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL

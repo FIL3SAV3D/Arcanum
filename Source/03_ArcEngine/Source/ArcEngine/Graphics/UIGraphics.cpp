@@ -80,8 +80,6 @@ void ArcEngine::UIGraphics::FrameStart(const Window& _Window)
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
-
-    ImGui::ShowDemoWindow();
 }
 
 void ArcEngine::UIGraphics::FrameEnd(const Window& _Window)

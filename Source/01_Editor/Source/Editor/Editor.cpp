@@ -3,20 +3,26 @@
 #include <Framework/Framework.h>
 #include <Game/Game.h>
 
+#include "Modes/EditorMode.h"
+
 void Editor::Create()
 {
     m_Framework = std::make_shared<Framework>();
     m_Framework->Create();
 
+    m_Framework->RegisterMode<EditorMode>("Editor");
+
     m_Game = std::make_unique<Game>();
     m_Game->SetFramework(m_Framework);
-    m_Game->Create();
-    m_Game->OnEnter();
 }
 
 void Editor::Run()
 {
-    m_Game->Run();
+    if (isPlaying)
+    {
+        m_Game->Run();
+    }
+    m_Framework->Run();
 }
 
 bool Editor::IsQuitting()

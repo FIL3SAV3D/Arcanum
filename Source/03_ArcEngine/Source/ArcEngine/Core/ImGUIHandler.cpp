@@ -1,7 +1,6 @@
 #include "ImGUIHandler.h"
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -155,13 +154,13 @@ void ImGUIHandler::Update()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	// Imgui end render
 
-	if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		GLFWwindow* backup_current_context = glfwGetCurrentContext();
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-		glfwMakeContextCurrent(backup_current_context);
-	}
+	//if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	//{
+	//	GLFWwindow* backup_current_context = glfwGetCurrentContext();
+	//	ImGui::UpdatePlatformWindows();
+	//	ImGui::RenderPlatformWindowsDefault();
+	//	glfwMakeContextCurrent(backup_current_context);
+	//}
 }
 
 void ImGUIHandler::ShowExampleAppDockSpace(bool* p_open)

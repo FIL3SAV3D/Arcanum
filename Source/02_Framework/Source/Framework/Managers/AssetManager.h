@@ -27,7 +27,6 @@ public:
     void CreateFactories();
     void DestroyFactories();
 
-
     void CreateAsset(const std::filesystem::path& _AssetPath);
     void DestroyAsset();
 
@@ -51,7 +50,6 @@ private:
     void ProcessMesh(aiMesh* _mesh, const aiScene* _scene);
 
 private:
-
     std::string m_AssetFolderFilePath{};
     std::string m_SerializedAssetFolderFilePath{};
 
