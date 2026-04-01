@@ -33,5 +33,4 @@ void TemplateMode01::RegisterSystems(std::shared_ptr<Coordinator> _Coordinator)
 
 void TemplateMode01::UnregisterSystems(std::shared_ptr<Coordinator> _Coordinator)
 {
-	_Coordinator->re
 }

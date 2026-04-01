@@ -1,0 +1,2 @@
+- [ ] Switch to a Component-Based Architecture
+- [ ] Add command based replication

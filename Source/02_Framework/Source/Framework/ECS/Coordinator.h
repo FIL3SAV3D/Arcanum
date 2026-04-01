@@ -95,7 +95,7 @@ public:
     template<typename T>
     void UnregisterSystem()
     {
-        return m_SystemManager.unreg<T>();
+        return m_SystemManager.UnregisterSystem<T>();
     }
 
     template<typename T>
