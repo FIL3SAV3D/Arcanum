@@ -19,35 +19,13 @@ private:
     mutable bool transformDirty = true;
 
 public:
-    void SetPosition(const glm::vec3& pos) {
-        position = pos;
-        transformDirty = true;
-    }
+    void SetPosition(const glm::vec3& pos);
+    void SetRotation(const glm::quat& rot);
+    void SetScale   (const glm::vec3& s);
 
-    void SetRotation(const glm::quat& rot) {
-        rotation = rot;
-        transformDirty = true;
-    }
+    const glm::vec3& GetPosition() const;
+    const glm::quat& GetRotation() const;
+    const glm::vec3& GetScale()    const;
 
-    void SetScale(const glm::vec3& s) {
-        scale = s;
-        transformDirty = true;
-    }
-
-    const glm::vec3& GetPosition() const { return position; }
-    const glm::quat& GetRotation() const { return rotation; }
-    const glm::vec3& GetScale() const { return scale; }
-
-    glm::mat4 GetTransformMatrix() const {
-        if (transformDirty) {
-            // Calculate transformation matrix
-            glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), position);
-            glm::mat4 rotationMatrix = glm::mat4_cast(rotation);
-            glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scale);
-
-            transformMatrix = translationMatrix * rotationMatrix * scaleMatrix;
-            transformDirty = false;
-        }
-        return transformMatrix;
-    }
+    glm::mat4 GetTransformMatrix() const;
 };

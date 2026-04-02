@@ -11,7 +11,9 @@ class Entity
 private:
     std::string name = {};
     bool active = true;
+
     std::vector<std::unique_ptr<Component>> components;
+    std::unordered_map<size_t, Component*> componentMap;
 
 public:
     explicit Entity(const std::string& entityName) : name(entityName) {};
@@ -46,30 +48,45 @@ public:
     T* AddComponent(Args&&... args) {
         static_assert(std::is_base_of<Component, T>::value, "T must derive from Component");
 
+        size_t typeID = Component::GetTypeID<T>();
+
+        // Check if component of this type already exists
+        auto it = componentMap.find(typeID);
+        if (it != componentMap.end()) {
+            return static_cast<T*>(it->second);
+        }
+
         // Create new component
         auto component = std::make_unique<T>(std::forward<Args>(args)...);
         T* componentPtr = component.get();
-        componentPtr->SetOwner(this);
+        componentMap[typeID] = componentPtr;
         components.push_back(std::move(component));
         return componentPtr;
     }
 
     template<typename T>
     T* GetComponent() {
-        for (auto& component : components) {
-            if (T* result = dynamic_cast<T*>(component.get())) {
-                return result;
-            }
+        size_t typeID = Component::GetTypeID<T>();
+        auto it = componentMap.find(typeID);
+        if (it != componentMap.end()) {
+            return static_cast<T*>(it->second);
         }
         return nullptr;
     }
 
     template<typename T>
     bool RemoveComponent() {
-        for (auto it = components.begin(); it != components.end(); ++it) {
-            if (dynamic_cast<T*>(it->get())) {
-                components.erase(it);
-                return true;
+        size_t typeID = Component::GetTypeID<T>();
+        auto it = componentMap.find(typeID);
+        if (it != componentMap.end()) {
+            Component* componentPtr = it->second;
+            componentMap.erase(it);
+
+            for (auto compIt = components.begin(); compIt != components.end(); ++compIt) {
+                if (compIt->get() == componentPtr) {
+                    components.erase(compIt);
+                    return true;
+                }
             }
         }
         return false;

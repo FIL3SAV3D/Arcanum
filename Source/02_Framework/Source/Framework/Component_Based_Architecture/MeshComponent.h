@@ -31,8 +31,8 @@ public:
         if (!transform) return;
 
         // Render mesh with material and transform
-        material->Bind();
-        material->SetUniform("modelMatrix", transform->GetTransformMatrix());
-        mesh->Render();
+        //material->Bind();
+        //material->SetUniform("modelMatrix", transform->GetTransformMatrix());
+        //mesh->Render();
     }
 };
