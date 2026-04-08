@@ -15,6 +15,11 @@ namespace ArcEngine
     private:
         vk::raii::Context context;
         vk::raii::Instance instance = nullptr;
+        vk::raii::DebugUtilsMessengerEXT debugMessenger = nullptr;
+
+        const std::vector<char const*> validationLayers = {
+            "VK_LAYER_KHRONOS_validation"
+        };
 
     public:
         void Run();
@@ -40,5 +45,19 @@ namespace ArcEngine
         void cleanup();
 
         void createInstance();
+
+        void setupDebugMessenger();
+
+        std::vector<const char*> getRequiredInstanceExtensions();
+
+        static VKAPI_ATTR vk::Bool32 VKAPI_CALL debugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT      severity,
+                                                              vk::DebugUtilsMessageTypeFlagsEXT             type,
+                                                              const vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                                                              void*                                         pUserData)
+        {
+            std::cerr << "validation layer: type " << to_string(type) << " msg: " << pCallbackData->pMessage << std::endl;
+
+            return vk::False;
+        }
     };
 }
