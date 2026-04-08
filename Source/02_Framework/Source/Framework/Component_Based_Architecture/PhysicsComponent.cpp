@@ -3,7 +3,7 @@
 #include "Framework/Component_Based_Architecture/CollisionEvent.h"
 #include "Framework/Component_Based_Architecture/EventSystem.h"
 
-void PhysicsComponent::Initialize() {
+void PhysicsComponent::OnInitialize() {
     // Register as event listener
     GetEventSystem().AddListener(this);
 }

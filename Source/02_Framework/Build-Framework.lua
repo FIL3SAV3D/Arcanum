@@ -22,6 +22,7 @@ project "Framework"
 
         -- Resource includes
         "../RES_ThirdParty/DearImGUI",
+        "$(VULKAN_SDK)/include",
     }
 
     links

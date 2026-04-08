@@ -13,9 +13,9 @@ private:
     float nearPlane = 0.1f;
     float farPlane = 1000.0f;
 
-    glm::mat4 viewMatrix = glm::mat4(1.0f);
-    glm::mat4 projectionMatrix = glm::mat4(1.0f);
-    bool projectionDirty = true;
+    mutable glm::mat4 viewMatrix = glm::mat4(1.0f);
+    mutable glm::mat4 projectionMatrix = glm::mat4(1.0f);
+    mutable bool projectionDirty = true;
 
 public:
     void SetPerspective(float fov, float aspect, float near, float far);

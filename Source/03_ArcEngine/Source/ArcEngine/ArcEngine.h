@@ -16,6 +16,8 @@ public:
     void Create();
     void Destroy();
 
+    void Run();
+
     void UpdateCameraData(const glm::vec4& _Position, const glm::mat4& _View, const glm::mat4& _Projection);
 
     void RenderMesh(std::shared_ptr<Model> _Model, const glm::mat4x4& _ObjectToWorld);

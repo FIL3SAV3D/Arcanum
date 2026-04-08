@@ -5,22 +5,19 @@
 
 #include <string>
 #include "Debug/ShaderReflectionHelper.h"
-#include "ArcEngine/Graphics/Vulkan-1.4/vkShaderParameterBuilder.h"
-
-#include <ArcEngine/Graphics/Vulkan-1.4/vulkan-api.h>
 
 class ShaderReflection
 {
 public:
-    void CreateSession();
-    void CreateShader(VulkanAPI& api, const char* _ShaderName);
-
-private:
-    VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
-    VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
-    VkPipeline pipeline = VK_NULL_HANDLE;
-
-    ShaderReflectionHelper helper;
-    ShaderParameterBuilder builder;
-    Slang::ComPtr<slang::IGlobalSession> globalSession;
+//    void CreateSession();
+//    void CreateShader(VulkanAPI& api, const char* _ShaderName);
+//
+//private:
+//    VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
+//    VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
+//    VkPipeline pipeline = VK_NULL_HANDLE;
+//
+//    ShaderReflectionHelper helper;
+//    ShaderParameterBuilder builder;
+//    Slang::ComPtr<slang::IGlobalSession> globalSession;
 };

@@ -3,19 +3,19 @@
 void Engine::Engine::Create()
 {
     ArcEngine::WindowSpecification specs;
-    specs.graphicsAPI = ArcEngine::OPENGL;
+    specs.graphicsAPI = ArcEngine::VULKAN;
     specs.windowName = "test";
     specs.windowSize = glm::uvec2(1920, 1080);
     m_Window.Create(specs);
 
-    m_Graphics.Create(ArcEngine::Graphics::OPENGL, m_Window);
+    m_Graphics.Create(ArcEngine::Graphics::VULKAN, m_Window);
 
-    m_UIGraphics.Create(ArcEngine::Graphics::OPENGL, m_Window);
+    //m_UIGraphics.Create(ArcEngine::Graphics::VULKAN, m_Window);
 }
 
 void Engine::Engine::Destroy()
 {
-    m_UIGraphics.Destroy(m_Window);
+    //m_UIGraphics.Destroy(m_Window);
 
     m_Graphics.Destroy();
 

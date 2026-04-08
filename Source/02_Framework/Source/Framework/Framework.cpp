@@ -103,7 +103,7 @@ void Framework::HandleInput()
 
         coordinator->OnInput(inputState);
 
-        ImGui_ImplSDL3_ProcessEvent(&event);
+        //ImGui_ImplSDL3_ProcessEvent(&event);
     }
 }
 
@@ -130,11 +130,11 @@ void Framework::HandleRender()
     coordinator->OnRender(renderState);
 
     { // UI Rendering
-        arcEngine->RenderUIStart();
+        //arcEngine->RenderUIStart();
 
-        coordinator->OnRenderUI(renderState);
+        //coordinator->OnRenderUI(renderState);
 
-        arcEngine->RenderUIEnd();
+        //arcEngine->RenderUIEnd();
     } // UI Rendering
 
     coordinator->OnRenderEnd(renderState);

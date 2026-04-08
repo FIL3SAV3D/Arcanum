@@ -7,7 +7,7 @@ class EventSystem;
 
 class PhysicsComponent : public Component, public EventListener {
 public:
-    void Initialize() override;
+    void OnInitialize() override;
 
     ~PhysicsComponent() override;
 

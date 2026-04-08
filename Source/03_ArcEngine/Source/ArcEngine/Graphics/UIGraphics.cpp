@@ -39,7 +39,14 @@ void ArcEngine::UIGraphics::Create(const Graphics::GraphicsAPI _GraphicsAPI, con
     }
     case(Graphics::VULKAN):
     {
-        assert(false && "not yet implemented");
+        ImGui_ImplSDL3_InitForVulkan(_Window.GetNativeWindow());
+
+        ImGui_ImplVulkan_InitInfo info{};
+        info.Allocator = nullptr;
+        info.ApiVersion = VK_API_VERSION_1_4;
+
+        ImGui_ImplVulkan_Init(&info);
+        //assert(false && "not yet implemented");
         break;
     }
     default:

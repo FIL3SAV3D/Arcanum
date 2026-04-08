@@ -1,139 +1,44 @@
 #pragma once
 
+#define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
+#include <vulkan/vulkan_raii.hpp>
+
+#include <iostream>
+#include <stdexcept>
+#include <cstdlib>
+
 #include "ArcEngine/Graphics/Interface/IGraphics.h"
-
-#include "ArcEngine/Graphics/Vulkan-1.4/VulkanSwapchain.h"
-#include <ArcEngine/Platform/Window.h>
-
-#include "vk_descriptors.h"
-#include <ArcEngine/Graphics/ShaderReflection.h>
 
 namespace ArcEngine
 {
-	constexpr unsigned int FRAME_OVERLAP = 2;
+    class VulkanGraphics : public IGraphics {
+    private:
+        vk::raii::Context context;
+        vk::raii::Instance instance = nullptr;
 
-	struct DeletionQueue
-	{
-		std::deque<std::function<void()>> deletors;
-
-		void push_function(std::function<void()>&& function) {
-			deletors.push_back(function);
-		}
-
-		void flush() {
-			// reverse iterate the deletion queue to execute all the functions
-			for (auto it = deletors.rbegin(); it != deletors.rend(); it++) {
-				(*it)(); //call functors
-			}
-
-			deletors.clear();
-		}
-	};
-
-	struct FrameData
-	{
-		VkSemaphore _swapchainSemaphore;
-		VkSemaphore _renderSemaphore;
-
-		VkFence _renderFence;
-
-		VkCommandPool _commandPool;
-		VkCommandBuffer _mainCommandBuffer;
-
-		DeletionQueue _deletionQueue;
-	};
-
-	struct AllocatedImage 
-	{
-		VkImage image;
-		VkImageView imageView;
-		VmaAllocation allocation;
-		VkExtent3D imageExtent;
-		VkFormat imageFormat;
-	};
-
-    class VulkanGraphics : public IGraphics
-    {
     public:
-		void Testing();
-		void TestingRender();
+        void Run();
 
-		void UpdateCameraData(const glm::vec4& _Position, const glm::mat4& _View, const glm::mat4& _Projection) override;
-
+        // Inherited via IGraphics
         void Create(const Window& _Window) override;
         void Destroy() override;
-
-		void FrameStart(const Window& _Window) override;
-		void FrameEnd(const Window& _Window) override;
-
-		void Resize(const glm::uvec2& _Size) override;
-
+        void Resize(const glm::uvec2& _Size) override;
+        void UpdateCameraData(const glm::vec4& _Position, const glm::mat4& _View, const glm::mat4& _Projection) override;
+        void FrameStart(const Window& _Window) override;
+        void FrameEnd(const Window& _Window) override;
         void Blit() override;
         void RenderMesh(std::shared_ptr<Model> _Model, const glm::mat4x4& _ObjectToWorld) override;
-		void draw_background(VkCommandBuffer cmd);
         void RenderMeshInstanced() override;
         void RenderMeshIndirect() override;
 
-		void immediate_submit(std::function<void(VkCommandBuffer cmd)>&& function);
-
-	private:
-		void init_descriptors();
-		void init_pipelines();
-		void init_background_pipelines();
-
-		void init_imgui(std::shared_ptr<Window> _window);
-
-		void draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView);
 
     private:
-		// Testing Vars
-		VulkanAPI vkApi;
-		ShaderReflection shaderReflectionManager;
+        void initVulkan();
 
-	private:
-		int _frameNumber{ 0 };
-		bool stop_rendering{ false };
+        void mainLoop();
 
-		DescriptorAllocator globalDescriptorAllocator;
+        void cleanup();
 
-		VkDescriptorSet _drawImageDescriptors;
-		VkDescriptorSetLayout _drawImageDescriptorLayout;
-
-		FrameData& get_current_frame() { return _frames[_frameNumber % FRAME_OVERLAP]; }
-
-		FrameData _frames[FRAME_OVERLAP];
-
-        VulkanSwapchain swapchain;
-
-        AllocatedImage _drawImage;
-        VkExtent2D _drawExtent;
-
-        VmaAllocator _allocator;
-
-        VkInstance _instance;// Vulkan library handle
-        VkDebugUtilsMessengerEXT _debug_messenger;// Vulkan debug output handle
-        VkPhysicalDevice _chosenGPU;// GPU chosen as the default device
-        VkDevice _device; // Vulkan device for commands
-        VkSurfaceKHR _surface;// Vulkan window surface
-
-		VkQueue _graphicsQueue;
-		uint32_t _graphicsQueueFamily;
-
-		DeletionQueue _mainDeletionQueue;
-
-		uint32_t swapchainImageIndex;
-
-
-		// immediate submit structures
-		VkFence _immFence;
-		VkCommandBuffer _immCommandBuffer;
-		VkCommandPool _immCommandPool;
-
-
-		VkPipeline _gradientPipeline;
-		VkPipelineLayout _gradientPipelineLayout;
-
-	private:
-		std::vector<VkPipeline> pipelines;
+        void createInstance();
     };
 }

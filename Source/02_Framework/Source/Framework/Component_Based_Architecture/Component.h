@@ -20,7 +20,8 @@ private:
     Entity* owner = nullptr;
 
 public:
-    virtual ~Component() = default;
+    Component() = default;
+    ~Component();
 
     template<typename T>
     static size_t GetTypeID() {
@@ -31,7 +32,7 @@ public:
 
     void Destroy();
 
-    bool IsActive() const { return state == State::Active; }
+    bool IsActive() const;
 
     void SetOwner(Entity* entity);
     Entity* GetOwner() const;
