@@ -15,11 +15,14 @@ namespace ArcEngine
     private:
         vk::raii::Context context;
         vk::raii::Instance instance = nullptr;
+        vk::raii::PhysicalDevice physicalDevice = nullptr;
         vk::raii::DebugUtilsMessengerEXT debugMessenger = nullptr;
 
         const std::vector<char const*> validationLayers = {
             "VK_LAYER_KHRONOS_validation"
         };
+
+        std::vector<const char*> requiredDeviceExtension = { vk::KHRSwapchainExtensionName };
 
     public:
         void Run();
@@ -47,6 +50,10 @@ namespace ArcEngine
         void createInstance();
 
         void setupDebugMessenger();
+
+        void pickPhysicalDevice();
+
+        bool isDeviceSuitable(vk::raii::PhysicalDevice const& physicalDevice);
 
         std::vector<const char*> getRequiredInstanceExtensions();
 
