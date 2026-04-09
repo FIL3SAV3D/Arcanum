@@ -55,6 +55,7 @@ void ArcEngine::VulkanGraphics::initVulkan() {
     createInstance();
     setupDebugMessenger();
     pickPhysicalDevice();
+    createLogicalDevice();
 }
 
 void ArcEngine::VulkanGraphics::mainLoop() {
@@ -65,8 +66,7 @@ void ArcEngine::VulkanGraphics::cleanup() {
 
 }
 
-void ArcEngine::VulkanGraphics::createInstance()
-{
+void ArcEngine::VulkanGraphics::createInstance() {
     constexpr vk::ApplicationInfo appInfo{.pApplicationName = "Hello Triangle",
                                           .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
                                           .pEngineName = "No Engine",
@@ -116,8 +116,7 @@ void ArcEngine::VulkanGraphics::createInstance()
     instance = vk::raii::Instance(context, createInfo);
 }
 
-void ArcEngine::VulkanGraphics::setupDebugMessenger()
-{
+void ArcEngine::VulkanGraphics::setupDebugMessenger() {
     if (!enableValidationLayers) return;
 
     vk::DebugUtilsMessageSeverityFlagsEXT severityFlags(vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
@@ -130,8 +129,7 @@ void ArcEngine::VulkanGraphics::setupDebugMessenger()
     debugMessenger = instance.createDebugUtilsMessengerEXT(debugUtilsMessengerCreateInfoEXT);
 }
 
-std::vector<const char*> ArcEngine::VulkanGraphics::getRequiredInstanceExtensions()
-{
+std::vector<const char*> ArcEngine::VulkanGraphics::getRequiredInstanceExtensions() {
     uint32_t SDLExtensionCount = 0;
     auto SDLExtensions = SDL_Vulkan_GetInstanceExtensions(&SDLExtensionCount);
 
@@ -144,8 +142,7 @@ std::vector<const char*> ArcEngine::VulkanGraphics::getRequiredInstanceExtension
     return extensions;
 }
 
-bool ArcEngine::VulkanGraphics::isDeviceSuitable(vk::raii::PhysicalDevice const& physicalDevice)
-{
+bool ArcEngine::VulkanGraphics::isDeviceSuitable(vk::raii::PhysicalDevice const& physicalDevice) {
     // Check if the physicalDevice supports the Vulkan 1.3 API version
     bool supportsVulkan1_3 = physicalDevice.getProperties().apiVersion >= vk::ApiVersion13;
 
@@ -175,8 +172,7 @@ bool ArcEngine::VulkanGraphics::isDeviceSuitable(vk::raii::PhysicalDevice const&
     return supportsVulkan1_3 && supportsGraphics && supportsAllRequiredExtensions && supportsRequiredFeatures;
 }
 
-void ArcEngine::VulkanGraphics::pickPhysicalDevice()
-{
+void ArcEngine::VulkanGraphics::pickPhysicalDevice() {
     std::vector<vk::raii::PhysicalDevice> physicalDevices = instance.enumeratePhysicalDevices();
     auto const devIter = std::ranges::find_if(physicalDevices, [&](auto const& physicalDevice) { return isDeviceSuitable(physicalDevice); });
     if (devIter == physicalDevices.end())
@@ -184,4 +180,8 @@ void ArcEngine::VulkanGraphics::pickPhysicalDevice()
         throw std::runtime_error("failed to find a suitable GPU!");
     }
     physicalDevice = *devIter;
+}
+
+void ArcEngine::VulkanGraphics::createLogicalDevice() {
+
 }

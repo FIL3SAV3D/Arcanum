@@ -16,6 +16,7 @@ namespace ArcEngine
         vk::raii::Context context;
         vk::raii::Instance instance = nullptr;
         vk::raii::PhysicalDevice physicalDevice = nullptr;
+        vk::raii::Device device = nullptr;
         vk::raii::DebugUtilsMessengerEXT debugMessenger = nullptr;
 
         const std::vector<char const*> validationLayers = {
@@ -52,6 +53,8 @@ namespace ArcEngine
         void setupDebugMessenger();
 
         void pickPhysicalDevice();
+
+        void createLogicalDevice();
 
         bool isDeviceSuitable(vk::raii::PhysicalDevice const& physicalDevice);
 
