@@ -9,6 +9,7 @@
 // std
 #include <stdexcept>
 #include <array>
+#include <filesystem>
 
 namespace arc
 {
@@ -64,11 +65,14 @@ namespace arc
 		pipeline_config.attributeDescriptions.clear();
 		pipeline_config.render_pass = _render_pass;
 		pipeline_config.pipeline_layout = pipeline_layout;
+
+		auto current_path = std::filesystem::current_path();
+
 		arc_pipeline = std::make_unique<arcPipeline>(
 			arc_device,
 			pipeline_config,
-			"E:/Arcanum/src/Shaders/compiled_shaders/InfGridShader.vert.spv",
-			"E:/Arcanum/src/Shaders/compiled_shaders/InfGridShader.frag.spv"
+			current_path.string() + "/src/Shaders/compiled_shaders/InfGridShader.vert.spv",
+			current_path.string() + "/src/Shaders/compiled_shaders/InfGridShader.frag.spv"
 		);
 	}
 

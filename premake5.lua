@@ -1,4 +1,5 @@
 vulkan_sdk = os.getenv("VULKAN_SDK")
+cwd = os.getcwd()
 
 cppdialect "c++20"
 language "C++"
@@ -33,15 +34,15 @@ workspace "Arcanum"
 
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
 		
-		links { "../Arcanum/Library/GLFW/lib-vc2022/glfw3.lib"}
+		links { "%{cwd}/Library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "ArcEngine" }
 
 
 		includedirs { "$(VULKAN_SDK)/include" }
-		includedirs { "../Arcanum/Library/GLFW/include" }
-		includedirs { "../Arcanum/Library/GLM" }
-		includedirs { "../Arcanum/src/ArcEngine" }
-		includedirs { "../Arcanum/src/Jolt" }
+		includedirs { "%{cwd}/Library/GLFW/include" }
+		includedirs { "%{cwd}/Library/GLM" }
+		includedirs { "%{cwd}/src/ArcEngine" }
+		includedirs { "%{cwd}/src/Jolt" }
 
 
 	project "ArcEngine"
@@ -57,17 +58,17 @@ workspace "Arcanum"
 		
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
 		
-		links { "../Arcanum/Library/GLFW/lib-vc2022/glfw3.lib"}
+		links { "%{cwd}/Library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "Jolt" }
 
 		
 		includedirs { "$(VULKAN_SDK)/include" }
-		includedirs { "../Arcanum/Library/GLFW/include" }
-		includedirs { "../Arcanum/Library/GLM" }
-		includedirs { "../Arcanum/Library/TinyGLTF" }
-		includedirs { "../Arcanum/Library/TinyObj" }
-		includedirs { "../Arcanum/src/ArcEngine" }
-		includedirs { "../Arcanum/src/Jolt" }
+		includedirs { "%{cwd}/Library/GLFW/include" }
+		includedirs { "%{cwd}/Library/GLM" }
+		includedirs { "%{cwd}/Library/TinyGLTF" }
+		includedirs { "%{cwd}/Library/TinyObj" }
+		includedirs { "%{cwd}/src/ArcEngine" }
+		includedirs { "%{cwd}/src/Jolt" }
 
 	project "Jolt"
 		kind "StaticLib"
@@ -79,7 +80,7 @@ workspace "Arcanum"
 			"src/Jolt/**.hpp"
 		}
 
-		includedirs { "../Arcanum/src/Jolt" }
+		includedirs { "%{cwd}/src/Jolt" }
 
 	project "Shaders"
 		kind "Utility"
