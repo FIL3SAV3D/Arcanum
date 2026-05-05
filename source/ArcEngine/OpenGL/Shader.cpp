@@ -62,8 +62,11 @@ void Shader::setMatrix4x4f(const std::string& _name, const glm::mat4x4& _value) 
 
 void Shader::CreateShader(const char* _vertexPath, const char* _fragmentPath)
 {
+	auto current_path = std::filesystem::current_path();
+
+
 	std::string shaderSearchPath;
-	shaderSearchPath.append("D:\\PersonalProjects\\Arcanum");
+	shaderSearchPath.append(current_path.string());
 	shaderSearchPath.append("\\source\\ArcEngine\\OpenGL\\Shaders\\");
 
 	std::string vertexCode;

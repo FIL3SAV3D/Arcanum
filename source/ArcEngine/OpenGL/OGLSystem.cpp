@@ -57,10 +57,12 @@ void OGLSystem::Run()
 
 	Shader skyboxShader("skybox.vert", "skybox.frag");
 
-	Model backpack = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
+	auto current_path = std::filesystem::current_path();
 
-	Model planet = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\planet.obj").c_str());
-	Model asteroid = Model(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\rock.obj").c_str());
+	Model backpack = Model(std::string(current_path.string() + "\\Data\\Models\\OpenGL\\Cube.fbx").c_str());
+
+	Model planet = Model(std::string(current_path.string() + "\\Data\\Models\\OpenGL\\planet.obj").c_str());
+	Model asteroid = Model(std::string(current_path.string() + "\\Data\\Models\\OpenGL\\rock.obj").c_str());
 
 	unsigned int amount = 100000;
 	glm::mat4* modelMatrices;
