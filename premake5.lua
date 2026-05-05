@@ -1,4 +1,5 @@
 vulkan_sdk = os.getenv("VULKAN_SDK")
+cwd = os.getcwd()
 
 cppdialect "c++20"
 language "C++"
@@ -41,31 +42,31 @@ workspace "Arcanum"
         }
 
 		filter {"configurations:Debug"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+			links { "%{cwd}/library/Assimp/lib/assimp-vc143-mtd.lib"}
 
 		filter {"configurations:Release"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mt.lib"}
+			links { "%{cwd}/library/Assimp/lib/assimp-vc143-mt.lib"}
 		
 		filter{}
 
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
 		
-		links { "../Arcanum/library/GLFW/lib-vc2022/glfw3.lib"}
+		links { "%{cwd}/library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "ArcEngine" }
 
 
 		includedirs { "$(VULKAN_SDK)/include" }
-		includedirs { "../Arcanum/library/GLFW/include" }
-		includedirs { "../Arcanum/library/GLM" }
-		includedirs { "../Arcanum/source/ArcEngine" }
-		includedirs { "../Arcanum/source/Jolt" }
-		includedirs { "../Arcanum/library/asio-1.34.2/include" }
-		includedirs { "../Arcanum/library/GLAD/include" }
-		includedirs { "../Arcanum/library/std_image" }
-		includedirs { "../Arcanum/library/Assimp/include" }
+		includedirs { "%{cwd}/library/GLFW/include" }
+		includedirs { "%{cwd}/library/GLM" }
+		includedirs { "%{cwd}/source/ArcEngine" }
+		includedirs { "%{cwd}/source/Jolt" }
+		includedirs { "%{cwd}/library/asio-1.34.2/include" }
+		includedirs { "%{cwd}/library/GLAD/include" }
+		includedirs { "%{cwd}/library/std_image" }
+		includedirs { "%{cwd}/library/Assimp/include" }
 
 		-- Submodules
-		includedirs { "../Arcanum/submodules/imgui" }
+		includedirs { "%{cwd}/submodules/imgui" }
 
 
 	project "ArcEngine"
@@ -91,32 +92,32 @@ workspace "Arcanum"
         }
 
 		filter {"configurations:Debug"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mtd.lib"}
+			links { "%{cwd}/library/Assimp/lib/assimp-vc143-mtd.lib"}
 
 		filter {"configurations:Release"}
-			links { "../Arcanum/library/Assimp/lib/assimp-vc143-mt.lib"}
+			links { "%{cwd}/library/Assimp/lib/assimp-vc143-mt.lib"}
 		
 		filter{}
 
 		links { "%{vulkan_sdk}/lib/vulkan-1.lib" }
-		links { "../Arcanum/library/GLFW/lib-vc2022/glfw3.lib"}
+		links { "%{cwd}/library/GLFW/lib-vc2022/glfw3.lib"}
 		links { "Jolt" }
 		
 		
 		includedirs { "$(VULKAN_SDK)/include" }
-		includedirs { "../Arcanum/library/GLFW/include" }
-		includedirs { "../Arcanum/library/GLM" }
-		includedirs { "../Arcanum/library/TinyGLTF" }
-		includedirs { "../Arcanum/library/TinyObj" }
-		includedirs { "../Arcanum/source/ArcEngine" }
-		includedirs { "../Arcanum/source/Jolt" }
-		includedirs { "../Arcanum/library/asio-1.34.2/include" }
-		includedirs { "../Arcanum/library/GLAD/include" }
-		includedirs { "../Arcanum/library/std_image" }
-		includedirs { "../Arcanum/library/Assimp/include" }
+		includedirs { "%{cwd}/library/GLFW/include" }
+		includedirs { "%{cwd}/library/GLM" }
+		includedirs { "%{cwd}/library/TinyGLTF" }
+		includedirs { "%{cwd}/library/TinyObj" }
+		includedirs { "%{cwd}/source/ArcEngine" }
+		includedirs { "%{cwd}/source/Jolt" }
+		includedirs { "%{cwd}/library/asio-1.34.2/include" }
+		includedirs { "%{cwd}/library/GLAD/include" }
+		includedirs { "%{cwd}/library/std_image" }
+		includedirs { "%{cwd}/library/Assimp/include" }
 
 		-- Submodules
-		includedirs { "../Arcanum/submodules/imgui" }
+		includedirs { "%{cwd}/submodules/imgui" }
 		
 	project "Jolt"
 		kind "StaticLib"
@@ -128,7 +129,8 @@ workspace "Arcanum"
 			"source/Jolt/**.hpp"
 		}
 
-		includedirs { "../Arcanum/source/Jolt" }
+		includedirs { "%{cwd}/source/Jolt" }
+		includedirs { "%{cwd}/source/Jolt/Jolt" }
 
 	project "ArcNetCommon"
 		kind "StaticLib"
@@ -140,8 +142,8 @@ workspace "Arcanum"
 			"source/ArcNetCommon/**.hpp"
 		}
 		
-		includedirs { "../Arcanum/source/ArcNetCommon" }
-		includedirs { "../Arcanum/library/asio-1.34.2/include" }
+		includedirs { "%{cwd}/source/ArcNetCommon" }
+		includedirs { "%{cwd}/library/asio-1.34.2/include" }
 		
 	project "Shaders"
 		kind "Utility"
