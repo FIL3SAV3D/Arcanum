@@ -13,6 +13,8 @@
 #include "Model.h"
 #include "HDRCubemap.h"
 
+#include <filesystem>
+
 #include <glm/gtc/matrix_transform.hpp>
 
 void DeferredRenderer::Initialize(const glm::vec2& _size)
@@ -62,18 +64,20 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 	m_postProcessChain = std::make_shared<DeferredPostProcessChain>();
 	m_postProcessChain->Create(m_gBuffer);
 
-	m_RatModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
-	m_cubeModel = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Source\\ArcEngine\\Models\\obj_models\\cube.obj").c_str());
+	auto currentPath = std::filesystem::current_path();
 
-	m_invertedCube = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\InvertedCube.fbx").c_str());
+	m_RatModel = std::make_shared<Model>(std::string(currentPath.string() + "\\Data\\Models\\GLB_Models\\Rat.glb").c_str());
+	m_cubeModel = std::make_shared<Model>(std::string(currentPath.string() + "\\Source\\ArcEngine\\Models\\obj_models\\cube.obj").c_str());
 
-	m_ratHat = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\Ratsmas_Hat.fbx").c_str());
+	m_invertedCube = std::make_shared<Model>(std::string(currentPath.string() + "\\Data\\Models\\OpenGL\\InvertedCube.fbx").c_str());
+
+	m_ratHat = std::make_shared<Model>(std::string(currentPath.string() + "\\Data\\Models\\OpenGL\\Ratsmas_Hat.fbx").c_str());
 
 
-	m_plane = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\plane.fbx").c_str());
+	m_plane = std::make_shared<Model>(std::string(currentPath.string() + "\\Data\\Models\\OpenGL\\plane.fbx").c_str());
 
-	m_deccerCubes = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\SM_Deccer_Cubes.fbx").c_str());
-	m_deccerCubesTex = std::make_shared<Model>(std::string("D:\\PersonalProjects\\Arcanum\\Data\\Models\\OpenGL\\SM_Deccer_Cubes_Textured.fbx").c_str());
+	m_deccerCubes = std::make_shared<Model>(std::string(currentPath.string() + "\\Data\\Models\\OpenGL\\SM_Deccer_Cubes.fbx").c_str());
+	m_deccerCubesTex = std::make_shared<Model>(std::string(currentPath.string() + "\\Data\\Models\\OpenGL\\SM_Deccer_Cubes_Textured.fbx").c_str());
 
 	
 	
@@ -172,15 +176,15 @@ void DeferredRenderer::Initialize(const glm::vec2& _size)
 	lightPositions.push_back(glm::vec3(0.0f, 10.0f, 0.0f));
 	lightColors.push_back(glm::vec3(1.0f, 1.0f, 1.0f));
 
-	BC = TextureFromFile("T_Rat_BC.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
-	N = TextureFromFile("T_Rat_N.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
-	ORM = TextureFromFile("T_Rat_ORM.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
+	BC = TextureFromFile("T_Rat_BC.png", currentPath.string() + "\\Data\\Models\\Src_Images\\");
+	N = TextureFromFile("T_Rat_N.png", currentPath.string() + "\\Data\\Models\\Src_Images\\");
+	ORM = TextureFromFile("T_Rat_ORM.png", currentPath.string() + "\\Data\\Models\\Src_Images\\");
 
-	BC_HOUSE = TextureFromFile("american_house_DIFF.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
-	ORM_HOUSE = TextureFromFile("T_Rat_ORM.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
+	BC_HOUSE = TextureFromFile("american_house_DIFF.png", currentPath.string() + "\\Data\\Models\\Src_Images\\");
+	ORM_HOUSE = TextureFromFile("T_Rat_ORM.png", currentPath.string() + "\\Data\\Models\\Src_Images\\");
 
 
-	N_HOUSE = TextureFromFile("T_Ratsmashat_BC.png", "D:\\PersonalProjects\\Arcanum\\Data\\Models\\Src_Images\\");
+	N_HOUSE = TextureFromFile("T_Ratsmashat_BC.png", currentPath.string() + "\\Data\\Models\\Src_Images\\");
 
 	srand(10);
 	for (unsigned int i = 0; i < NR_OF_RATS; i++)

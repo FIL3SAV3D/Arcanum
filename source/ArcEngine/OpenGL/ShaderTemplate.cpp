@@ -66,15 +66,14 @@ void ShaderTemplate::CreateShader(const char* _vertexShaderPath, const char* _fr
 {
 	std::string directory;
 	std::string currentPath = std::filesystem::current_path().string();
-	const size_t last_slash_idx = currentPath.rfind('\\');
-	if (std::string::npos != last_slash_idx)
-	{
-		directory = currentPath.substr(0, last_slash_idx);
-	}
+	//const size_t last_slash_idx = currentPath.rfind('\\');
+	//if (std::string::npos != last_slash_idx)
+	//{
+	//	directory = currentPath.substr(0, last_slash_idx);
+	//}
 
 	std::string shaderSearchPath;
-	shaderSearchPath.append("D:\\PersonalProjects");
-	shaderSearchPath.append("\\Arcanum");
+	shaderSearchPath.append(currentPath);
 	shaderSearchPath.append("\\source\\ArcEngine\\OpenGL\\Shaders\\");
 
 	ID = glCreateProgram();
